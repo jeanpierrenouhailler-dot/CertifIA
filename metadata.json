@@ -1,0 +1,6 @@
+{
+  "name": "CertifAI • AI Cloud Exam Prep",
+  "description": "Plateforme de préparation certifiante et télémétrie cognitive pour examens Cloud IA (Azure AI-102, AWS AIF-C01, Google Cloud PMLE, IBM watsonx).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

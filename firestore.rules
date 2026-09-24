@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Validation primitives
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Entity validation functions
+    function isValidUserProfile(data, userId) {
+      return data.userId == request.auth.uid &&
+             data.userId == userId &&
+             data.email is string && data.email.size() <= 256 &&
+             data.displayName is string && data.displayName.size() <= 120 &&
+             (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 1024)) &&
+             data.targetExam is string && data.targetExam.size() <= 64 &&
+             (!('targetExamTitle' in data) || (data.targetExamTitle is string && data.targetExamTitle.size() <= 120)) &&
+             (!('streakDays' in data) || (data.streakDays is number && data.streakDays >= 0)) &&
+             (!('questionsSolved' in data) || (data.questionsSolved is number && data.questionsSolved >= 0)) &&
+             (!('averageScore' in data) || (data.averageScore is number && data.averageScore >= 0 && data.averageScore <= 100)) &&
+             (!('readinessIndex' in data) || (data.readinessIndex is number && data.readinessIndex >= 0 && data.readinessIndex <= 100)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
+    }
+
+    function isValidExamAttempt(data, userId) {
+      return data.userId == request.auth.uid &&
+             data.userId == userId &&
+             data.id is string && data.id.size() <= 128 &&
+             data.examCode is string && data.examCode.size() <= 32 &&
+             (!('examTitle' in data) || (data.examTitle is string && data.examTitle.size() <= 128)) &&
+             data.score is number && data.score >= 0 &&
+             (!('maxScore' in data) || (data.maxScore is number && data.maxScore > 0)) &&
+             data.passed is bool &&
+             (!('duration' in data) || (data.duration is string && data.duration.size() <= 32)) &&
+             (!('weakPoint' in data) || (data.weakPoint is string && data.weakPoint.size() <= 128)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64));
+    }
+
+    function isValidFlashcardReview(data, userId) {
+      return data.userId == request.auth.uid &&
+             data.userId == userId &&
+             data.id is string && data.id.size() <= 128 &&
+             data.cardId is string && data.cardId.size() <= 64 &&
+             data.rating is string && data.rating.size() <= 32 &&
+             (!('intervalDays' in data) || (data.intervalDays is number && data.intervalDays >= 0)) &&
+             (!('reviewedAt' in data) || (data.reviewedAt is string && data.reviewedAt.size() <= 64));
+    }
+
+    // Connection testing doc
+    match /test/connection {
+      allow get: if true;
+    }
+
+    // User profile documents - Strict PII protection
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUserProfile(incoming(), userId);
+      allow update: if isOwner(userId) && isValidUserProfile(incoming(), userId) && incoming().userId == existing().userId;
+      allow delete: if false;
+
+      // Subcollection: Exam attempts
+      match /attempts/{attemptId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(attemptId) && isValidExamAttempt(incoming(), userId);
+        allow update, delete: if false;
+      }
+
+      // Subcollection: Flashcard spaced repetition reviews
+      match /reviews/{reviewId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(reviewId) && isValidFlashcardReview(incoming(), userId);
+        allow update, delete: if false;
+      }
+    }
+  }
+}

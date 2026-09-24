@@ -1,0 +1,174 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with personal certification goals and cloud learning telemetry",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the authenticated user",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Full display name of the user",
+          "maxLength": 120
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Profile picture URL",
+          "maxLength": 1024
+        },
+        "targetExam": {
+          "type": "string",
+          "description": "Identifier of the target certification (e.g. ai102, aifc01)",
+          "maxLength": 64
+        },
+        "targetExamTitle": {
+          "type": "string",
+          "description": "Human-readable title of the active certification",
+          "maxLength": 120
+        },
+        "streakDays": {
+          "type": "number",
+          "description": "Consecutive days of study"
+        },
+        "questionsSolved": {
+          "type": "number",
+          "description": "Total number of exam/quiz questions answered"
+        },
+        "averageScore": {
+          "type": "number",
+          "description": "Average score percentage across simulations"
+        },
+        "readinessIndex": {
+          "type": "number",
+          "description": "Calculated exam readiness percentage"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of account creation",
+          "maxLength": 64
+        }
+      },
+      "required": ["userId", "email", "displayName", "targetExam"]
+    },
+    "ExamAttempt": {
+      "title": "ExamAttempt",
+      "description": "Historical record of an exam or quiz attempt completed by the user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the attempt",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the user who completed the attempt",
+          "maxLength": 128
+        },
+        "examCode": {
+          "type": "string",
+          "description": "Code of the certification (e.g. AI-102, AIF-C01)",
+          "maxLength": 32
+        },
+        "examTitle": {
+          "type": "string",
+          "description": "Name of the certification",
+          "maxLength": 128
+        },
+        "score": {
+          "type": "number",
+          "description": "Score achieved in points"
+        },
+        "maxScore": {
+          "type": "number",
+          "description": "Maximum score possible"
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether the exam score met the passing criteria"
+        },
+        "duration": {
+          "type": "string",
+          "description": "Duration formatted string (e.g. 45m 12s)",
+          "maxLength": 32
+        },
+        "weakPoint": {
+          "type": "string",
+          "description": "Primary domain requiring review",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp when attempt was recorded",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "userId", "examCode", "score", "passed"]
+    },
+    "FlashcardReview": {
+      "title": "FlashcardReview",
+      "description": "Spaced repetition SM-2 review event recorded for a memo card",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Review record ID",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the user",
+          "maxLength": 128
+        },
+        "cardId": {
+          "type": "string",
+          "description": "Identifier of the reviewed flashcard",
+          "maxLength": 64
+        },
+        "rating": {
+          "type": "string",
+          "description": "Rating given (revoir, moyen, maitrise, facile)",
+          "maxLength": 32
+        },
+        "intervalDays": {
+          "type": "number",
+          "description": "Scheduled interval in days"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "description": "ISO timestamp of review",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "userId", "cardId", "rating"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Stores user learning profile, target certification, and telemetry"
+    },
+    "/users/{userId}/attempts/{attemptId}": {
+      "schema": "ExamAttempt",
+      "description": "Subcollection of exam simulations and score records for the user"
+    },
+    "/users/{userId}/reviews/{reviewId}": {
+      "schema": "FlashcardReview",
+      "description": "Subcollection of spaced repetition card reviews for the user"
+    }
+  }
+}
