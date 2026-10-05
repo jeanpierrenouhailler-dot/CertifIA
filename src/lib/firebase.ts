@@ -39,41 +39,60 @@ export const db = getFirestore(
   firebaseConfig.firestoreDatabaseId || '(default)'
 );
 
-// Operation types for detailed security/permission error context
+// Operation types for detailed security/permission error context (matches firebase-skill standard)
 export enum OperationType {
   CREATE = 'create',
-  READ = 'read',
   UPDATE = 'update',
   DELETE = 'delete',
   LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
 }
 
 export interface FirestoreErrorInfo {
   error: string;
   operationType: OperationType;
   path: string | null;
-  authStatus: 'signed_in' | 'signed_out';
-  userId: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  };
 }
 
 export function handleFirestoreError(
   error: unknown,
   operationType: OperationType,
   path: string | null = null
-): FirestoreErrorInfo {
+): never {
   const errMessage = error instanceof Error ? error.message : String(error);
   const currentUser = auth.currentUser;
   
-  const errorInfo: FirestoreErrorInfo = {
+  const errInfo: FirestoreErrorInfo = {
     error: errMessage,
+    authInfo: {
+      userId: currentUser?.uid,
+      email: currentUser?.email,
+      emailVerified: currentUser?.emailVerified,
+      isAnonymous: currentUser?.isAnonymous,
+      tenantId: currentUser?.tenantId,
+      providerInfo: currentUser?.providerData?.map(provider => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || []
+    },
     operationType,
-    path,
-    authStatus: currentUser ? 'signed_in' : 'signed_out',
-    userId: currentUser ? currentUser.uid : null,
+    path
   };
 
-  console.error('[Firestore Security Rule / Operation Error]', errorInfo);
-  return errorInfo;
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
 }
 
 // Connection test helper to confirm live rules & connection
@@ -81,12 +100,14 @@ export async function testFirestoreConnection(): Promise<boolean> {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
     return true;
-  } catch (err: unknown) {
-    if (err instanceof Error && err.message.includes('permission-denied')) {
-      // Permission denied on test doc is expected if connection succeeded and rules are live
+  } catch (error: unknown) {
+    if (error instanceof Error && (error.message.includes('the client is offline') || error.message.includes('unavailable'))) {
+      console.warn('[Firestore] Backend is operating in offline mode:', error.message);
+      return false;
+    }
+    if (error instanceof Error && error.message.includes('permission-denied')) {
       return true;
     }
-    console.warn('[Firestore] Connection test message:', err);
     return true;
   }
 }
@@ -130,7 +151,10 @@ export async function syncUserProfile(user: User, additionalData?: Partial<UserP
   try {
     await setDoc(userRef, initialProfile, { merge: true });
   } catch (err) {
+    if (err instanceof Error && (err.message.includes('unavailable') || err.message.includes('offline'))) {
+      console.warn('[Firestore] syncUserProfile operating offline:', err.message);
+      return;
+    }
     handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`);
-    throw err;
   }
 }

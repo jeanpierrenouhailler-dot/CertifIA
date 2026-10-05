@@ -14,14 +14,19 @@ import {
   FileText, 
   ChevronRight, 
   Zap, 
-  Layers,
-  X,
-  Sliders,
-  Share2
+  Layers, 
+  X, 
+  Sliders, 
+  Share2,
+  Database,
+  BookOpen,
+  Check
 } from 'lucide-react';
-import { AppScreen, ExamSessionHistory } from '../types';
+import { AppScreen, ExamSessionHistory, ExamAttemptRecord } from '../types';
 import { examHistoryData } from '../data/analyticsData';
 import { certificationsData } from '../data/certificationsData';
+import { useProgress } from '../context/ProgressContext';
+import { useAuth } from '../context/AuthContext';
 
 interface AnalyticsViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -29,26 +34,107 @@ interface AnalyticsViewProps {
 }
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpenBlueprint }) => {
-  const [selectedTargetExam, setSelectedTargetExam] = useState('ai102');
+  const { 
+    certProgress, 
+    examAttempts, 
+    getCertStats, 
+    activeCertId, 
+    setActiveCertId, 
+    updateGoalTarget,
+    isSyncing 
+  } = useProgress();
+  const { userProfile, user } = useAuth();
+
+  const [selectedTargetExam, setSelectedTargetExam] = useState<string>(activeCertId || 'ai102');
   const [selectedReport, setSelectedReport] = useState<ExamSessionHistory | null>(null);
   const [isCopilotTestGenerated, setIsCopilotTestGenerated] = useState(false);
+  const [activeTabSection, setActiveTabSection] = useState<'certifications' | 'examens' | 'flashcards' | 'objectifs'>('certifications');
 
   const activeCert = certificationsData.find((c) => c.id === selectedTargetExam) || certificationsData[0];
+  const activeProg = certProgress[selectedTargetExam] || {
+    id: selectedTargetExam,
+    userId: 'user',
+    certCode: activeCert.code,
+    progress: activeCert.userProgress || 50,
+    score: 765,
+    readinessIndex: 74,
+    lastCardIndex: 0,
+    reviewedCardsCount: 52,
+    updatedAt: new Date().toISOString(),
+  };
+
+  const activeStats = getCertStats(selectedTargetExam);
+
+  const handleTargetChange = (newTarget: string) => {
+    setSelectedTargetExam(newTarget);
+    const found = certificationsData.find(c => c.id === newTarget);
+    if (found) {
+      updateGoalTarget(newTarget, found.title);
+    }
+  };
+
+  const handleOpenAttemptReport = (attempt: ExamAttemptRecord) => {
+    let domainScores: { name: string; score: number }[] = [];
+    if (attempt.domainScoresSummary) {
+      try {
+        const parsed = JSON.parse(attempt.domainScoresSummary);
+        domainScores = Object.entries(parsed).map(([k, v]) => ({ name: k, score: Number(v) }));
+      } catch {
+        domainScores = [{ name: 'Score Global', score: Math.round((attempt.score / attempt.maxScore) * 100) }];
+      }
+    } else {
+      domainScores = [
+        { name: 'Architecture & Modèles', score: 82 },
+        { name: 'Ingénierie & Pipelines', score: 74 },
+        { name: 'Sécurité & Gouvernance', score: 68 },
+      ];
+    }
+
+    const report: ExamSessionHistory = {
+      id: `Tentative #${attempt.attemptNumber} (${attempt.examCode})`,
+      date: new Date(attempt.createdAt).toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      duration: attempt.duration,
+      weakPoint: attempt.weakPoint,
+      weakPointSeverity: attempt.passed ? 'medium' : 'high',
+      score: attempt.score,
+      maxScore: attempt.maxScore,
+      passed: attempt.passed,
+      domainScores,
+      recommendation: attempt.passed
+        ? 'Examen validé avec succès ! Concentrez vos révisions sur les concepts identifiés comme point faible pour garantir une marge de sécurité maximale.'
+        : 'Score en deçà du seuil d\'admission (700/1000). Révisez les flashcards de la catégorie faible avant de tenter une nouvelle simulation.',
+    };
+
+    setSelectedReport(report);
+  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
       {/* Top Header & Target Switcher */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-[#1c1f2a]">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/20 mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-            Télémétrie Cognitive & Diagnostic des Compétences
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/20">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              Télémétrie Cognitive & Diagnostic des Compétences
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <Database className="w-3 h-3 text-emerald-400" />
+              {isSyncing ? "Synchronisation Firestore..." : "Persistance Firestore Active"}
+            </span>
           </div>
+
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-headline">
-            Tableau de Bord de Préparation & Prédictibilité
+            Tableau de Bord de Préparation & Progression Réelle
           </h1>
           <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-            Modélisation probabiliste du score réel à l'examen basée sur 482 questions résolues et 4 simulations officielles.
+            Toutes vos sessions, tentatives d'examens et fiches de mémorisation espacée sont sauvegardées en continu dans Firestore.
           </p>
         </div>
 
@@ -57,12 +143,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
           <div className="text-xs text-slate-400 pl-2 font-mono">Cible Active :</div>
           <select
             value={selectedTargetExam}
-            onChange={(e) => setSelectedTargetExam(e.target.value)}
-            className="bg-[#0f131d] border border-[#262a35] text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500"
+            onChange={(e) => handleTargetChange(e.target.value)}
+            className="bg-[#0f131d] border border-[#262a35] text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 font-mono"
           >
-            <option value="ai102">Azure AI-102 (74% Prêt)</option>
-            <option value="aifc01">AWS AIF-C01 (45% En cours)</option>
-            <option value="gcpmle">Google Cloud PMLE (15%)</option>
+            <option value="c1000177">IBM watsonx C1000-177 ({certProgress['c1000177']?.progress ?? 42}%)</option>
+            <option value="gcpmle">Google Cloud PMLE ({certProgress['gcpmle']?.progress ?? 25}%)</option>
+            <option value="aifc01">AWS AIF-C01 ({certProgress['aifc01']?.progress ?? 45}%)</option>
+            <option value="mlsc01">AWS MLS-C01 ({certProgress['mlsc01']?.progress ?? 30}%)</option>
+            <option value="ai900">Azure AI-900 ({certProgress['ai900']?.progress ?? 85}%)</option>
+            <option value="ai102">Azure AI-102 ({certProgress['ai102']?.progress ?? 74}%)</option>
           </select>
           <button
             onClick={() => onOpenBlueprint && onOpenBlueprint(selectedTargetExam)}
@@ -71,6 +160,276 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             Ajuster Cible
           </button>
         </div>
+      </div>
+
+      {/* Structured Progress Tree Overview (Requested Architecture) */}
+      <div className="p-6 rounded-2xl bg-gradient-to-br from-[#171b26] via-[#121622] to-[#0f131d] border border-[#262a35] shadow-xl space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#262a35]">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <h2 className="text-base font-bold text-white font-headline">
+                Architecture de Progression & Persistance Utilisateur
+              </h2>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Structure de données Firestore temps réel : /users/{user?.uid ? user.uid.substring(0, 10) + '...' : 'invité'}
+            </p>
+          </div>
+
+          {/* Navigation Segments */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-xl bg-[#0a0e18] border border-[#262a35] text-xs font-mono">
+            <button
+              onClick={() => setActiveTabSection('certifications')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                activeTabSection === 'certifications'
+                  ? 'bg-blue-600 text-white font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              1. Certifications
+            </button>
+            <button
+              onClick={() => setActiveTabSection('examens')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                activeTabSection === 'examens'
+                  ? 'bg-blue-600 text-white font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              2. Examens ({examAttempts.length})
+            </button>
+            <button
+              onClick={() => setActiveTabSection('flashcards')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                activeTabSection === 'flashcards'
+                  ? 'bg-blue-600 text-white font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              3. Flashcards SRS
+            </button>
+            <button
+              onClick={() => setActiveTabSection('objectifs')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                activeTabSection === 'objectifs'
+                  ? 'bg-blue-600 text-white font-bold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              4. Objectifs
+            </button>
+          </div>
+        </div>
+
+        {/* Tab 1: Certifications Matrix */}
+        {activeTabSection === 'certifications' && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="text-xs text-slate-300 font-mono flex items-center justify-between">
+              <span>Progression, domaines et scores par certification :</span>
+              <span className="text-blue-400">Cliquez sur une carte pour basculer la cible active</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {certificationsData.map((c) => {
+                const prog = certProgress[c.id] || { progress: c.userProgress, score: c.passScore, readinessIndex: 70 };
+                const isCurrent = selectedTargetExam === c.id;
+
+                return (
+                  <div
+                    key={c.id}
+                    onClick={() => handleTargetChange(c.id)}
+                    className={`p-4 rounded-xl border text-left cursor-pointer transition-all ${
+                      isCurrent
+                        ? 'bg-blue-950/40 border-blue-500 shadow-lg shadow-blue-950/50 ring-1 ring-blue-500/40'
+                        : 'bg-[#171b26]/70 border-[#262a35] hover:border-[#3b4354]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-mono font-bold text-white px-2 py-0.5 rounded bg-slate-900 border border-slate-700">
+                        {c.code}
+                      </span>
+                      <span className="text-xs font-mono text-emerald-400 font-bold">
+                        {prog.progress}% achevé
+                      </span>
+                    </div>
+
+                    <div className="text-sm font-bold text-white line-clamp-1">
+                      {c.title}
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden mt-3">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all duration-500"
+                        style={{ width: `${prog.progress}%` }}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-[#262a35] text-[11px] font-mono">
+                      <div>
+                        <span className="text-slate-400">Score moyen :</span>
+                        <div className="font-bold text-white mt-0.5">{prog.score || 750} pts</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Domaines :</span>
+                        <div className="font-bold text-blue-300 mt-0.5">{c.domains.length} modules</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Exam Simulations History */}
+        {activeTabSection === 'examens' && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="flex items-center justify-between text-xs text-slate-300 font-mono">
+              <span>Tentatives officielles d'examens enregistrées :</span>
+              <button
+                onClick={() => onNavigate('exam')}
+                className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1"
+              >
+                <span>Lancer une nouvelle tentative</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {examAttempts.map((attempt) => (
+                <div
+                  key={attempt.id}
+                  onClick={() => handleOpenAttemptReport(attempt)}
+                  className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-blue-500/50 cursor-pointer transition-all space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-xs font-mono font-bold">
+                      Tentative #{attempt.attemptNumber}
+                    </span>
+                    <span
+                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase ${
+                        attempt.passed
+                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                      }`}
+                    >
+                      {attempt.passed ? 'Validé ✓' : 'Non validé'}
+                    </span>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-mono text-slate-400">{attempt.examCode}</div>
+                    <div className="text-sm font-bold text-white mt-0.5">{attempt.examTitle}</div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-[#171b26] flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-400">Score final :</span>
+                    <span className="text-base font-bold text-emerald-400">{attempt.score} / {attempt.maxScore}</span>
+                  </div>
+
+                  <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between">
+                    <span>Durée : {attempt.duration}</span>
+                    <span>{new Date(attempt.createdAt).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Flashcards Retention SRS */}
+        {activeTabSection === 'flashcards' && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="flex items-center justify-between text-xs text-slate-300 font-mono">
+              <span>Répartition de rétention mémoire SM-2 pour {activeCert.code} :</span>
+              <button
+                onClick={() => onNavigate('flashcards')}
+                className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1"
+              >
+                <span>Accéder aux fiches mémo</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Maîtrisées */}
+              <div className="p-5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase text-emerald-400 font-bold">
+                    1. Maîtrisées
+                  </span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div className="text-3xl font-extrabold font-mono text-white">
+                  {activeStats.maitriseCount} <span className="text-xs font-normal text-slate-400">cartes</span>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Intervalle d'échéance SRS ≥ 7 jours. Concepts ancrés en mémoire profonde.
+                </p>
+              </div>
+
+              {/* À revoir */}
+              <div className="p-5 rounded-xl bg-rose-950/20 border border-rose-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase text-rose-400 font-bold">
+                    2. À revoir
+                  </span>
+                  <Clock className="w-4 h-4 text-rose-400" />
+                </div>
+                <div className="text-3xl font-extrabold font-mono text-white">
+                  {activeStats.revoirCount} <span className="text-xs font-normal text-slate-400">cartes</span>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Intervalle d'échéance 1 jour. À re-tester sous 24h pour contrer l'oubli.
+                </p>
+              </div>
+
+              {/* Difficiles */}
+              <div className="p-5 rounded-xl bg-amber-950/20 border border-amber-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono uppercase text-amber-400 font-bold">
+                    3. Difficiles
+                  </span>
+                  <AlertTriangle className="w-4 h-4 text-amber-400" />
+                </div>
+                <div className="text-3xl font-extrabold font-mono text-white">
+                  {activeStats.moyenCount} <span className="text-xs font-normal text-slate-400">cartes</span>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Intervalle 3 jours. Concepts nécessitant une consolidation active.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Study Goals */}
+        {activeTabSection === 'objectifs' && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in duration-200 text-xs">
+            <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] space-y-2">
+              <span className="text-slate-400 font-mono">Certification Prioritaire</span>
+              <div className="text-sm font-bold text-white">{activeCert.title}</div>
+              <div className="text-[11px] font-mono text-blue-400">Code : {activeCert.code}</div>
+            </div>
+            <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] space-y-2">
+              <span className="text-slate-400 font-mono">Série & Constance</span>
+              <div className="text-2xl font-bold font-mono text-amber-400 flex items-center gap-1.5">
+                <span>{userProfile?.streakDays ?? 14} jours</span>
+                <Flame className="w-4 h-4 fill-amber-400" />
+              </div>
+              <div className="text-[11px] text-slate-400">Rythme soutenu sans interruption</div>
+            </div>
+            <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] space-y-2">
+              <span className="text-slate-400 font-mono">Volume de validation</span>
+              <div className="text-2xl font-bold font-mono text-emerald-400">
+                {userProfile?.questionsSolved ?? 482} qcm
+              </div>
+              <div className="text-[11px] text-slate-400">Toutes certifications confondues</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 4 Cardinal KPI Cards */}
@@ -501,21 +860,28 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
               </tr>
             </thead>
             <tbody className="divide-y divide-[#262a35]/60 font-sans">
-              {examHistoryData.map((item) => (
+              {examAttempts.map((item) => (
                 <tr key={item.id} className="hover:bg-[#0f131d]/50 transition-colors">
                   <td className="py-3 font-mono font-bold text-white">
-                    {item.id}
+                    <span className="text-blue-400 font-bold">Tentative #{item.attemptNumber}</span>
+                    <span className="ml-2 text-[10px] text-slate-400 font-mono">({item.examCode})</span>
                   </td>
-                  <td className="py-3 text-slate-300">
-                    {item.date}
+                  <td className="py-3 text-slate-300 font-mono text-[11px]">
+                    {new Date(item.createdAt).toLocaleDateString('fr-FR', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
                   </td>
                   <td className="py-3 font-mono text-slate-400">
                     {item.duration}
                   </td>
                   <td className="py-3 text-slate-300">
                     <span className="flex items-center gap-1.5">
-                      <AlertTriangle className={`w-3.5 h-3.5 ${item.weakPointSeverity === 'high' ? 'text-rose-400' : 'text-amber-400'}`} />
-                      <span>{item.weakPoint}</span>
+                      <AlertTriangle className={`w-3.5 h-3.5 ${item.passed ? 'text-amber-400' : 'text-rose-400'}`} />
+                      <span className="line-clamp-1">{item.weakPoint}</span>
                     </span>
                   </td>
                   <td className="py-3 text-right font-mono font-bold text-white">
@@ -529,12 +895,12 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                           : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
                       }`}
                     >
-                      {item.passed ? 'ADMIS' : 'ÉCHEC'}
+                      {item.passed ? 'ADMIS ✓' : 'ÉCHEC'}
                     </span>
                   </td>
                   <td className="py-3 text-right">
                     <button
-                      onClick={() => setSelectedReport(item)}
+                      onClick={() => handleOpenAttemptReport(item)}
                       className="text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
                     >
                       Rapport détaillé

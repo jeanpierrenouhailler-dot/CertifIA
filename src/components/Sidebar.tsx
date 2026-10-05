@@ -11,7 +11,8 @@ import {
   Sparkles,
   Flame,
   X,
-  User
+  User,
+  CheckSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -37,6 +38,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems = [
     {
+      id: 'today' as AppScreen,
+      label: "Aujourd'hui",
+      icon: Target,
+      badge: '🎯 17',
+      highlightBadge: true,
+    },
+    {
+      id: 'recommendation' as AppScreen,
+      label: 'Parcours IA',
+      icon: Sparkles,
+      badge: 'Sur-mesure',
+      highlightBadge: true,
+    },
+    {
       id: 'catalogue' as AppScreen,
       label: 'Catalogue',
       icon: Compass,
@@ -45,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'quiz' as AppScreen,
       label: 'Entraînement',
-      icon: Target,
+      icon: CheckSquare,
       badge: 'QCM',
     },
     {

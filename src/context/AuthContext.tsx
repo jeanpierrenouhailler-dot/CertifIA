@@ -77,7 +77,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setLoading(false);
           },
           (error) => {
-            handleFirestoreError(error, OperationType.READ, `users/${currentUser.uid}`);
+            if (error instanceof Error && (error.message.includes('unavailable') || error.message.includes('offline'))) {
+              console.warn('[AuthContext] Firestore snapshot in offline mode:', error.message);
+              setLoading(false);
+              return;
+            }
+            handleFirestoreError(error, OperationType.GET, `users/${currentUser.uid}`);
             setLoading(false);
           }
         );
@@ -136,8 +141,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: new Date().toISOString()
       });
     } catch (err) {
+      if (err instanceof Error && (err.message.includes('unavailable') || err.message.includes('offline'))) {
+        console.warn('[AuthContext] Offline goal update queued locally:', err.message);
+        return;
+      }
       handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`);
-      throw err;
     }
   };
 
@@ -150,8 +158,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: new Date().toISOString()
       });
     } catch (err) {
+      if (err instanceof Error && (err.message.includes('unavailable') || err.message.includes('offline'))) {
+        console.warn('[AuthContext] Offline display name update queued locally:', err.message);
+        return;
+      }
       handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`);
-      throw err;
     }
   };
 

@@ -17,12 +17,14 @@ import {
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { examQuestionsBank, getInitialExamGrid } from '../data/examData';
+import { useProgress } from '../context/ProgressContext';
 
 interface ExamViewProps {
   onNavigate: (screen: AppScreen) => void;
 }
 
 export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
+  const { recordExamAttempt } = useProgress();
   const [currentQNum, setCurrentQNum] = useState(28);
   const [gridItems, setGridItems] = useState(getInitialExamGrid);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState(4468); // 01:14:28
@@ -476,9 +478,34 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 Revenir à l'examen
               </button>
               <button
-                onClick={() => {
+                onClick={async () => {
                   setIsSubmitModalOpen(false);
                   setIsExamCompleted(true);
+                  
+                  // Calculate dynamic score based on answered questions
+                  const answeredRatio = Math.max(0.1, answeredCount / 65);
+                  const scaledScore = Math.min(1000, Math.round(answeredRatio * 820 + 120));
+                  const passed = scaledScore >= 700;
+                  const elapsedSeconds = Math.max(60, 5400 - timeLeftSeconds);
+                  const durationStr = `${Math.floor(elapsedSeconds / 60)}m ${(elapsedSeconds % 60).toString().padStart(2, '0')}s`;
+
+                  await recordExamAttempt({
+                    examCode: 'AIF-C01',
+                    examTitle: 'AWS Certified AI Practitioner',
+                    score: scaledScore,
+                    maxScore: 1000,
+                    passed,
+                    duration: durationStr,
+                    weakPoint: 'Amazon Bedrock Guardrails & Knowledge Bases',
+                    domainScoresSummary: JSON.stringify({
+                      '1. Fondamentaux IA/ML': Math.round(scaledScore * 0.09),
+                      '2. Principes GenAI': Math.round(scaledScore * 0.08),
+                      '3. Amazon Bedrock & RAG': Math.round(scaledScore * 0.07),
+                      '4. IA Responsable & Biais': Math.round(scaledScore * 0.085),
+                      '5. Sécurité KMS': Math.round(scaledScore * 0.09),
+                    }),
+                  });
+
                   onNavigate('analytics');
                 }}
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/25 transition-all"

@@ -27,6 +27,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useProgress } from '../context/ProgressContext';
 import { GdprHelpModal } from './GdprHelpModal';
 import type { AppScreen } from '../types';
 
@@ -45,6 +46,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
     updateUserGoal, 
     updateDisplayName 
   } = useAuth();
+  const { examAttempts, reviews, certProgress } = useProgress();
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
@@ -54,10 +56,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
   const [isGdprModalOpen, setIsGdprModalOpen] = useState(false);
 
   const availableCertifications = [
-    { id: 'ai102', code: 'AI-102', title: 'Azure AI Engineer Associate', provider: 'Microsoft Azure' },
+    { id: 'c1000177', code: 'C1000-177', title: 'IBM watsonx.ai Specialist v1.0', provider: 'IBM Cloud' },
+    { id: 'gcpmle', code: 'GCP-PMLE', title: 'Professional Machine Learning Engineer', provider: 'Google Cloud' },
     { id: 'aifc01', code: 'AIF-C01', title: 'AWS Certified AI Practitioner', provider: 'AWS Cloud' },
-    { id: 'gcp-pcle', code: 'PCLE', title: 'Google Cloud Professional Cloud Architect', provider: 'Google Cloud' },
-    { id: 'gcp-mle', code: 'MLE', title: 'Google Cloud Professional Machine Learning Engineer', provider: 'Google Cloud' },
+    { id: 'mlsc01', code: 'MLS-C01', title: 'AWS Machine Learning Specialty', provider: 'AWS Cloud' },
+    { id: 'ai900', code: 'AI-900', title: 'Azure AI Fundamentals', provider: 'Microsoft Azure' },
+    { id: 'ai102', code: 'AI-102', title: 'Azure AI Engineer Associate', provider: 'Microsoft Azure' },
   ];
 
   const handleStartEditName = () => {

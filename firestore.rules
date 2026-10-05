@@ -37,11 +37,26 @@ service cloud.firestore {
              (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 1024)) &&
              data.targetExam is string && data.targetExam.size() <= 64 &&
              (!('targetExamTitle' in data) || (data.targetExamTitle is string && data.targetExamTitle.size() <= 120)) &&
+             (!('targetDate' in data) || (data.targetDate is string && data.targetDate.size() <= 64)) &&
+             (!('weeklyTarget' in data) || (data.weeklyTarget is number && data.weeklyTarget >= 0)) &&
              (!('streakDays' in data) || (data.streakDays is number && data.streakDays >= 0)) &&
              (!('questionsSolved' in data) || (data.questionsSolved is number && data.questionsSolved >= 0)) &&
              (!('averageScore' in data) || (data.averageScore is number && data.averageScore >= 0 && data.averageScore <= 100)) &&
              (!('readinessIndex' in data) || (data.readinessIndex is number && data.readinessIndex >= 0 && data.readinessIndex <= 100)) &&
              (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
+    }
+
+    function isValidCertificationProgress(data, userId) {
+      return data.userId == request.auth.uid &&
+             data.userId == userId &&
+             data.id is string && data.id.size() <= 64 &&
+             data.certCode is string && data.certCode.size() <= 32 &&
+             (!('progress' in data) || (data.progress is number && data.progress >= 0 && data.progress <= 100)) &&
+             (!('score' in data) || (data.score is number && data.score >= 0 && data.score <= 100)) &&
+             (!('readinessIndex' in data) || (data.readinessIndex is number && data.readinessIndex >= 0 && data.readinessIndex <= 100)) &&
+             (!('lastCardIndex' in data) || (data.lastCardIndex is number && data.lastCardIndex >= 0)) &&
+             (!('reviewedCardsCount' in data) || (data.reviewedCardsCount is number && data.reviewedCardsCount >= 0)) &&
              (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
@@ -51,11 +66,13 @@ service cloud.firestore {
              data.id is string && data.id.size() <= 128 &&
              data.examCode is string && data.examCode.size() <= 32 &&
              (!('examTitle' in data) || (data.examTitle is string && data.examTitle.size() <= 128)) &&
+             (!('attemptNumber' in data) || (data.attemptNumber is number && data.attemptNumber >= 1)) &&
              data.score is number && data.score >= 0 &&
              (!('maxScore' in data) || (data.maxScore is number && data.maxScore > 0)) &&
              data.passed is bool &&
              (!('duration' in data) || (data.duration is string && data.duration.size() <= 32)) &&
              (!('weakPoint' in data) || (data.weakPoint is string && data.weakPoint.size() <= 128)) &&
+             (!('domainScoresSummary' in data) || (data.domainScoresSummary is string && data.domainScoresSummary.size() <= 1024)) &&
              (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64));
     }
 
@@ -64,8 +81,16 @@ service cloud.firestore {
              data.userId == userId &&
              data.id is string && data.id.size() <= 128 &&
              data.cardId is string && data.cardId.size() <= 64 &&
+             (!('certCode' in data) || (data.certCode is string && data.certCode.size() <= 32)) &&
              data.rating is string && data.rating.size() <= 32 &&
              (!('intervalDays' in data) || (data.intervalDays is number && data.intervalDays >= 0)) &&
+             (!('repetitions' in data) || (data.repetitions is number && data.repetitions >= 0)) &&
+             (!('easeFactor' in data) || (data.easeFactor is number && data.easeFactor >= 1.0)) &&
+             (!('difficulty' in data) || (data.difficulty is number && data.difficulty >= 1 && data.difficulty <= 5)) &&
+             (!('totalReviews' in data) || (data.totalReviews is number && data.totalReviews >= 0)) &&
+             (!('successReviews' in data) || (data.successReviews is number && data.successReviews >= 0)) &&
+             (!('nextReviewDate' in data) || (data.nextReviewDate is string && data.nextReviewDate.size() <= 64)) &&
+             (!('isBookmarked' in data) || (data.isBookmarked is bool)) &&
              (!('reviewedAt' in data) || (data.reviewedAt is string && data.reviewedAt.size() <= 64));
     }
 
@@ -81,6 +106,13 @@ service cloud.firestore {
       allow update: if isOwner(userId) && isValidUserProfile(incoming(), userId) && incoming().userId == existing().userId;
       allow delete: if false;
 
+      // Subcollection: Certification progressions
+      match /certifications/{certId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(certId) && isValidCertificationProgress(incoming(), userId);
+        allow delete: if false;
+      }
+
       // Subcollection: Exam attempts
       match /attempts/{attemptId} {
         allow get, list: if isOwner(userId);
@@ -91,8 +123,8 @@ service cloud.firestore {
       // Subcollection: Flashcard spaced repetition reviews
       match /reviews/{reviewId} {
         allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidId(reviewId) && isValidFlashcardReview(incoming(), userId);
-        allow update, delete: if false;
+        allow create, update: if isOwner(userId) && isValidId(reviewId) && isValidFlashcardReview(incoming(), userId);
+        allow delete: if isOwner(userId);
       }
     }
   }

@@ -27,13 +27,22 @@
         },
         "targetExam": {
           "type": "string",
-          "description": "Identifier of the target certification (e.g. ai102, aifc01)",
+          "description": "Identifier of the target certification (e.g. ai102, aifc01, c1000177)",
           "maxLength": 64
         },
         "targetExamTitle": {
           "type": "string",
           "description": "Human-readable title of the active certification",
           "maxLength": 120
+        },
+        "targetDate": {
+          "type": "string",
+          "description": "Target exam date formatted as YYYY-MM-DD",
+          "maxLength": 64
+        },
+        "weeklyTarget": {
+          "type": "number",
+          "description": "Weekly flashcard/question learning objective count"
         },
         "streakDays": {
           "type": "number",
@@ -64,6 +73,54 @@
       },
       "required": ["userId", "email", "displayName", "targetExam"]
     },
+    "CertificationProgress": {
+      "title": "CertificationProgress",
+      "description": "Detailed learning progression and domain mastery for an individual cloud certification",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Certification key ID (e.g. ai102, aifc01, c1000177)",
+          "maxLength": 64
+        },
+        "userId": {
+          "type": "string",
+          "description": "UID of the user",
+          "maxLength": 128
+        },
+        "certCode": {
+          "type": "string",
+          "description": "Certification code (e.g. AI-102, AIF-C01, C1000-177)",
+          "maxLength": 32
+        },
+        "progress": {
+          "type": "number",
+          "description": "Overall progression percentage from 0 to 100"
+        },
+        "score": {
+          "type": "number",
+          "description": "Average quiz and test score for this certification"
+        },
+        "readinessIndex": {
+          "type": "number",
+          "description": "Exam readiness index for this certification"
+        },
+        "lastCardIndex": {
+          "type": "number",
+          "description": "Saved index of the last active flashcard"
+        },
+        "reviewedCardsCount": {
+          "type": "number",
+          "description": "Number of cards reviewed in spaced repetition"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last progress update",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "userId", "certCode"]
+    },
     "ExamAttempt": {
       "title": "ExamAttempt",
       "description": "Historical record of an exam or quiz attempt completed by the user",
@@ -81,13 +138,17 @@
         },
         "examCode": {
           "type": "string",
-          "description": "Code of the certification (e.g. AI-102, AIF-C01)",
+          "description": "Code of the certification (e.g. AI-102, AIF-C01, C1000-177)",
           "maxLength": 32
         },
         "examTitle": {
           "type": "string",
           "description": "Name of the certification",
           "maxLength": 128
+        },
+        "attemptNumber": {
+          "type": "number",
+          "description": "Sequential attempt number (tentative 1, 2, 3)"
         },
         "score": {
           "type": "number",
@@ -111,6 +172,11 @@
           "description": "Primary domain requiring review",
           "maxLength": 128
         },
+        "domainScoresSummary": {
+          "type": "string",
+          "description": "JSON serialized string of domain breakdowns",
+          "maxLength": 1024
+        },
         "createdAt": {
           "type": "string",
           "description": "ISO timestamp when attempt was recorded",
@@ -126,7 +192,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Review record ID",
+          "description": "Review record ID (card identifier)",
           "maxLength": 128
         },
         "userId": {
@@ -139,6 +205,11 @@
           "description": "Identifier of the reviewed flashcard",
           "maxLength": 64
         },
+        "certCode": {
+          "type": "string",
+          "description": "Certification identifier (e.g. c1000177, gcpmle, aifc01)",
+          "maxLength": 32
+        },
         "rating": {
           "type": "string",
           "description": "Rating given (revoir, moyen, maitrise, facile)",
@@ -147,6 +218,35 @@
         "intervalDays": {
           "type": "number",
           "description": "Scheduled interval in days"
+        },
+        "repetitions": {
+          "type": "number",
+          "description": "Number of consecutive successful repetitions"
+        },
+        "easeFactor": {
+          "type": "number",
+          "description": "SM-2 ease factor (retention modifier)"
+        },
+        "difficulty": {
+          "type": "number",
+          "description": "Card difficulty score from 1 (easy) to 5 (critical)"
+        },
+        "totalReviews": {
+          "type": "number",
+          "description": "Total number of times this card has been reviewed"
+        },
+        "successReviews": {
+          "type": "number",
+          "description": "Total number of successful recall reviews"
+        },
+        "nextReviewDate": {
+          "type": "string",
+          "description": "Calculated next review date (YYYY-MM-DD)",
+          "maxLength": 64
+        },
+        "isBookmarked": {
+          "type": "boolean",
+          "description": "Whether the card is bookmarked as favorite"
         },
         "reviewedAt": {
           "type": "string",
@@ -161,6 +261,10 @@
     "/users/{userId}": {
       "schema": "UserProfile",
       "description": "Stores user learning profile, target certification, and telemetry"
+    },
+    "/users/{userId}/certifications/{certId}": {
+      "schema": "CertificationProgress",
+      "description": "Subcollection of per-certification progress, scores, and saved card indexes"
     },
     "/users/{userId}/attempts/{attemptId}": {
       "schema": "ExamAttempt",

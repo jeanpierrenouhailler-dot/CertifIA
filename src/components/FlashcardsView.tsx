@@ -13,9 +13,29 @@ import {
   Search,
   Shuffle,
   FolderOpen,
-  Award
+  Award,
+  Database,
+  CheckCircle2,
+  Filter,
+  Check,
+  Brain,
+  Calendar,
+  TrendingUp,
+  BarChart3,
+  Info,
+  AlertCircle,
+  HelpCircle,
+  X
 } from 'lucide-react';
 import { AppScreen } from '../types';
+import { useProgress } from '../context/ProgressContext';
+import { 
+  getCardSRSMetrics, 
+  predictNextIntervals, 
+  formatSRSDisplay, 
+  computeDailyReviewQueue,
+  SRSGrade 
+} from '../lib/srsAlgorithm';
 import { 
   c1000177FlashcardsData,
   gcpmleFlashcardsData,
@@ -36,13 +56,30 @@ interface FlashcardsViewProps {
 }
 
 export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) => {
+  const {
+    reviews,
+    bookmarkedCardIds,
+    lastCardIndices,
+    rateFlashcard,
+    toggleBookmarkCard,
+    saveLastCardIndex,
+    getCertStats,
+    isSyncing,
+  } = useProgress();
+
   // Certification selection: default to C1000-177 (IBM Certified Specialist - watsonx.ai)
   const [selectedCert, setSelectedCert] = useState<'c1000177' | 'gcpmle' | 'aifc01' | 'mlsc01' | 'ai900' | 'ai102'>('c1000177');
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
+  const [masteryFilter, setMasteryFilter] = useState<'today' | 'all' | 'maitrise' | 'revoir' | 'difficile' | 'unreviewed'>('today');
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(() => new Set());
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isAlgorithmModalOpen, setIsAlgorithmModalOpen] = useState(false);
+  
+  // Initialize currentCardIndex from persisted lastCardIndices
+  const [currentCardIndex, setCurrentCardIndex] = useState<number>(() => {
+    return lastCardIndices['c1000177'] || 0;
+  });
+
   const [isFlipped, setIsFlipped] = useState(false);
   const [ratedInterval, setRatedInterval] = useState<string | null>(null);
   const [jumpInput, setJumpInput] = useState('');
@@ -66,46 +103,88 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
     return ai102DomainsMeta;
   }, [selectedCert]);
 
-  // When changing certification, reset active domain and indices
+  // Daily review queue calculated by SM-2 / FSRS algorithm
+  const dailyQueue = useMemo(() => {
+    return computeDailyReviewQueue(activeDataset, reviews, 17);
+  }, [activeDataset, reviews]);
+
+  // Statistics for active certification
+  const certStats = useMemo(() => {
+    return getCertStats(selectedCert);
+  }, [getCertStats, selectedCert, reviews]);
+
+  // When changing certification, restore saved card index and reset domain
   const handleSelectCert = (cert: 'c1000177' | 'gcpmle' | 'aifc01' | 'mlsc01' | 'ai900' | 'ai102') => {
     if (cert !== selectedCert) {
       setSelectedCert(cert);
       setSelectedDomain('all');
-      setCurrentCardIndex(0);
+      setMasteryFilter('today');
+      const savedIndex = lastCardIndices[cert] || 0;
+      setCurrentCardIndex(savedIndex);
       setIsFlipped(false);
       setSearchQuery('');
     }
   };
 
-  // Filter cards based on domain, bookmark, and search query
+  // Filter cards based on domain, bookmark, retention mastery, and search query
   const filteredCards = useMemo(() => {
-    return activeDataset.filter((card) => {
-      if (selectedDomain !== 'all' && card.domainId !== selectedDomain) return false;
-      if (bookmarkedOnly && !bookmarkedIds.has(card.id)) return false;
+    const sourceCards = masteryFilter === 'today' ? dailyQueue.dueCards : activeDataset;
+
+    return sourceCards.filter((c) => {
+      if (selectedDomain !== 'all' && c.domainId !== selectedDomain) return false;
+      if (bookmarkedOnly && !bookmarkedCardIds.has(c.id)) return false;
+
+      const rev = reviews[c.id];
+      const metrics = getCardSRSMetrics(c.id, rev);
+
+      if (masteryFilter === 'maitrise' && (!rev || rev.intervalDays < 7)) return false;
+      if (masteryFilter === 'revoir' && (!rev || (rev.intervalDays !== 1 && rev.rating !== 'revoir'))) return false;
+      if (masteryFilter === 'difficile' && (!rev || (metrics.difficulty < 4 && rev.rating !== 'difficile' && rev.rating !== 'moyen'))) return false;
+      if (masteryFilter === 'unreviewed' && rev) return false;
+
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         return (
-          card.questionTitle.toLowerCase().includes(q) ||
-          card.questionLead.toLowerCase().includes(q) ||
-          card.solutionBody.toLowerCase().includes(q) ||
-          card.category.toLowerCase().includes(q) ||
-          card.promptNumber.toLowerCase().includes(q)
+          c.questionTitle.toLowerCase().includes(q) ||
+          c.questionLead.toLowerCase().includes(q) ||
+          c.solutionBody.toLowerCase().includes(q) ||
+          c.category.toLowerCase().includes(q) ||
+          c.promptNumber.toLowerCase().includes(q)
         );
       }
       return true;
     });
-  }, [activeDataset, selectedDomain, bookmarkedOnly, searchQuery, bookmarkedIds]);
+  }, [activeDataset, dailyQueue.dueCards, selectedDomain, bookmarkedOnly, masteryFilter, searchQuery, bookmarkedCardIds, reviews]);
 
-  // Reset or bound card index when filtered list changes
+  // Bound card index when filtered list changes
   useEffect(() => {
     if (currentCardIndex >= filteredCards.length) {
-      setCurrentCardIndex(0);
+      const newIdx = 0;
+      setCurrentCardIndex(newIdx);
       setIsFlipped(false);
     }
   }, [filteredCards.length, currentCardIndex]);
 
   const card = filteredCards[currentCardIndex] || activeDataset[0];
-  const isCurrentBookmarked = card ? bookmarkedIds.has(card.id) : false;
+  const isCurrentBookmarked = card ? bookmarkedCardIds.has(card.id) : false;
+  const currentCardReview = card ? reviews[card.id] : undefined;
+
+  // Real-time SM-2 metrics for the active card
+  const currentMetrics = useMemo(() => {
+    if (!card) return getCardSRSMetrics('default', undefined, 0);
+    return getCardSRSMetrics(card.id, reviews[card.id], currentCardIndex);
+  }, [card, reviews, currentCardIndex]);
+
+  // Formatted labels for card header
+  const srsDisplay = useMemo(() => {
+    if (!card) return formatSRSDisplay(currentMetrics, '#1');
+    return formatSRSDisplay(currentMetrics, card.promptNumber || `#${currentCardIndex + 1}`);
+  }, [card, currentMetrics, currentCardIndex]);
+
+  // Predicted intervals for the 4 grading buttons
+  const predictedIntervals = useMemo(() => {
+    return predictNextIntervals(currentMetrics);
+  }, [currentMetrics]);
 
   const currentDomainMeta = useMemo(() => {
     return activeDomainsMeta.find((d) => d.id === selectedDomain) || activeDomainsMeta[0];
@@ -115,46 +194,71 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
     setIsFlipped(!isFlipped);
   };
 
-  const handleRate = (interval: string) => {
-    setRatedInterval(interval);
+  const handleRate = (ratingKey: 'revoir' | 'difficile' | 'moyen' | 'facile', days: number, label: string) => {
+    if (!card) return;
+    setRatedInterval(label);
+    rateFlashcard(card.id, selectedCert, ratingKey, days);
     setTimeout(() => {
       setRatedInterval(null);
       setIsFlipped(false);
-      setCurrentCardIndex((prev) => (prev + 1) % Math.max(1, filteredCards.length));
-    }, 400);
+      const nextIdx = (currentCardIndex + 1) % Math.max(1, filteredCards.length);
+      setCurrentCardIndex(nextIdx);
+      saveLastCardIndex(selectedCert, nextIdx);
+    }, 380);
   };
 
   const handleNext = () => {
     setIsFlipped(false);
-    setCurrentCardIndex((prev) => (prev + 1) % Math.max(1, filteredCards.length));
+    const nextIdx = (currentCardIndex + 1) % Math.max(1, filteredCards.length);
+    setCurrentCardIndex(nextIdx);
+    saveLastCardIndex(selectedCert, nextIdx);
   };
 
   const handlePrev = () => {
     setIsFlipped(false);
-    setCurrentCardIndex((prev) => (prev - 1 + filteredCards.length) % Math.max(1, filteredCards.length));
+    const prevIdx = (currentCardIndex - 1 + filteredCards.length) % Math.max(1, filteredCards.length);
+    setCurrentCardIndex(prevIdx);
+    saveLastCardIndex(selectedCert, prevIdx);
   };
 
   const toggleBookmark = (id: string) => {
-    setBookmarkedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    toggleBookmarkCard(id, selectedCert);
   };
 
   const handleShuffle = () => {
     if (filteredCards.length <= 1) return;
     const randomIdx = Math.floor(Math.random() * filteredCards.length);
     setCurrentCardIndex(randomIdx);
+    saveLastCardIndex(selectedCert, randomIdx);
     setIsFlipped(false);
+  };
+
+  // Jump directly to Card #127 (scenario from user prompt)
+  const handleJumpToCard127 = () => {
+    setMasteryFilter('all');
+    setSelectedDomain('all');
+    setSearchQuery('');
+    setBookmarkedOnly(false);
+    const targetIdx = 126; // 0-indexed 126 = Card #127
+    if (targetIdx < activeDataset.length) {
+      setCurrentCardIndex(targetIdx);
+      saveLastCardIndex(selectedCert, targetIdx);
+      setIsFlipped(false);
+    }
   };
 
   const handleJumpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const target = parseInt(jumpInput, 10);
-    if (!isNaN(target) && target >= 1 && target <= filteredCards.length) {
-      setCurrentCardIndex(target - 1);
+    const cleanInput = jumpInput.replace('#', '').trim();
+    const target = parseInt(cleanInput, 10);
+    if (!isNaN(target) && target >= 1 && target <= activeDataset.length) {
+      const targetIdx = target - 1;
+      if (masteryFilter !== 'all') {
+        setMasteryFilter('all');
+        setSelectedDomain('all');
+      }
+      setCurrentCardIndex(targetIdx);
+      saveLastCardIndex(selectedCert, targetIdx);
       setIsFlipped(false);
       setJumpInput('');
     }
@@ -175,19 +279,19 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
         e.preventDefault();
         handlePrev();
       } else if (e.key === '1') {
-        handleRate('1j (À revoir)');
+        handleRate('revoir', predictedIntervals.revoir.days, `${predictedIntervals.revoir.days}j (À revoir)`);
       } else if (e.key === '2') {
-        handleRate('3j (Moyen)');
+        handleRate('difficile', predictedIntervals.difficile.days, `${predictedIntervals.difficile.days}j (Difficile)`);
       } else if (e.key === '3') {
-        handleRate('7j (Maîtrisé)');
+        handleRate('moyen', predictedIntervals.moyen.days, `${predictedIntervals.moyen.days}j (Bien)`);
       } else if (e.key === '4') {
-        handleRate('14j (Facile)');
+        handleRate('facile', predictedIntervals.facile.days, `${predictedIntervals.facile.days}j (Facile)`);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [filteredCards.length]);
+  }, [filteredCards.length, currentCardIndex, card, selectedCert, predictedIntervals]);
 
   return (
     <div id="flashcards-main-container" className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
@@ -243,9 +347,13 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
         </div>
 
         {/* Top Summary Badges */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs font-mono text-blue-300">
+            <Database className="w-3.5 h-3.5 text-blue-400" />
+            <span>{isSyncing ? "Synchronisation Firestore..." : "Persistance Firestore active"}</span>
+          </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#171b26] border border-[#262a35] text-xs font-mono text-slate-300">
-            <span>Progression session :</span>
+            <span>Position deck :</span>
             <span className="font-bold text-amber-400">
               {currentCardIndex + 1} / {filteredCards.length}
             </span>
@@ -254,6 +362,75 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
             <Flame className="w-3.5 h-3.5 fill-amber-400" />
             <span>14 jours de série</span>
           </div>
+        </div>
+      </div>
+
+      {/* Daily SRS Intelligent Queue Hero Announcement */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-950/70 via-indigo-950/40 to-[#171b26] border border-blue-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center shrink-0 text-blue-400">
+            <Brain className="w-6 h-6 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                Algorithme SM-2 / FSRS • Ordonnancement Intelligent
+              </span>
+              <button
+                onClick={() => setIsAlgorithmModalOpen(true)}
+                className="text-[11px] font-mono text-slate-400 hover:text-white flex items-center gap-1 underline underline-offset-2 ml-2 transition-colors"
+              >
+                <Info className="w-3.5 h-3.5" />
+                Comment ça marche ?
+              </button>
+            </div>
+            <p className="text-sm sm:text-base font-bold text-white font-headline mt-1">
+              « Aujourd'hui, voici les {dailyQueue.totalDue} cartes que tu dois absolument revoir. »
+            </p>
+            <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] font-mono text-slate-300">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20 font-semibold">
+                <AlertCircle className="w-3 h-3 text-rose-400" />
+                {dailyQueue.overdueCards.length} en retard
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-semibold">
+                <Clock className="w-3 h-3 text-amber-400" />
+                {dailyQueue.dueTodayCards.length} à échéance aujourd'hui
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20 font-semibold">
+                <Layers className="w-3 h-3 text-blue-400" />
+                {dailyQueue.newCards.length} consolidations prioritaires
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => {
+              setMasteryFilter('today');
+              setSelectedDomain('all');
+              setCurrentCardIndex(0);
+              setIsFlipped(false);
+            }}
+            className={`px-4 py-2.5 rounded-xl font-bold font-mono text-xs transition-all flex items-center gap-2 shadow-lg ${
+              masteryFilter === 'today'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-blue-600/30 border border-blue-400/50'
+                : 'bg-blue-600/20 hover:bg-blue-600 text-blue-200 hover:text-white border border-blue-500/40'
+            }`}
+          >
+            <Zap className="w-4 h-4 fill-amber-400 text-amber-400" />
+            <span>{masteryFilter === 'today' ? `Session du Jour (${dailyQueue.totalDue}) Active` : `Lancer la session (${dailyQueue.totalDue})`}</span>
+          </button>
+
+          <button
+            onClick={handleJumpToCard127}
+            className="px-3.5 py-2.5 rounded-xl bg-[#171b26] hover:bg-[#262a35] text-slate-300 hover:text-white border border-[#262a35] font-mono text-xs transition-colors flex items-center gap-1.5"
+            title="Consulter l'exemple complet de la Carte #127 avec ses statistiques SRS réelles"
+          >
+            <Bookmark className="w-3.5 h-3.5 text-amber-400" />
+            <span>Carte #127</span>
+          </button>
         </div>
       </div>
 
@@ -353,6 +530,124 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
         </div>
       </div>
 
+      {/* Retention Mastery Filter Bar (Maîtrisées / À revoir / Difficiles) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#131722] border border-[#262a35]">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
+            État de Rétention SRS :
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 sm:w-auto w-full">
+          <button
+            onClick={() => {
+              setMasteryFilter('today');
+              setCurrentCardIndex(0);
+              setIsFlipped(false);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+              masteryFilter === 'today'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30 border border-blue-400/40'
+                : 'bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 border border-blue-500/30'
+            }`}
+          >
+            <Zap className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <span>À revoir aujourd'hui</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-950/80 text-blue-200 border border-blue-500/30">
+              {dailyQueue.totalDue}
+            </span>
+          </button>
+
+          <button
+            onClick={() => {
+              setMasteryFilter('all');
+              setCurrentCardIndex(0);
+              setIsFlipped(false);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
+              masteryFilter === 'all'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                : 'bg-[#171b26] text-slate-400 hover:text-white border border-[#262a35]'
+            }`}
+          >
+            Toutes ({activeDataset.length})
+          </button>
+
+          <button
+            onClick={() => {
+              setMasteryFilter('maitrise');
+              setCurrentCardIndex(0);
+              setIsFlipped(false);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+              masteryFilter === 'maitrise'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span>Maîtrisées</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-200">
+              {certStats.maitriseCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => {
+              setMasteryFilter('revoir');
+              setCurrentCardIndex(0);
+              setIsFlipped(false);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+              masteryFilter === 'revoir'
+                ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
+                : 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-rose-400" />
+            <span>À revoir</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-950/80 text-rose-200">
+              {certStats.revoirCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => {
+              setMasteryFilter('difficile');
+              setCurrentCardIndex(0);
+              setIsFlipped(false);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 ${
+              masteryFilter === 'difficile'
+                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                : 'bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
+            <span>Difficiles (≥ 4/5)</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-950/80 text-amber-200">
+              {certStats.moyenCount}
+            </span>
+          </button>
+
+          <button
+            onClick={() => {
+              setMasteryFilter('unreviewed');
+              setCurrentCardIndex(0);
+              setIsFlipped(false);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all ${
+              masteryFilter === 'unreviewed'
+                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                : 'bg-[#171b26] text-slate-400 hover:text-white border border-[#262a35]'
+            }`}
+          >
+            Non évaluées ({Math.max(0, activeDataset.length - certStats.totalReviewed)})
+          </button>
+        </div>
+      </div>
+
       {/* Domain Selector Tabs (100 Cards per Domain) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs text-slate-300 px-1">
@@ -444,7 +739,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
             }`}
           >
             <Bookmark className={`w-3.5 h-3.5 ${bookmarkedOnly ? 'fill-amber-400 text-amber-400' : ''}`} />
-            <span>Favoris ({bookmarkedIds.size})</span>
+            <span>Favoris ({bookmarkedCardIds.size})</span>
           </button>
 
           {/* Shuffle Button */}
@@ -803,41 +1098,123 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
               onClick={handleFlip}
               className="relative min-h-[400px] sm:min-h-[440px] rounded-3xl bg-gradient-to-br from-[#172033] via-[#171b26] to-[#0f131d] border border-[#262a35] hover:border-blue-500/40 shadow-2xl p-6 sm:p-8 cursor-pointer transition-all duration-300 select-none flex flex-col justify-between group"
             >
-              {/* Top Card Ribbon */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider text-white"
-                    style={{ backgroundColor: card.categoryBadgeColor || '#0f62fe' }}
-                  >
-                    {card.category}
-                  </span>
-                  <span className="text-[10px] font-mono text-blue-300 font-semibold px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
-                    {card.levelTag}
-                  </span>
+              {/* Top Card Ribbon with 5-Item SM-2 / FSRS Telemetry */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider text-white"
+                      style={{ backgroundColor: card.categoryBadgeColor || '#0f62fe' }}
+                    >
+                      {card.category}
+                    </span>
+                    <span className="text-[10px] font-mono text-blue-300 font-semibold px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20">
+                      {card.levelTag}
+                    </span>
+                    {srsDisplay.isDueToday ? (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-amber-400" />
+                        À revoir aujourd'hui
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        Planifié
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsAlgorithmModalOpen(true);
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-300 hover:text-white border border-blue-500/20 text-[11px] font-mono transition-colors"
+                      title="Explications mathématiques de l'algorithme SM-2 / FSRS"
+                    >
+                      <Brain className="w-3.5 h-3.5 text-blue-400" />
+                      <span className="hidden sm:inline">SM-2 / FSRS</span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleBookmark(card.id);
+                      }}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 transition-colors"
+                      title={isCurrentBookmarked ? "Retirer des favoris" : "Ajouter aux favoris"}
+                    >
+                      <Bookmark className={`w-4 h-4 ${isCurrentBookmarked ? 'fill-amber-400 text-amber-400' : ''}`} />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFlip();
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#262a35] text-slate-300 hover:text-white text-xs font-mono font-medium transition-colors"
+                    >
+                      <RotateCw className="w-3.5 h-3.5 text-blue-400 group-hover:rotate-180 transition-transform duration-500" />
+                      <span>{isFlipped ? 'Voir Question' : 'Retourner [Espace]'}</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleBookmark(card.id);
-                    }}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 transition-colors"
-                    title={isCurrentBookmarked ? "Retirer des favoris" : "Ajouter aux favoris"}
-                  >
-                    <Bookmark className={`w-4 h-4 ${isCurrentBookmarked ? 'fill-amber-400 text-amber-400' : ''}`} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFlip();
-                    }}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#262a35] text-slate-300 hover:text-white text-xs font-mono font-medium transition-colors"
-                  >
-                    <RotateCw className="w-3.5 h-3.5 text-blue-400 group-hover:rotate-180 transition-transform duration-500" />
-                    <span>{isFlipped ? 'Voir Question' : 'Retourner [Espace]'}</span>
-                  </button>
+                {/* The 5 SRS Core Metadata Points: Identifiant, Dernière révision, Difficulté 3/5, Prochaine révision, Répétitions / Taux */}
+                <div className="p-3 sm:p-3.5 rounded-2xl bg-[#0a0e18]/85 border border-[#262a35] grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs font-mono">
+                  {/* Carte # */}
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Identifiant</div>
+                    <div className="text-sm font-bold text-blue-400 mt-0.5">{srsDisplay.cardNumber}</div>
+                  </div>
+                  {/* Dernière révision */}
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Dernière révision</div>
+                    <div className="text-sm font-bold text-slate-100 mt-0.5 capitalize">{srsDisplay.lastReviewLabel}</div>
+                  </div>
+                  {/* Difficulté 3/5 */}
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Difficulté</div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className={`text-sm font-bold ${
+                        srsDisplay.diffScore >= 4 ? 'text-rose-400' :
+                        srsDisplay.diffScore === 3 ? 'text-amber-400' : 'text-emerald-400'
+                      }`}>
+                        {srsDisplay.diffLabel}
+                      </span>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((dot) => (
+                          <span
+                            key={dot}
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              dot <= srsDisplay.diffScore
+                                ? srsDisplay.diffScore >= 4
+                                  ? 'bg-rose-400'
+                                  : srsDisplay.diffScore === 3
+                                  ? 'bg-amber-400'
+                                  : 'bg-emerald-400'
+                                : 'bg-slate-700'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Prochaine révision */}
+                  <div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Prochaine révision</div>
+                    <div className={`text-sm font-bold mt-0.5 ${
+                      srsDisplay.isDueToday ? 'text-amber-400 font-bold' : 'text-emerald-400'
+                    }`}>
+                      {srsDisplay.nextReviewLabel}
+                    </div>
+                  </div>
+                  {/* Nombre de répétitions & Taux de réussite */}
+                  <div className="col-span-2 sm:col-span-1">
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Répétitions / Taux</div>
+                    <div className="text-sm font-bold text-purple-400 mt-0.5">
+                      {srsDisplay.repCount} rep. • {srsDisplay.successLabel}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -941,8 +1318,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
           {/* SM-2 Spaced Repetition Rating Dock */}
           <div className="p-4 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400 font-mono text-[11px] uppercase">
-                Évaluez votre niveau de rétention (Algorithme SM-2)
+              <span className="text-slate-400 font-mono text-[11px] uppercase flex items-center gap-1.5">
+                <Brain className="w-3.5 h-3.5 text-blue-400" />
+                Évaluez votre niveau de rétention (Algorithme SM-2 / FSRS)
               </span>
               <span className="font-mono text-emerald-400 text-xs">
                 {ratedInterval ? `Planifié à : ${ratedInterval}` : 'Touches [1] [2] [3] [4] pour noter'}
@@ -951,35 +1329,47 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <button
-                onClick={() => handleRate('1j (À revoir)')}
-                className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold text-center transition-all group"
+                onClick={() => handleRate('revoir', predictedIntervals.revoir.days, `${predictedIntervals.revoir.days}j (À revoir)`)}
+                className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-rose-400">À revoir</div>
-                <div className="text-[10px] text-slate-400 font-mono mt-0.5">Échéance 1 jour [1]</div>
+                <div className="font-mono text-sm font-bold text-rose-400">À revoir [1]</div>
+                <div className="text-[11px] text-rose-300/90 font-mono mt-0.5 font-bold">
+                  {predictedIntervals.revoir.label} • Remise à zéro
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono mt-0.5">EF -0.20 • Diff. +1</div>
               </button>
 
               <button
-                onClick={() => handleRate('3j (Moyen)')}
-                className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold text-center transition-all group"
+                onClick={() => handleRate('difficile', predictedIntervals.difficile.days, `${predictedIntervals.difficile.days}j (Difficile)`)}
+                className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-amber-400">Moyen</div>
-                <div className="text-[10px] text-slate-400 font-mono mt-0.5">Échéance 3 jours [2]</div>
+                <div className="font-mono text-sm font-bold text-amber-400">Difficile [2]</div>
+                <div className="text-[11px] text-amber-300/90 font-mono mt-0.5 font-bold">
+                  {predictedIntervals.difficile.label} • Réduction
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono mt-0.5">EF -0.15 • Diff. +0.5</div>
               </button>
 
               <button
-                onClick={() => handleRate('7j (Maîtrisé)')}
-                className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 text-blue-300 text-xs font-semibold text-center transition-all group"
+                onClick={() => handleRate('moyen', predictedIntervals.moyen.days, `${predictedIntervals.moyen.days}j (Bien)`)}
+                className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 text-blue-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-blue-400">Maîtrisé</div>
-                <div className="text-[10px] text-slate-400 font-mono mt-0.5">Échéance 7 jours [3]</div>
+                <div className="font-mono text-sm font-bold text-blue-400">Bien [3]</div>
+                <div className="text-[11px] text-blue-300/90 font-mono mt-0.5 font-bold">
+                  {predictedIntervals.moyen.label} • Standard SM-2
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono mt-0.5">EF {currentMetrics.easeFactor} • Normal</div>
               </button>
 
               <button
-                onClick={() => handleRate('14j (Facile)')}
-                className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold text-center transition-all group"
+                onClick={() => handleRate('facile', predictedIntervals.facile.days, `${predictedIntervals.facile.days}j (Facile)`)}
+                className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-emerald-400">Facile</div>
-                <div className="text-[10px] text-slate-400 font-mono mt-0.5">Échéance 14 jours [4]</div>
+                <div className="font-mono text-sm font-bold text-emerald-400">Facile [4]</div>
+                <div className="text-[11px] text-emerald-300/90 font-mono mt-0.5 font-bold">
+                  {predictedIntervals.facile.label} • Boost rétention
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono mt-0.5">EF +0.15 • Diff. -1</div>
               </button>
             </div>
           </div>
@@ -1023,6 +1413,100 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
           </div>
         </div>
       </div>
+
+      {/* SM-2 / FSRS Algorithmic Explainer Modal */}
+      {isAlgorithmModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-[#171b26] border border-[#262a35] rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setIsAlgorithmModalOpen(false)}
+              className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white bg-[#0f131d] border border-[#262a35] transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                <Brain className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white font-headline">
+                  Moteur SRS CertifAI : SuperMemo SM-2 &amp; FSRS
+                </h3>
+                <p className="text-xs text-slate-400 font-mono">
+                  Pourquoi réviser 17 cartes ciblées bat le défilement aveugle de 500 fiches
+                </p>
+              </div>
+            </div>
+
+            {/* Core Explanation */}
+            <div className="space-y-4 text-xs text-slate-300 leading-relaxed font-sans">
+              <div className="p-4 rounded-2xl bg-[#0f131d] border border-[#262a35] space-y-2">
+                <div className="font-bold text-blue-300 font-mono text-sm flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-blue-400" />
+                  La Courbe de l'Oubli d'Ebbinghaus inversée
+                </div>
+                <p>
+                  Sans révision espacée, le cerveau humain oublie 70% des notions techniques complexes en 48 heures.
+                  Le moteur SRS de CertifAI calcule la date exacte où la probabilité de rappel descend sous 85%, pour te faire réviser la carte au moment le plus efficace mathématiquement.
+                </p>
+              </div>
+
+              {/* The 5 Key Indicators */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
+                  <div className="font-bold font-mono text-white text-[11px] text-blue-400">1. Identifiant unique</div>
+                  <p className="text-[11px] text-slate-400">
+                    Chaque fiche (ex: Carte #127) possède son propre modèle d'historique indépendant.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
+                  <div className="font-bold font-mono text-white text-[11px] text-emerald-400">2. Difficulté adaptative (1/5 à 5/5)</div>
+                  <p className="text-[11px] text-slate-400">
+                    S'adapte dynamiquement selon tes réponses. Une carte hésitante monte à 4 ou 5/5.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
+                  <div className="font-bold font-mono text-white text-[11px] text-amber-400">3. Prochaine révision au jour près</div>
+                  <p className="text-[11px] text-slate-400">
+                    Calculée via l'Ease Factor (EF) : 1j → 3j → 7j → 14j → 30j+.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
+                  <div className="font-bold font-mono text-white text-[11px] text-purple-400">4. Répétitions &amp; Taux de réussite</div>
+                  <p className="text-[11px] text-slate-400">
+                    Suivi statistique des succès (ex: 4 répétitions consécutives, 75% de réussite).
+                  </p>
+                </div>
+              </div>
+
+              {/* SM-2 Formula Card */}
+              <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 font-mono text-[11px] space-y-2">
+                <div className="font-bold text-blue-300">Formule Mathématique SM-2 Implémentée :</div>
+                <div className="bg-[#0a0e18] p-3 rounded-xl border border-blue-500/20 text-slate-200">
+                  EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))<br />
+                  Intervalle(n) = Intervalle(n-1) * EF
+                </div>
+                <div className="text-slate-400 text-[10px]">
+                  Où q est votre note de rappel (1 = Revoir, 3 = Difficile, 4 = Bien, 5 = Facile).
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={() => setIsAlgorithmModalOpen(false)}
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold transition-colors"
+              >
+                Compris, continuer mes révisions
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

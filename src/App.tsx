@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { AppScreen, CloudProvider } from './types';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
+import { TodayView } from './components/TodayView';
+import { RecommendationView } from './components/RecommendationView';
 import { CatalogueView } from './components/CatalogueView';
 import { QuizView } from './components/QuizView';
 import { FlashcardsView } from './components/FlashcardsView';
@@ -17,17 +19,20 @@ import { ShortcutsModal } from './components/ShortcutsModal';
 import { ProfileView } from './components/ProfileView';
 import { certificationsData } from './data/certificationsData';
 import { AuthProvider } from './context/AuthContext';
+import { ProgressProvider } from './context/ProgressContext';
 
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <ProgressProvider>
+        <AppContent />
+      </ProgressProvider>
     </AuthProvider>
   );
 }
 
 function AppContent() {
-  const [currentScreen, setCurrentScreen] = useState<AppScreen>('catalogue');
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>('today');
   const [activeProviderFilter, setActiveProviderFilter] = useState<CloudProvider>('Tous');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
@@ -95,6 +100,20 @@ function AppContent() {
 
         {/* Dynamic Screen View */}
         <main className="flex-1 pb-16">
+          {currentScreen === 'today' && (
+            <TodayView
+              onNavigate={(screen) => setCurrentScreen(screen)}
+              onOpenBlueprint={handleOpenBlueprint}
+            />
+          )}
+
+          {currentScreen === 'recommendation' && (
+            <RecommendationView
+              onNavigate={(screen) => setCurrentScreen(screen)}
+              onOpenBlueprint={handleOpenBlueprint}
+            />
+          )}
+
           {currentScreen === 'catalogue' && (
             <CatalogueView
               onNavigate={(screen) => setCurrentScreen(screen)}
