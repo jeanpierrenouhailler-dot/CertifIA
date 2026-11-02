@@ -234,6 +234,18 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
             onClose();
           },
         },
+        {
+          id: 'glossary',
+          label: 'Glossaire & Encyclopédie IA',
+          subtitle: 'Concepts clés, pièges d\'examen et correspondances multi-cloud (A-Z)',
+          icon: BookOpen,
+          badge: 'A-Z & Fiches',
+          badgeColor: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border-indigo-500/20',
+          onClick: () => {
+            onNavigate('glossary');
+            onClose();
+          },
+        },
       ],
     },
     {

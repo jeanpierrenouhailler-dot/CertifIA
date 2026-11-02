@@ -15,7 +15,10 @@ import {
   Search,
   ShieldCheck,
   ChevronRight,
-  Maximize2
+  Maximize2,
+  Bot,
+  BookOpen,
+  RotateCcw
 } from 'lucide-react';
 import { QuizQuestion, AppScreen } from '../types';
 import { quizQuestionsData, quizMatrixItems } from '../data/quizData';
@@ -23,9 +26,10 @@ import { quizQuestionsData, quizMatrixItems } from '../data/quizData';
 interface QuizViewProps {
   onNavigate: (screen: AppScreen) => void;
   onOpenBlueprint?: (certId: string) => void;
+  onOpenAIAssistant?: (context?: any) => void;
 }
 
-export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint }) => {
+export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint, onOpenAIAssistant }) => {
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(1); // Index 1 is Q7 in our set
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D' | null>('A');
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(true);
@@ -351,6 +355,73 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint 
               <span>Suivante (Q8)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Passerelles Pédagogiques Post-Question / Quiz */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] space-y-3">
+            <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200 dark:border-[#262a35]">
+              <span className="font-mono font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                Passerelles d’Apprentissage
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">Actions recommandées</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+              {/* Bridge 1: AI Assistant */}
+              <button
+                onClick={() => {
+                  if (onOpenAIAssistant) {
+                    onOpenAIAssistant({
+                      certId: 'ai102',
+                      certCode: 'AI-102',
+                      topic: 'Indexation Hybride & RAG Semantic Ranker',
+                      questionText: currentQ.question,
+                      userSelection: selectedOption || 'A',
+                    });
+                  } else {
+                    onNavigate('assistant');
+                  }
+                }}
+                className="p-3 rounded-xl bg-white dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] hover:border-blue-500/50 text-left transition-all group flex flex-col justify-between space-y-2"
+              >
+                <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-semibold font-mono text-[11px]">
+                  <Bot className="w-3.5 h-3.5" />
+                  Demander au tuteur IA
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Comprendre l'explication et déjouer les pièges de cette question
+                </div>
+              </button>
+
+              {/* Bridge 2: Flashcards SRS */}
+              <button
+                onClick={() => onNavigate('flashcards')}
+                className="p-3 rounded-xl bg-white dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] hover:border-emerald-500/50 text-left transition-all group flex flex-col justify-between space-y-2"
+              >
+                <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold font-mono text-[11px]">
+                  <Layers className="w-3.5 h-3.5" />
+                  Fiches Mémo associées
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Mémoriser la notion avec la répétition espacée SM-2
+                </div>
+              </button>
+
+              {/* Bridge 3: Full Exam */}
+              <button
+                onClick={() => onNavigate('exam')}
+                className="p-3 rounded-xl bg-white dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] hover:border-amber-500/50 text-left transition-all group flex flex-col justify-between space-y-2"
+              >
+                <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold font-mono text-[11px]">
+                  <Clock className="w-3.5 h-3.5" />
+                  Examen Blanc Chrono
+                </div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Tester vos réflexes en conditions d'examen réelles
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 

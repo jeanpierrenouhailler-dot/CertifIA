@@ -91,3 +91,32 @@ Accessible directement depuis la catégorie **« 🗂️ Répartition des Flashc
 * **IBM watsonx C1000-177 (watsonx.ai v1.0 Specialist) :** 400 fiches (4 domaines x 100 fiches)
 
 Total : **27 domaines officiels** d'examen couverts avec pondérations officielles, consultables via `src/components/FlashcardsDistributionModal.tsx`.
+
+---
+
+## 7. Glossaire & Encyclopédie des Concepts IA (`src/data/glossaryData.ts` & `src/components/GlossaryView.tsx`)
+Conçu pour combler le fossé entre la mémorisation brute et la compréhension conceptuelle profonde transversale à toutes les certifications Cloud :
+* **Vue Duale Intelligente :**
+  1. **Glossaire Rapide A-Z :** Recherche instantanée multi-critères, index alphabétique cliquable, cartes rétractables, pièges d'examen officiels mis en évidence et bookmarking en favoris.
+  2. **Encyclopédie Approfondie :** Articles de référence avec diagrammes de flux ASCII, principes de calcul formels, comparaisons multi-cloud (Azure vs AWS vs GCP vs IBM vs NVIDIA), et liens directs vers les questions QCM et fiches mémo associées.
+* **Concepts Fondamentaux Couverts :**
+  * RAG (Retrieval-Augmented Generation) & HyDE, Recherche Hybride (Dense + Sparse BM25 + Reciprocal Rank Fusion), Re-ranking sémantique.
+  * Transformers, Multi-Head Self-Attention, Positional Encoding, MoE (Mixture of Experts).
+  * LoRA, QLoRA, PEFT, Quantification (INT8, INT4, AWQ, FP8).
+  * Feature Store (Online vs Offline), Data Drift (Covariate Shift) vs Concept Drift, Index de Stabilité de Population (PSI).
+  * watsonx.governance FactSheets, EU AI Act (Catégories de risque), Guardrails & Prompt Injection (Directe/Indirecte).
+  * Métriques de classification (Precision, Recall, F1-Score) et d'évaluation LLM (ROUGE, BLEU, BERTScore, G-Eval).
+
+---
+
+## 8. Nouvelle Architecture de Navigation & UX/UI (v2.6.0)
+Restructuration fondée sur 5 piliers cardinaux et un design anti-slop à haute lisibilité :
+1. **ACCUEIL (`today`)** : Message de bienvenue, progression générale, certification en cours, bouton d'action principal « Reprendre mon apprentissage » en 1 clic, récapitulatif des 17 cartes SM-2 dues, 8 notions fragiles, 12 questions ciblées, flux des activités récentes et prochaines étapes recommandées.
+2. **CERTIFICATIONS (`catalogue`)** : Catalogue des 18 certifications officielles, filtres (fournisseur, niveau, domaine, budget), fiches détaillées (Blueprints), comparateur interactif côte à côte (`CertificationsComparatorModal.tsx`) et passerelles directes d'entraînement.
+3. **APPRENTISSAGE (`quiz`, `flashcards`, `exam`, `recommendation`)** : Mes parcours, Quiz & entraînements scénarisés, Fiches mémo avec répétition espacée SRS SM-2 (2 800 cartes), examens blancs chronométrés 90 minutes en conditions réelles, et passerelles post-activité (revoir les erreurs, fiches associées, tuteur IA).
+4. **PROGRESSION (`analytics`)** : Télémétrie cognitive, diagnostic des compétences maîtrisées vs compétences à renforcer, historique des tentatives avec clause de rigueur méthodologique (les estimations ne sont pas des garanties d'examen).
+5. **ASSISTANT IA (`assistant` & `AIAssistantDrawer.tsx`)** : Tuteur pédagogique IA disponible en tiroir latéral contextuel ou écran dédié, fournissant explications pas à pas, pièges d'examen officiels et astuces mnémotechniques.
+* **Barre Latérale Rétractable** : Mode étendu (72) et mode icônes avec tooltips natifs.
+* **Barre Supérieure Légère & Fil d'Ariane Dynamique** : Titre contextuel, fil d'Ariane, certification cible active, Command Palette (`Cmd+K`) et accès profil.
+* **Barre Inférieure Mobile (`MobileBottomNav.tsx`)** : 5 destinations tactiles conformes ($\ge 44\text{px}$) + menu tiroir pour les options secondaires.
+* **Composants d'État Réutilisables** : `PageHeader.tsx`, `EmptyState.tsx`, `LoadingState.tsx`, `ErrorState.tsx`.

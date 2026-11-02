@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { AppScreen, CloudProvider } from './types';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { TodayView } from './components/TodayView';
 import { RecommendationView } from './components/RecommendationView';
 import { CatalogueView } from './components/CatalogueView';
@@ -14,6 +15,10 @@ import { QuizView } from './components/QuizView';
 import { FlashcardsView } from './components/FlashcardsView';
 import { ExamView } from './components/ExamView';
 import { AnalyticsView } from './components/AnalyticsView';
+import { AIAssistantView } from './components/AIAssistantView';
+import { AIAssistantDrawer, AIAssistantContext } from './components/AIAssistantDrawer';
+import { CertificationsComparatorModal } from './components/CertificationsComparatorModal';
+import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { BlueprintDrawer } from './components/BlueprintDrawer';
 import { ShortcutsModal } from './components/ShortcutsModal';
 import { ProfileView } from './components/ProfileView';
@@ -22,6 +27,7 @@ import { SystemSettingsModal } from './components/SystemSettingsModal';
 import { LegalOnboardingModal } from './components/LegalOnboardingModal';
 import { InstallAppModal } from './components/InstallAppModal';
 import { FlashcardsDistributionModal, FlashcardCertId } from './components/FlashcardsDistributionModal';
+import { GlossaryView } from './components/GlossaryView';
 import { certificationsData } from './data/certificationsData';
 import { AuthProvider } from './context/AuthContext';
 import { ProgressProvider } from './context/ProgressContext';
@@ -52,10 +58,15 @@ function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('today');
   const [activeProviderFilter, setActiveProviderFilter] = useState<CloudProvider>('Tous');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isSystemSettingsOpen, setIsSystemSettingsOpen] = useState(false);
   const [isFlashcardsDistributionOpen, setIsFlashcardsDistributionOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isComparatorOpen, setIsComparatorOpen] = useState(false);
+  const [isAIAssistantDrawerOpen, setIsAIAssistantDrawerOpen] = useState(false);
+  const [aiAssistantContext, setAiAssistantContext] = useState<AIAssistantContext | null>(null);
   const [selectedFlashcardCert, setSelectedFlashcardCert] = useState<FlashcardCertId>('c1000177');
   const [blueprintExamId, setBlueprintExamId] = useState<string | null>(null);
 
@@ -68,6 +79,11 @@ function AppContent() {
     setIsFlashcardsDistributionOpen(false);
   };
 
+  const handleOpenAIAssistantWithContext = (context?: AIAssistantContext) => {
+    setAiAssistantContext(context || null);
+    setIsAIAssistantDrawerOpen(true);
+  };
+
   // Global keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -78,16 +94,22 @@ function AppContent() {
 
       if (e.key === 'Escape') {
         setIsShortcutsOpen(false);
+        setIsCommandPaletteOpen(false);
+        setIsComparatorOpen(false);
+        setIsAIAssistantDrawerOpen(false);
         setBlueprintExamId(null);
         setIsMobileSidebarOpen(false);
         setIsHamburgerOpen(false);
         setIsSystemSettingsOpen(false);
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setIsShortcutsOpen(true);
+        setIsCommandPaletteOpen((prev) => !prev);
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') {
         e.preventDefault();
         setIsHamburgerOpen((prev) => !prev);
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
+        e.preventDefault();
+        setIsAIAssistantDrawerOpen((prev) => !prev);
       }
     };
 
@@ -112,7 +134,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0f131d] dark:text-[#dfe2f1] font-sans selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-200 transition-colors duration-200">
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation (Collapsible Desktop + Mobile Drawer) */}
       <Sidebar
         currentScreen={currentScreen}
         onNavigate={(screen) => setCurrentScreen(screen)}
@@ -120,34 +142,38 @@ function AppContent() {
         onSelectProvider={(prov) => setActiveProviderFilter(prov)}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
         onOpenBlueprint={handleOpenBlueprint}
         onOpenHamburgerMenu={() => setIsHamburgerOpen(true)}
         onOpenSystemSettings={() => setIsSystemSettingsOpen(true)}
         onOpenLegalModal={() => {
-          // Open legal modal manually
           closeLegalModal();
           setTimeout(() => {
-            // trigger open
             window.dispatchEvent(new CustomEvent('open-legal-modal'));
           }, 50);
         }}
         onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
+        onOpenComparator={() => setIsComparatorOpen(true)}
+        onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
       />
 
-      {/* Main Workspace (offset by 64 Tailwind spacing for lg sidebar) */}
-      <div className="lg:pl-64 flex flex-col min-h-screen">
+      {/* Main Workspace (offset dynamically based on sidebar collapsed state) */}
+      <div className={`flex flex-col min-h-screen transition-all duration-200 ${isSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'}`}>
         {/* Sticky Top Header */}
         <Header
+          currentScreen={currentScreen}
           onOpenHamburgerMenu={() => setIsHamburgerOpen(true)}
           onOpenSystemSettings={() => setIsSystemSettingsOpen(true)}
-          onOpenShortcuts={() => setIsShortcutsOpen(true)}
+          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
           onOpenMobileMenu={() => setIsMobileSidebarOpen(true)}
           onNavigate={(screen) => setCurrentScreen(screen)}
           onOpenBlueprint={handleOpenBlueprint}
+          onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
         />
 
         {/* Dynamic Screen View */}
-        <main className="flex-1 pb-16">
+        <main className="flex-1 pb-20 lg:pb-16">
           {currentScreen === 'today' && (
             <TodayView
               onNavigate={(screen) => setCurrentScreen(screen)}
@@ -166,6 +192,10 @@ function AppContent() {
             <CatalogueView
               onNavigate={(screen) => setCurrentScreen(screen)}
               onOpenBlueprint={handleOpenBlueprint}
+              onOpenComparator={() => setIsComparatorOpen(true)}
+              onOpenAIAssistant={(certId, certCode) =>
+                handleOpenAIAssistantWithContext({ certId, certCode, topic: certCode })
+              }
               initialProviderFilter={activeProviderFilter}
             />
           )}
@@ -174,6 +204,7 @@ function AppContent() {
             <QuizView
               onNavigate={(screen) => setCurrentScreen(screen)}
               onOpenBlueprint={handleOpenBlueprint}
+              onOpenAIAssistant={handleOpenAIAssistantWithContext}
             />
           )}
 
@@ -195,6 +226,14 @@ function AppContent() {
             <AnalyticsView
               onNavigate={(screen) => setCurrentScreen(screen)}
               onOpenBlueprint={handleOpenBlueprint}
+              onOpenAIAssistant={handleOpenAIAssistantWithContext}
+            />
+          )}
+
+          {currentScreen === 'assistant' && (
+            <AIAssistantView
+              onNavigate={(screen) => setCurrentScreen(screen)}
+              onOpenBlueprint={handleOpenBlueprint}
             />
           )}
 
@@ -203,8 +242,52 @@ function AppContent() {
               onNavigate={(screen) => setCurrentScreen(screen)}
             />
           )}
+
+          {currentScreen === 'glossary' && (
+            <GlossaryView
+              onNavigate={(screen) => setCurrentScreen(screen)}
+              onOpenBlueprint={handleOpenBlueprint}
+            />
+          )}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        currentScreen={currentScreen}
+        onNavigate={(screen) => setCurrentScreen(screen)}
+        onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
+        onOpenMenu={() => setIsHamburgerOpen(true)}
+      />
+
+      {/* Contextual AI Pedagogical Assistant Slide-Over Drawer */}
+      <AIAssistantDrawer
+        isOpen={isAIAssistantDrawerOpen}
+        onClose={() => setIsAIAssistantDrawerOpen(false)}
+        context={aiAssistantContext}
+        onNavigate={(screen) => setCurrentScreen(screen)}
+        onOpenBlueprint={handleOpenBlueprint}
+      />
+
+      {/* Certifications Side-by-Side Comparator Modal */}
+      <CertificationsComparatorModal
+        isOpen={isComparatorOpen}
+        onClose={() => setIsComparatorOpen(false)}
+        onNavigate={(screen) => setCurrentScreen(screen)}
+        onOpenBlueprint={handleOpenBlueprint}
+      />
+
+      {/* Command Palette Global Search (Cmd+K / Ctrl+K) */}
+      <CommandPaletteModal
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onNavigate={(screen) => setCurrentScreen(screen)}
+        onOpenBlueprint={handleOpenBlueprint}
+        onOpenComparator={() => setIsComparatorOpen(true)}
+        onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
+        onOpenSystemSettings={() => setIsSystemSettingsOpen(true)}
+        onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
+      />
 
       {/* Categorized Hamburger Menu Drawer */}
       <CategorizedHamburgerMenu

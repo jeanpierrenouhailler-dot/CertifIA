@@ -4,6 +4,48 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 
 ---
 
+## [2.6.0] - 2026-11-02 • Restructuration Majeure de la Navigation & UX/UI
+
+### 🏛️ Restructuration Piliers & Navigation
+* **Refonte de l'Architecture autour de 5 Piliers Majeurs :**
+  1. **ACCUEIL (`today`)** : Tableau de bord épuré, accueil personnalisé post-connexion, indicateur de certification cible, bouton d'action principal « Reprendre mon apprentissage » en 1 clic, récapitulatif des 17 cartes SM-2 dues, 8 notions fragiles, 12 questions ciblées, flux des activités récentes et prochaines étapes recommandées.
+  2. **CERTIFICATIONS (`catalogue`)** : Catalogue officiel avec filtres avancés (fournisseur Cloud, niveau de difficulté, domaine IA, fourchette de prix), accès direct aux fiches détaillées (Blueprints), passerelle d'entraînement direct (« S'entraîner ») et intégration du comparateur.
+  3. **APPRENTISSAGE (`quiz`, `flashcards`, `exam`, `recommendation`)** : Espace d'assimilation et d'entraînement avec passerelles post-activité fluides (revoir les erreurs, fiches mémo associées, questionner le tuteur IA, lancer un examen blanc chronométré 90 min).
+  4. **PROGRESSION (`analytics`)** : Télémétrie cognitive, diagnostic des compétences maîtrisées vs compétences à renforcer, historique détaillé des tentatives avec clause de transparence méthodologique (les estimations ne sont pas des garanties d'examen).
+  5. **ASSISTANT IA (`assistant` & `AIAssistantDrawer`)** : Tuteur pédagogique IA disponible en tiroir latéral contextuel ou écran dédié, pré-chargé avec le contexte d'une question ou d'une certification, fournissant explications, pièges d'examen officiels et astuces mnémotechniques.
+* **Barre Latérale Rétractable (Collapsible Sidebar) :**
+  * Mode développé complet (72 de large) et mode réduit (icônes avec tooltips natifs).
+  * Navigation accordéon fluide, zéro surcharge visuelle, statut actif net et contrasté.
+* **Barre Supérieure Légère & Fil d'Ariane Dynamique (`Header.tsx`) :**
+  * Fil d'Ariane contextuel (`Section > Page active`).
+  * Badge interactif de certification cible active (accès direct au Blueprint).
+  * Déclencheur Command Palette (`Cmd+K`), accès rapide tuteur IA, bascule thème clair/sombre, mode infobulles guidées et accès profil.
+* **Barre de Navigation Inférieure Mobile (`MobileBottomNav.tsx`) :**
+  * 5 destinations tactiles de premier niveau avec surface d'appui normalisée ($\ge 44\text{px}$).
+  * Bouton « Plus » ouvrant le menu catégorisé pour les réglages et l'encyclopédie.
+* **Command Palette Globale (`CommandPaletteModal.tsx` • `Cmd+K` / `Ctrl+K`) :**
+  * Recherche instantanée multi-sources (certifications, notions du glossaire, quiz, actions directes et paramètres).
+* **Comparateur de Certifications Côte à Côte (`CertificationsComparatorModal.tsx`) :**
+  * Comparaison simultanée de 2 à 3 examens (fournisseur, niveau, prix, durée, seuil, domaines pondérés, passerelle d'entraînement).
+* **Composants d'État Réutilisables (`PageHeader`, `EmptyState`, `LoadingState`, `ErrorState`).**
+
+---
+
+## [2.5.0] - 2026-11-02
+
+### ✨ Ajouté
+* **Glossaire & Encyclopédie Transversale de l'IA (`src/components/GlossaryView.tsx` & `src/data/glossaryData.ts`) :**
+  * **Mode Dual Fluide :**
+    * 🔤 **Glossaire Rapide (A-Z)** : Cartes condensées avec recherche instantanée multi-champs (terme, acronyme, anglais, définition, piège), index alphabétique interactif (A à Z), filtres par catégorie (GenAI, RAG, MLOps, Gouvernance, Vision, Cloud) et par Cloud Provider (Azure, AWS, GCP, IBM, NVIDIA, Théorie).
+    * 🏛️ **Encyclopédie Approfondie** : Fiches d'architecture complètes avec explications détaillées, flux de données ASCII, formules mathématiques (Cosinus, F1, RRF, BLEU, PSI), grilles de correspondances multi-cloud (Azure vs AWS vs GCP vs IBM vs NVIDIA), et liens directs d'entraînement vers les QCM et Flashcards.
+  * **⚠️ Pièges d'Examen Systématiques :** Mise en exergue des erreurs et confusions récurrentes dans les examens officiels (AI-102, AI-900, AIF-C01, MLS-C01, GCP-PMLE, IBM watsonx C1000-177).
+  * **⭐ Système de Termes Favoris :** Enregistrement local des concepts prioritaires à réviser avant l'épreuve.
+  * **Intégration Complète :**
+    * Nouvel onglet de navigation dans la barre latérale `Sidebar.tsx`.
+    * Entrée dédiée dans la catégorie *📚 Révisions & Entraînement* du menu hamburger.
+    * Carte d'accès rapide dans le tableau de bord quotidien `TodayView.tsx`.
+    * Écran dédié avec support intégral des thèmes Sombre et Clair.
+
 ## [2.4.0] - 2026-11-02
 
 ### ✨ Ajouté

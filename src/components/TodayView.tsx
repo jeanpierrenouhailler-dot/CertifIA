@@ -481,21 +481,21 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 </div>
               </div>
 
-              {/* [ Commencer ma session ] Main Action Button */}
+              {/* [ Reprendre mon apprentissage ] Main Action Button */}
               <button
                 id="btn-start-today-session"
                 onClick={handleStartSession}
                 className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-bold font-headline text-base shadow-xl shadow-blue-600/30 hover:shadow-blue-600/40 border border-blue-400/40 transition-all flex items-center justify-center gap-3 group/btn"
               >
                 <Play className="w-5 h-5 fill-white text-white group-hover/btn:scale-110 transition-transform" />
-                <span>Commencer ma session</span>
+                <span>Reprendre mon apprentissage</span>
                 <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
 
           {/* Quick Access into Single Modes */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div 
               onClick={() => onNavigate('flashcards')}
               className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] hover:border-blue-500/40 transition-all cursor-pointer flex items-center justify-between"
@@ -505,23 +505,38 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                   <Brain className="w-3.5 h-3.5" />
                   Mémorisation SRS
                 </div>
-                <div className="text-sm font-bold text-white">Parcourir toutes les fiches mémo</div>
-                <div className="text-[11px] text-slate-400">400 à 500 cartes complètes avec SM-2</div>
+                <div className="text-sm font-bold text-white">Fiches mémo</div>
+                <div className="text-[11px] text-slate-400">2 800 cartes avec SM-2</div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </div>
+
+            <div 
+              onClick={() => onNavigate('glossary')}
+              className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] hover:border-indigo-500/40 transition-all cursor-pointer flex items-center justify-between"
+            >
+              <div className="space-y-1">
+                <div className="text-xs font-mono font-bold text-indigo-400 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5" />
+                  Encyclopédie IA
+                </div>
+                <div className="text-sm font-bold text-white">Glossaire & Fiches</div>
+                <div className="text-[11px] text-slate-400">Concepts, pièges & architectures</div>
               </div>
               <ChevronRight className="w-4 h-4 text-slate-400" />
             </div>
 
             <div 
               onClick={() => onNavigate('exam')}
-              className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] hover:border-blue-500/40 transition-all cursor-pointer flex items-center justify-between"
+              className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] hover:border-emerald-500/40 transition-all cursor-pointer flex items-center justify-between"
             >
               <div className="space-y-1">
                 <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" />
                   Simulation Réelle
                 </div>
-                <div className="text-sm font-bold text-white">Lancer un examen blanc complet</div>
-                <div className="text-[11px] text-slate-400">Chronométré 90 minutes • Conditions officielles</div>
+                <div className="text-sm font-bold text-white">Examen blanc</div>
+                <div className="text-[11px] text-slate-400">90 min • Conditions réelles</div>
               </div>
               <ChevronRight className="w-4 h-4 text-slate-400" />
             </div>
@@ -659,6 +674,85 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 <span>Consulter le Blueprint officiel</span>
               </button>
             )}
+          </div>
+
+          {/* Activités Récentes */}
+          <div className="p-6 rounded-3xl bg-[#171b26] border border-[#262a35] space-y-4">
+            <div className="flex items-center justify-between text-xs pb-3 border-b border-[#262a35]">
+              <span className="font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-blue-400" />
+                Activités Récentes
+              </span>
+              <span className="text-[10px] font-mono text-slate-400">Dernières 24h</span>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex items-start justify-between p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]">
+                <div className="space-y-0.5">
+                  <div className="font-semibold text-slate-200">Session SRS Matinale</div>
+                  <div className="text-[11px] text-slate-400">14 fiches révisées avec succès</div>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  +100%
+                </span>
+              </div>
+
+              <div className="flex items-start justify-between p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]">
+                <div className="space-y-0.5">
+                  <div className="font-semibold text-slate-200">QCM RAG & Vector Search</div>
+                  <div className="text-[11px] text-slate-400">6/7 bonnes réponses obtenues</div>
+                </div>
+                <span className="text-[10px] font-mono text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                  85.7%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Prochaines Étapes Recommandées */}
+          <div className="p-6 rounded-3xl bg-[#171b26] border border-[#262a35] space-y-4">
+            <div className="flex items-center justify-between text-xs pb-3 border-b border-[#262a35]">
+              <span className="font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                Prochaines Étapes
+              </span>
+              <span className="text-[10px] font-mono text-indigo-400">Guidé</span>
+            </div>
+
+            <div className="space-y-2.5 text-xs">
+              <div 
+                onClick={handleStartSession}
+                className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/25 hover:border-blue-500/50 cursor-pointer transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-bold text-blue-300">1. Terminer la session du jour</div>
+                  <div className="text-[11px] text-slate-400">17 cartes pour sécuriser le seuil SM-2</div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-blue-400 shrink-0" />
+              </div>
+
+              <div 
+                onClick={() => onNavigate('quiz')}
+                className="p-3 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-slate-500 cursor-pointer transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-bold text-slate-200">2. Renforcer les pièges RAG</div>
+                  <div className="text-[11px] text-slate-400">Vérifier les filtres Custom Blocklists</div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+              </div>
+
+              <div 
+                onClick={() => onNavigate('exam')}
+                className="p-3 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-slate-500 cursor-pointer transition-all flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-bold text-slate-200">3. Examen blanc complet</div>
+                  <div className="text-[11px] text-slate-400">Valider 700/1000 en 90 minutes</div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

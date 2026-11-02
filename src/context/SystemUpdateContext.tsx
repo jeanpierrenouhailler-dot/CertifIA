@@ -9,18 +9,20 @@ export interface VersionInfo {
 }
 
 export const APP_VERSION_INFO: VersionInfo = {
-  version: 'v2.4.0',
+  version: 'v2.6.0',
   releaseDate: '2 Novembre 2026',
-  buildNumber: '20261102.1',
+  buildNumber: '20261102.3',
   channel: 'production',
   highlights: [
-    'Menu Hamburger catégorisé complet & navigation unifiée',
-    'Panneau de Paramètres Système avec vérification & forçage des mises à jour',
-    'Système de mises à jour automatiques en arrière-plan',
-    'Thème Clair & Thème Sombre ultra-fluides',
-    'Onboarding juridique avec clause d’exonération de responsabilité',
-    'Mode Guide Novice & infobulles contextuelles interactives',
-    'Support PWA complet avec bouton d’installation mobile & desktop',
+    'Restructuration complète de la navigation autour de 5 piliers majeurs',
+    'Accueil personnalisé avec bouton « Reprendre mon apprentissage » en 1 clic',
+    'Tuteur Pédagogique IA contextuel (explications, pièges officiels, mnémotechniques)',
+    'Comparateur de certifications officiel côte à côte (Azure, AWS, GCP, IBM, NVIDIA)',
+    'Command Palette globale (Cmd+K / Ctrl+K) avec recherche instantanée',
+    'Barre latérale rétractable (mode complet & mode icônes avec tooltips)',
+    'Barre de navigation mobile inférieure normalisée (zones tactiles ≥ 44px)',
+    'Passerelles pédagogiques après chaque question (SRS, Quiz, Examen Blanc, Tuteur IA)',
+    'Glossaire & Encyclopédie de l’Intelligence Artificielle',
   ],
 };
 

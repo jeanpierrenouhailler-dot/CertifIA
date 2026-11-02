@@ -6,7 +6,7 @@
 
 ### *Plateforme intelligente de préparation certifiante et de télémétrie cognitive pour examens Cloud & IA*
 
-[![Version](https://img.shields.io/badge/Version-v2.4.0-blue.svg?style=for-the-badge&logo=semver)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-v2.6.0-blue.svg?style=for-the-badge&logo=semver)](CHANGELOG.md)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-emerald.svg?style=for-the-badge&logo=pwa)](public/manifest.webmanifest)
 [![SM-2 Algorithm](https://img.shields.io/badge/Algorithm-SM--2%20%2F%20FSRS-purple.svg?style=for-the-badge)](src/lib/srsAlgorithm.ts)
 [![Theme](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-amber.svg?style=for-the-badge)](src/context/ThemeContext.tsx)
@@ -16,29 +16,30 @@
 
 ---
 
-## 📸 Aperçu de l'Interface & Fonctionnalités Clés
+## 📸 Aperçu de l'Interface & Nouvelle Architecture (v2.6.0)
 
 <div align="center">
-  <img src="/assets/certifai-screenshot.svg" alt="Capture d'écran CertifIA v2.4.0" width="100%" style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" />
+  <img src="/assets/certifai-screenshot.svg" alt="Capture d'écran CertifIA v2.6.0" width="100%" style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" />
 </div>
 
-> **Aperçu visuel complet :** Le tableau de bord unifié **Aujourd'hui** avec les 17 cartes SRS prêtes à réviser, le **Menu Hamburger Catégorisé**, le **Parcours IA en 4 Niveaux**, la carte d'exemple SM-2 **Carte #127** et les **Paramètres Système v2.4.0**.
+> **Aperçu visuel complet :** L'architecture unifiée structurée autour des **5 Piliers Majeurs** (*Accueil*, *Certifications*, *Apprentissage*, *Progression*, *Assistant IA*), la **Barre latérale rétractable** (mode étendu & icônes avec tooltips), la **Barre supérieure avec Fil d'Ariane**, la **Command Palette `Cmd+K`**, le **Comparateur de certifications** et le **Tuteur Pédagogique IA contextuel**.
 
 ---
 
-## 🚀 Dernières Nouveautés • Version 2.4.0 (Novembre 2026)
+## 🚀 Dernières Nouveautés • Version 2.6.0 (Novembre 2026)
 
-* 🍔 **Menu Hamburger Catégorisé** : Regroupement ergonomique de l'ensemble des modules par catégorie (*Session & Orientation*, *Révisions & Entraînement*, *Évaluation & Spécifications*, *Télémétrie & Compte*).
-* ⚙️ **Paramètres Système & Mises à Jour** :
-  * 📅 Date de sortie officielle de la version (`v2.4.0 • 2 Novembre 2026`).
-  * 🕒 Horodatage en direct de la dernière vérification certifiée.
-  * 🔄 Bouton **« Vérifier les mises à jour »** avec interrogation réseau et retour instantané.
-  * ⚡ Bouton **« Forcer la mise à jour »** avec nettoyage automatique du cache et réactualisation fluide.
-  * 🔄 **Système de Mises à Jour Automatiques en Arrière-Plan** : Scrutation périodique silencieuse toutes les 3 minutes et application instantanée sans perte de progression utilisateur.
-* ☀️ **Thème Clair & Thème Sombre** : Bascule instantanée entre le mode *Cyber Obsidian* (sombre immersif) et le mode *Workspace Entreprise* (clair haute lisibilité) avec persistance locale.
-* 🛡️ **Onboarding Juridique & Mentions Légales** : Clause stricte et explicite d'exonération de responsabilité spécifiant que l'éditeur décline toute responsabilité quant à l'exactitude des données et questions fournies à des fins d'entraînement personnel.
-* 🎓 **Mode Guide Novice & Infobulles Contextuelles** : Bulles explicatives interactives (`InfoTooltip`) sur chaque champ, carte et statistique pour guider pas à pas les utilisateurs débutants.
-* 📲 **Bouton « Installer l'application » (PWA)** : Installation en un clic sur écran d'accueil mobile (iOS/Android) ou bureau (Windows/macOS/Chrome/Edge) pour un usage plein écran hors-ligne.
+* 🏛️ **Restructuration Complète de la Navigation (5 Piliers Majeurs)** :
+  1. 🏠 **ACCUEIL** : Tableau de bord épuré avec accueil personnalisé post-connexion, indicateur de certification cible, bouton d'action principal « Reprendre mon apprentissage » en un clic, récapitulatif des 17 cartes SM-2 dues, 8 notions fragiles, 12 questions ciblées, flux des activités récentes et prochaines étapes recommandées.
+  2. 🧭 **CERTIFICATIONS** : Catalogue unifié des 18 certifications officielles (Azure, AWS, Google Cloud, IBM, NVIDIA) avec filtres avancés (fournisseur, niveau de difficulté, domaine IA, budget), fiches détaillées (Blueprints), comparateur côte à côte et passerelles d'entraînement direct.
+  3. 🎓 **APPRENTISSAGE** : Hub pédagogique regroupant Quiz & entraînements scénarisés, Fiches mémo avec répétition espacée (2 800 cartes SRS), examens blancs chronométrés 90 minutes en conditions réelles, et passerelles post-activité (revoir les erreurs, fiches associées, tuteur IA).
+  4. 📊 **PROGRESSION** : Télémétrie cognitive, diagnostic des compétences maîtrisées vs compétences à renforcer, historique détaillé des tentatives avec clause de transparence méthodologique (les estimations ne sont pas des garanties d'examen).
+  5. 🤖 **ASSISTANT IA** : Tuteur pédagogique IA disponible en tiroir coulissant contextuel ou écran dédié, fournissant explications pas à pas, pièges d'examen officiels et astuces mnémotechniques.
+* ↔️ **Barre Latérale Rétractable (Collapsible Sidebar)** : Mode développé confortable et mode réduit en icônes avec infobulles natives, navigation accordéon fluide et état actif haute visibilité.
+* 🧭 **Barre Supérieure Légère & Fil d'Ariane Dynamique (`Header.tsx`)** : Titre contextuel, fil d'Ariane (`Section > Page active`), badge interactif de certification cible active, recherche globale et bouton tuteur IA.
+* 📱 **Barre de Navigation Inférieure Mobile (`MobileBottomNav.tsx`)** : 5 destinations tactiles conformes aux standards ergonomiques (zones d'appui $\ge 44\text{px}$) et bouton « Plus » pour les outils secondaires.
+* ⚡ **Command Palette Globale (`CommandPaletteModal.tsx` • `Cmd+K` / `Ctrl+K`)** : Recherche rapide et navigation instantanée au clavier parmi les certifications, questions, notions du glossaire et réglages.
+* ⚖️ **Comparateur de Certifications Côte à Côte (`CertificationsComparatorModal.tsx`)** : Comparaison simultanée de 2 à 3 certifications officielles.
+* 📖 **Glossaire & Encyclopédie de l'IA** : Définitions A-Z, fiches d'architecture complètes, pièges d'examen, formules mathématiques et correspondances multi-cloud.
 
 ---
 
@@ -103,7 +104,7 @@ Accessible à tout moment via le bouton **Menu** en haut à gauche ou le raccour
 | :--- | :--- | :--- |
 | **🎯 Session & Orientation** | *Aujourd'hui*, *Parcours IA* | Pilotage quotidien et feuille de route 4 niveaux |
 | **🗂️ Répartition des Flashcards** | *Répartition par certification*, *Azure (1 000)*, *AWS (900)*, *GCP (500)*, *IBM (400)* | Inventaire officiel des **2 800 cartes**, pondérations et répartition par domaine |
-| **📚 Révisions & Entraînement** | *Catalogue (18 certifs)*, *QCM*, *Fiches SRS* | Apprentissage granulaire et répétition espacée |
+| **📚 Révisions & Entraînement** | *Catalogue (18 certifs)*, *QCM*, *Fiches SRS*, *Glossaire & Encyclopédie* | Apprentissage granulaire, répétition espacée et fiches conceptuelles A-Z |
 | **⏱️ Évaluation & Spécifications** | *Examen Blanc*, *Blueprints Officiels* | Mise en situation réelle et pondérations d'examen |
 | **📊 Télémétrie & Compte** | *Analytics*, *Mon Profil Firebase* | Suivi de la courbe d'oubli et calendrier cible |
 | **⚙️ Paramètres & Utilitaires** | *Paramètres Système*, *Mentions Légales*, *PWA*, *Thème*, *Guide* | Administration, vérification de mises à jour, accessibilité |

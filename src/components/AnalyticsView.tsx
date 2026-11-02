@@ -20,20 +20,23 @@ import {
   Share2,
   Database,
   BookOpen,
-  Check
+  Check,
+  Bot
 } from 'lucide-react';
 import { AppScreen, ExamSessionHistory, ExamAttemptRecord } from '../types';
 import { examHistoryData } from '../data/analyticsData';
 import { certificationsData } from '../data/certificationsData';
 import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
+import { PageHeader } from './ui/PageHeader';
 
 interface AnalyticsViewProps {
   onNavigate: (screen: AppScreen) => void;
   onOpenBlueprint?: (certId: string) => void;
+  onOpenAIAssistant?: (context?: any) => void;
 }
 
-export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpenBlueprint }) => {
+export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpenBlueprint, onOpenAIAssistant }) => {
   const { 
     certProgress, 
     examAttempts, 
@@ -116,27 +119,33 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
-      {/* Top Header & Target Switcher */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-[#1c1f2a]">
-        <div>
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-blue-500/10 text-blue-300 border border-blue-500/20">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-              Télémétrie Cognitive & Diagnostic des Compétences
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Database className="w-3 h-3 text-emerald-400" />
-              {isSyncing ? "Synchronisation Firestore..." : "Persistance Firestore Active"}
+      {/* Standard Page Header */}
+      <PageHeader
+        title="Tableau de Bord & Progression"
+        subtitle="Indicateurs cognitifs, compétences maîtrisées, points faibles identifiés et historique complet de vos examens."
+        badge="Télémétrie Cognitive"
+        breadcrumbs={[
+          { label: 'Accueil', onClick: () => onNavigate('today') },
+          { label: 'Progression', active: true },
+          { label: 'Tableau de bord', active: true },
+        ]}
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <Database className="w-3.5 h-3.5 text-emerald-400" />
+              {isSyncing ? "Sync..." : "Firestore Connecté"}
             </span>
           </div>
+        }
+      />
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-headline">
-            Tableau de Bord de Préparation & Progression Réelle
-          </h1>
-          <p className="text-sm text-slate-400 mt-1 max-w-2xl">
-            Toutes vos sessions, tentatives d'examens et fiches de mémorisation espacée sont sauvegardées en continu dans Firestore.
-          </p>
-        </div>
+      {/* Rigueur Méthodologique / Pas de fausse garantie */}
+      <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-3">
+        <Sparkles className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+        <p className="leading-relaxed">
+          <strong className="font-semibold text-blue-600 dark:text-blue-300">Rigueur & Transparence :</strong> Les scores et indices de préparation affichés sont des estimations cognitives basées sur vos sessions d'entraînement et l'algorithme SRS. Ils mesurent votre assiduité et vos réflexes, mais ne constituent en aucun cas une garantie formelle de réussite le jour de l’examen officiel.
+        </p>
+      </div>
 
         {/* Target Selector Bar */}
         <div className="flex items-center gap-3 p-2 rounded-2xl bg-[#171b26] border border-[#262a35]">
@@ -160,7 +169,6 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             Ajuster Cible
           </button>
         </div>
-      </div>
 
       {/* Structured Progress Tree Overview (Requested Architecture) */}
       <div className="p-6 rounded-2xl bg-gradient-to-br from-[#171b26] via-[#121622] to-[#0f131d] border border-[#262a35] shadow-xl space-y-6">
