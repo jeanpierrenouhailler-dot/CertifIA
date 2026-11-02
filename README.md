@@ -102,6 +102,7 @@ Accessible à tout moment via le bouton **Menu** en haut à gauche ou le raccour
 | Catégorie | Modules Inclus | Description |
 | :--- | :--- | :--- |
 | **🎯 Session & Orientation** | *Aujourd'hui*, *Parcours IA* | Pilotage quotidien et feuille de route 4 niveaux |
+| **🗂️ Répartition des Flashcards** | *Répartition par certification*, *Azure (1 000)*, *AWS (900)*, *GCP (500)*, *IBM (400)* | Inventaire officiel des **2 800 cartes**, pondérations et répartition par domaine |
 | **📚 Révisions & Entraînement** | *Catalogue (18 certifs)*, *QCM*, *Fiches SRS* | Apprentissage granulaire et répétition espacée |
 | **⏱️ Évaluation & Spécifications** | *Examen Blanc*, *Blueprints Officiels* | Mise en situation réelle et pondérations d'examen |
 | **📊 Télémétrie & Compte** | *Analytics*, *Mon Profil Firebase* | Suivi de la courbe d'oubli et calendrier cible |

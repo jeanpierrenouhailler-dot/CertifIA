@@ -8,14 +8,19 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 
 ### ✨ Ajouté
 * **Menu Hamburger Catégorisé (`src/components/CategorizedHamburgerMenu.tsx`) :**
-  * Tiroir coulissant moderne accessible depuis l'en-tête (mobile et desktop) et la barre latérale.
-  * Regroupement complet des fonctionnalités en 5 catégories intuitives :
+  * Tiroir coulissant moderne accessible depuis l'en-tête (mobile et desktop), la barre latérale et le raccourci `Ctrl + M`.
+  * Regroupement complet des fonctionnalités avec une **catégorie dédiée « 🗂️ Répartition des Flashcards »** :
     * 🎯 *Session & Orientation* (Aujourd'hui, Parcours IA).
+    * 🗂️ *Répartition des Flashcards* (Lien « Répartition des flashcards par certification », Azure 1 000 fiches, AWS 900 fiches, Google Cloud 500 fiches, IBM 400 fiches).
     * 📚 *Révisions & Entraînement* (Catalogue 18 certifs, QCM, Fiches SRS).
     * ⏱️ *Évaluation & Spécifications* (Examen Blanc, Blueprints).
     * 📊 *Télémétrie & Compte* (Analytics, Profil Firebase).
     * ⚙️ *Paramètres & Utilitaires* (Paramètres Système, Mentions Légales, PWA, Thème, Guide).
   * Filtre de recherche instantané à l'intérieur du menu.
+* **Modal Interactif de Répartition des Flashcards (`src/components/FlashcardsDistributionModal.tsx`) :**
+  * Inventaire exhaustif des **2 800 cartes mémo** réparties sur **6 certifications** et **27 domaines officiels**.
+  * Fiches détaillées avec taux de couverture, répartition de 100 cartes par sous-domaine officiel et bouton de lancement direct des révisions.
+  * Bouton d'accès rapide « Répartition (2 800) » intégré dans la barre latérale et le deck de flashcards.
 * **Menu de Paramètres Système & Mises à Jour (`src/components/SystemSettingsModal.tsx`) :**
   * Affichage de la **Date de sortie officielle** (`2 Novembre 2026`).
   * Affichage de la **Date et heure de la dernière vérification certifiée**.

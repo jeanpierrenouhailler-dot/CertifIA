@@ -78,3 +78,16 @@ Dans `src/components/LegalOnboardingModal.tsx` :
 * Décharge de responsabilité formelle indiquant que l'éditeur ne saurait être tenu responsable des données, questions ou réponses fournies dans le cadre de l'outil d'entraînement.
 * Acceptation obligatoire lors de la première utilisation (`localStorage` : `certifai_legal_accepted_v1`).
 * Consultation accessible à tout moment depuis le menu hamburger, la barre latérale et les paramètres.
+
+---
+
+## 6. Inventaire & Répartition des 2 800 Flashcards
+Accessible directement depuis la catégorie **« 🗂️ Répartition des Flashcards »** du menu hamburger ou le bouton inventaire du deck :
+* **Azure AI-102 (Azure AI Engineer Associate) :** 500 fiches (5 domaines x 100 fiches)
+* **Azure AI-900 (Azure AI Fundamentals) :** 500 fiches (5 domaines x 100 fiches)
+* **AWS AIF-C01 (Certified AI Practitioner) :** 500 fiches (5 domaines x 100 fiches)
+* **AWS MLS-C01 (Machine Learning - Specialty) :** 400 fiches (4 domaines x 100 fiches)
+* **Google Cloud GCP-PMLE (Professional ML Engineer) :** 500 fiches (5 domaines x 100 fiches)
+* **IBM watsonx C1000-177 (watsonx.ai v1.0 Specialist) :** 400 fiches (4 domaines x 100 fiches)
+
+Total : **27 domaines officiels** d'examen couverts avec pondérations officielles, consultables via `src/components/FlashcardsDistributionModal.tsx`.

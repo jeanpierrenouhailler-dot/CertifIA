@@ -20,7 +20,8 @@ import {
   Award,
   Zap,
   BookOpen,
-  ArrowRight
+  ArrowRight,
+  PieChart
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { CertifAILogo } from './CertifAILogo';
@@ -36,6 +37,8 @@ interface CategorizedHamburgerMenuProps {
   onNavigate: (screen: AppScreen) => void;
   onOpenSystemSettings: () => void;
   onOpenBlueprint?: (certId: string) => void;
+  onOpenFlashcardsDistribution?: () => void;
+  onSelectCertFlashcards?: (certId: 'c1000177' | 'gcpmle' | 'aifc01' | 'mlsc01' | 'ai900' | 'ai102') => void;
 }
 
 export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> = ({
@@ -45,6 +48,8 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
   onNavigate,
   onOpenSystemSettings,
   onOpenBlueprint,
+  onOpenFlashcardsDistribution,
+  onSelectCertFlashcards,
 }) => {
   const [filterQuery, setFilterQuery] = useState('');
   const { theme, toggleTheme } = useTheme();
@@ -54,27 +59,137 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
 
   if (!isOpen) return null;
 
-  const categories = [
+  interface MenuItem {
+    id: string;
+    label: string;
+    subtitle: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: string;
+    badgeColor?: string;
+    onClick?: () => void;
+  }
+
+  interface MenuCategory {
+    id: string;
+    title: string;
+    description: string;
+    items: MenuItem[];
+  }
+
+  const categories: MenuCategory[] = [
     {
       id: 'session',
       title: '🎯 Session & Orientation',
       description: 'Pilotage quotidien et trajectoire personnalisée',
       items: [
         {
-          id: 'today' as AppScreen,
+          id: 'today',
           label: "Aujourd'hui",
           subtitle: 'Votre session quotidienne (17 cartes SM-2 + 8 fragiles + 12 QCM)',
           icon: Target,
           badge: '🎯 Prioritaire',
           badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/20',
+          onClick: () => {
+            onNavigate('today');
+            onClose();
+          },
         },
         {
-          id: 'recommendation' as AppScreen,
+          id: 'recommendation',
           label: 'Parcours IA',
           subtitle: 'Moteur d’orientation sur-mesure du Niveau 1 au Niveau 4',
           icon: Sparkles,
           badge: '4 Niveaux',
           badgeColor: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border-indigo-500/20',
+          onClick: () => {
+            onNavigate('recommendation');
+            onClose();
+          },
+        },
+      ],
+    },
+    {
+      id: 'flashcards-distribution',
+      title: '🗂️ Répartition des Flashcards',
+      description: 'Inventaire officiel et répartition des 2 800 cartes par certification',
+      items: [
+        {
+          id: 'distribution-overview',
+          label: 'Répartition des flashcards par certification',
+          subtitle: 'Inventaire complet des 2 800 fiches (Azure, AWS, GCP, IBM) et domaines',
+          icon: PieChart,
+          badge: '2 800 Cartes',
+          badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20',
+          onClick: () => {
+            onClose();
+            if (onOpenFlashcardsDistribution) {
+              onOpenFlashcardsDistribution();
+            }
+          },
+        },
+        {
+          id: 'distribution-azure',
+          label: 'Microsoft Azure (1 000 fiches)',
+          subtitle: 'AI-102 (500 fiches) & AI-900 (500 fiches)',
+          icon: Layers,
+          badge: '1 000 Cartes',
+          badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/20',
+          onClick: () => {
+            onClose();
+            if (onSelectCertFlashcards) {
+              onSelectCertFlashcards('ai102');
+            } else {
+              onNavigate('flashcards');
+            }
+          },
+        },
+        {
+          id: 'distribution-aws',
+          label: 'Amazon Web Services (900 fiches)',
+          subtitle: 'AIF-C01 (500 fiches) & MLS-C01 (400 fiches)',
+          icon: Layers,
+          badge: '900 Cartes',
+          badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20',
+          onClick: () => {
+            onClose();
+            if (onSelectCertFlashcards) {
+              onSelectCertFlashcards('aifc01');
+            } else {
+              onNavigate('flashcards');
+            }
+          },
+        },
+        {
+          id: 'distribution-gcp',
+          label: 'Google Cloud (500 fiches)',
+          subtitle: 'GCP-PMLE (500 fiches MLOps & Vertex AI)',
+          icon: Layers,
+          badge: '500 Cartes',
+          badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20',
+          onClick: () => {
+            onClose();
+            if (onSelectCertFlashcards) {
+              onSelectCertFlashcards('gcpmle');
+            } else {
+              onNavigate('flashcards');
+            }
+          },
+        },
+        {
+          id: 'distribution-ibm',
+          label: 'IBM watsonx.ai (400 fiches)',
+          subtitle: 'C1000-177 (400 fiches Studio, Lakehouse, AI Act)',
+          icon: Layers,
+          badge: '400 Cartes',
+          badgeColor: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border-indigo-500/20',
+          onClick: () => {
+            onClose();
+            if (onSelectCertFlashcards) {
+              onSelectCertFlashcards('c1000177');
+            } else {
+              onNavigate('flashcards');
+            }
+          },
         },
       ],
     },
@@ -84,28 +199,40 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       description: 'Apprentissage granulaire et répétition espacée',
       items: [
         {
-          id: 'catalogue' as AppScreen,
+          id: 'catalogue',
           label: 'Catalogue Certifications',
           subtitle: '18 référentiels officiels Azure, AWS, Google Cloud, IBM',
           icon: Compass,
           badge: '18 Certifs',
           badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20',
+          onClick: () => {
+            onNavigate('catalogue');
+            onClose();
+          },
         },
         {
-          id: 'quiz' as AppScreen,
+          id: 'quiz',
           label: 'Entraînement QCM',
           subtitle: 'Questions d’architecture corrigées avec pièges officiels',
           icon: CheckSquare,
           badge: 'QCM Examen',
           badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20',
+          onClick: () => {
+            onNavigate('quiz');
+            onClose();
+          },
         },
         {
-          id: 'flashcards' as AppScreen,
+          id: 'flashcards',
           label: 'Fiches Mémo SRS',
           subtitle: 'Algorithme SuperMemo-2 / FSRS au seuil d’oubli calculé',
           icon: Layers,
           badge: 'SM-2 Actif',
           badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/20',
+          onClick: () => {
+            onNavigate('flashcards');
+            onClose();
+          },
         },
       ],
     },
@@ -115,12 +242,16 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       description: 'Mesure en conditions réelles et référentiels officiels',
       items: [
         {
-          id: 'exam' as AppScreen,
+          id: 'exam',
           label: 'Examen Blanc Chronométré',
           subtitle: 'Épreuve live chronométrée 90 min (seuil éliminatoire 700 pts)',
           icon: Clock,
           badge: 'Live Simulation',
           badgeColor: 'bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/20',
+          onClick: () => {
+            onNavigate('exam');
+            onClose();
+          },
         },
       ],
     },
@@ -130,28 +261,40 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       description: 'Analytics de progression et synchronisation cloud',
       items: [
         {
-          id: 'analytics' as AppScreen,
+          id: 'analytics',
           label: 'Analytics & Rétention',
           subtitle: 'Courbes de progression, séries (streak) et indice de préparation',
           icon: BarChart3,
           badge: 'Télémétrie',
           badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/20',
+          onClick: () => {
+            onNavigate('analytics');
+            onClose();
+          },
         },
         {
-          id: 'profile' as AppScreen,
+          id: 'profile',
           label: 'Mon Profil & Objectifs',
           subtitle: 'Connexion Firebase, calendrier cible et volume hebdomadaire',
           icon: User,
           badge: 'Profil Cloud',
           badgeColor: 'bg-slate-500/10 text-slate-600 dark:text-slate-300 border-slate-500/20',
+          onClick: () => {
+            onNavigate('profile');
+            onClose();
+          },
         },
       ],
     },
   ];
 
-  const handleSelectScreen = (screen: AppScreen) => {
-    onNavigate(screen);
-    onClose();
+  const handleSelectItem = (item: MenuItem) => {
+    if (item.onClick) {
+      item.onClick();
+    } else {
+      onNavigate(item.id as AppScreen);
+      onClose();
+    }
   };
 
   const filteredCategories = filterQuery.trim()
@@ -238,7 +381,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleSelectScreen(item.id)}
+                      onClick={() => handleSelectItem(item)}
                       className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 group ${
                         isActive
                           ? 'bg-blue-50 dark:bg-blue-600/15 border-blue-500/40 text-blue-700 dark:text-blue-300 shadow-sm'

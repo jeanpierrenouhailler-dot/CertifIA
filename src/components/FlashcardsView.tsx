@@ -52,11 +52,19 @@ import {
   ai102DomainsMeta 
 } from '../data/flashcardsData';
 
+import { FlashcardCertId } from './FlashcardsDistributionModal';
+
 interface FlashcardsViewProps {
   onNavigate: (screen: AppScreen) => void;
+  initialCert?: FlashcardCertId;
+  onOpenDistributionModal?: () => void;
 }
 
-export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) => {
+export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ 
+  onNavigate,
+  initialCert,
+  onOpenDistributionModal
+}) => {
   const {
     reviews,
     bookmarkedCardIds,
@@ -68,17 +76,27 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
     isSyncing,
   } = useProgress();
 
-  // Certification selection: default to C1000-177 (IBM Certified Specialist - watsonx.ai)
-  const [selectedCert, setSelectedCert] = useState<'c1000177' | 'gcpmle' | 'aifc01' | 'mlsc01' | 'ai900' | 'ai102'>('c1000177');
+  // Certification selection: default to initialCert or C1000-177 (IBM Certified Specialist - watsonx.ai)
+  const [selectedCert, setSelectedCert] = useState<FlashcardCertId>(() => initialCert || 'c1000177');
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
   const [masteryFilter, setMasteryFilter] = useState<'today' | 'all' | 'maitrise' | 'revoir' | 'difficile' | 'unreviewed'>('today');
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
   const [isAlgorithmModalOpen, setIsAlgorithmModalOpen] = useState(false);
+
+  // Sync with initialCert if it changes from parent
+  useEffect(() => {
+    if (initialCert) {
+      setSelectedCert(initialCert);
+      setSelectedDomain('all');
+      setCurrentCardIndex(lastCardIndices[initialCert] || 0);
+      setIsFlipped(false);
+    }
+  }, [initialCert]);
   
   // Initialize currentCardIndex from persisted lastCardIndices
   const [currentCardIndex, setCurrentCardIndex] = useState<number>(() => {
-    return lastCardIndices['c1000177'] || 0;
+    return lastCardIndices[initialCert || 'c1000177'] || 0;
   });
 
   const [isFlipped, setIsFlipped] = useState(false);
@@ -437,11 +455,21 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
 
       {/* Certification Toggle Bar (6 Certifications) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#171b26] border border-[#262a35]">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Award className="w-4 h-4 text-blue-400 shrink-0" />
           <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
             Certification Cible :
           </span>
+          {onOpenDistributionModal && (
+            <button
+              onClick={onOpenDistributionModal}
+              className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1 transition-colors sm:ml-2"
+              title="Consulter l'inventaire officiel et la répartition des 2 800 cartes par certification"
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>Répartition (2 800)</span>
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:w-auto w-full">

@@ -21,6 +21,7 @@ import { CategorizedHamburgerMenu } from './components/CategorizedHamburgerMenu'
 import { SystemSettingsModal } from './components/SystemSettingsModal';
 import { LegalOnboardingModal } from './components/LegalOnboardingModal';
 import { InstallAppModal } from './components/InstallAppModal';
+import { FlashcardsDistributionModal, FlashcardCertId } from './components/FlashcardsDistributionModal';
 import { certificationsData } from './data/certificationsData';
 import { AuthProvider } from './context/AuthContext';
 import { ProgressProvider } from './context/ProgressContext';
@@ -54,10 +55,18 @@ function AppContent() {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isSystemSettingsOpen, setIsSystemSettingsOpen] = useState(false);
+  const [isFlashcardsDistributionOpen, setIsFlashcardsDistributionOpen] = useState(false);
+  const [selectedFlashcardCert, setSelectedFlashcardCert] = useState<FlashcardCertId>('c1000177');
   const [blueprintExamId, setBlueprintExamId] = useState<string | null>(null);
 
   const { isLegalModalOpen, closeLegalModal, acceptLegal, hasAcceptedLegal } = useGuide();
   const { isInstallModalOpen, closeInstallModal } = usePwa();
+
+  const handleSelectCertFlashcards = (certId: FlashcardCertId) => {
+    setSelectedFlashcardCert(certId);
+    setCurrentScreen('flashcards');
+    setIsFlashcardsDistributionOpen(false);
+  };
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -122,6 +131,7 @@ function AppContent() {
             window.dispatchEvent(new CustomEvent('open-legal-modal'));
           }, 50);
         }}
+        onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
       />
 
       {/* Main Workspace (offset by 64 Tailwind spacing for lg sidebar) */}
@@ -169,6 +179,8 @@ function AppContent() {
 
           {currentScreen === 'flashcards' && (
             <FlashcardsView
+              initialCert={selectedFlashcardCert}
+              onOpenDistributionModal={() => setIsFlashcardsDistributionOpen(true)}
               onNavigate={(screen) => setCurrentScreen(screen)}
             />
           )}
@@ -202,6 +214,15 @@ function AppContent() {
         onNavigate={(screen) => setCurrentScreen(screen)}
         onOpenSystemSettings={() => setIsSystemSettingsOpen(true)}
         onOpenBlueprint={handleOpenBlueprint}
+        onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
+        onSelectCertFlashcards={handleSelectCertFlashcards}
+      />
+
+      {/* Flashcards Distribution & Inventory Modal */}
+      <FlashcardsDistributionModal
+        isOpen={isFlashcardsDistributionOpen}
+        onClose={() => setIsFlashcardsDistributionOpen(false)}
+        onSelectCert={handleSelectCertFlashcards}
       />
 
       {/* System Settings & Updates Modal */}
