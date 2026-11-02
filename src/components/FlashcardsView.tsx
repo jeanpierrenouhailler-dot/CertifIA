@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { useProgress } from '../context/ProgressContext';
+import { InfoTooltip } from './InfoTooltip';
 import { 
   getCardSRSMetrics, 
   predictNextIntervals, 
@@ -1163,17 +1164,35 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
                 <div className="p-3 sm:p-3.5 rounded-2xl bg-[#0a0e18]/85 border border-[#262a35] grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs font-mono">
                   {/* Carte # */}
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Identifiant</div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                      <span>Identifiant</span>
+                      <InfoTooltip
+                        title="Identifiant de la Fiche"
+                        content="Numérotation unique de la fiche mémo permettant un repérage précis dans le référentiel d'examen (ex: Carte #127)."
+                      />
+                    </div>
                     <div className="text-sm font-bold text-blue-400 mt-0.5">{srsDisplay.cardNumber}</div>
                   </div>
                   {/* Dernière révision */}
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Dernière révision</div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                      <span>Dernière révision</span>
+                      <InfoTooltip
+                        title="Historique de révision"
+                        content="Date à laquelle vous avez interagi pour la dernière fois avec cette notion (aujourd'hui, hier, il y a 3 jours...)."
+                      />
+                    </div>
                     <div className="text-sm font-bold text-slate-100 mt-0.5 capitalize">{srsDisplay.lastReviewLabel}</div>
                   </div>
                   {/* Difficulté 3/5 */}
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Difficulté</div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                      <span>Difficulté</span>
+                      <InfoTooltip
+                        title="Indice de Difficulté (1 à 5)"
+                        content="Calculé dynamiquement par l'algorithme SM-2 selon vos réussites et échecs. 1/5 = Très facile, 5/5 = Piège critique."
+                      />
+                    </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className={`text-sm font-bold ${
                         srsDisplay.diffScore >= 4 ? 'text-rose-400' :
@@ -1201,7 +1220,13 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
                   </div>
                   {/* Prochaine révision */}
                   <div>
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Prochaine révision</div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                      <span>Prochaine révision</span>
+                      <InfoTooltip
+                        title="Prochaine échéance SM-2"
+                        content="Intervalle calculé pour présenter la carte juste avant que votre mémoire ne commence à effacer le souvenir (seuil d'oubli Ebbinghaus)."
+                      />
+                    </div>
                     <div className={`text-sm font-bold mt-0.5 ${
                       srsDisplay.isDueToday ? 'text-amber-400 font-bold' : 'text-emerald-400'
                     }`}>
@@ -1210,7 +1235,13 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({ onNavigate }) =>
                   </div>
                   {/* Nombre de répétitions & Taux de réussite */}
                   <div className="col-span-2 sm:col-span-1">
-                    <div className="text-[10px] text-slate-400 uppercase tracking-wider">Répétitions / Taux</div>
+                    <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                      <span>Répétitions / Taux</span>
+                      <InfoTooltip
+                        title="Taux de réussite cumulé"
+                        content="Nombre total d'évaluations réussies sur cette carte et pourcentage de victoires mémo."
+                      />
+                    </div>
                     <div className="text-sm font-bold text-purple-400 mt-0.5">
                       {srsDisplay.repCount} rep. • {srsDisplay.successLabel}
                     </div>

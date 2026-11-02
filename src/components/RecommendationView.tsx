@@ -51,6 +51,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { certificationsData } from '../data/certificationsData';
+import { InfoTooltip } from './InfoTooltip';
 
 interface RecommendationViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -239,8 +240,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                   <span className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 font-mono font-bold text-xs flex items-center justify-center">
                     A
                   </span>
-                  <label className="text-sm font-bold text-white font-headline">
-                    Quel est votre niveau ?
+                  <label className="text-sm font-bold text-white font-headline flex items-center gap-2">
+                    <span>Quel est votre niveau ?</span>
+                    <InfoTooltip
+                      title="Niveau d'expérience"
+                      content="Définit le point d'entrée recommandé. Les débutants démarrent par les fondamentaux (ex: AI-900), évitant le taux d'abandon précoce."
+                    />
                   </label>
                 </div>
 
@@ -282,8 +287,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                   <span className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 font-mono font-bold text-xs flex items-center justify-center">
                     B
                   </span>
-                  <label className="text-sm font-bold text-white font-headline">
-                    Votre métier ?
+                  <label className="text-sm font-bold text-white font-headline flex items-center gap-2">
+                    <span>Votre métier ?</span>
+                    <InfoTooltip
+                      title="Métier cible"
+                      content="Oriente les certifications vers vos cas d'usage réels : SDK et code pour développeurs, modélisation pour data scientists, gouvernance pour chefs de projet."
+                    />
                   </label>
                 </div>
 
@@ -318,8 +327,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                   <span className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 font-mono font-bold text-xs flex items-center justify-center">
                     C
                   </span>
-                  <label className="text-sm font-bold text-white font-headline">
-                    Votre objectif ?
+                  <label className="text-sm font-bold text-white font-headline flex items-center gap-2">
+                    <span>Votre objectif ?</span>
+                    <InfoTooltip
+                      title="Objectif technologique"
+                      content="Choix de la spécialité majeure : IA Générative (LLM, RAG), Cloud AI managé, Machine Learning pur ou pipelines MLOps."
+                    />
                   </label>
                 </div>
 

@@ -12,9 +12,15 @@ import {
   Flame,
   X,
   User,
-  CheckSquare
+  CheckSquare,
+  Menu,
+  Settings,
+  Download,
+  Scale
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { usePwa } from '../context/PwaContext';
+import { useSystemUpdate } from '../context/SystemUpdateContext';
 
 interface SidebarProps {
   currentScreen: AppScreen;
@@ -24,6 +30,9 @@ interface SidebarProps {
   isOpenMobile?: boolean;
   onCloseMobile?: () => void;
   onOpenBlueprint?: (examId: string) => void;
+  onOpenHamburgerMenu?: () => void;
+  onOpenSystemSettings?: () => void;
+  onOpenLegalModal?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -33,8 +42,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenMobile = false,
   onCloseMobile,
   onOpenBlueprint,
+  onOpenHamburgerMenu,
+  onOpenSystemSettings,
+  onOpenLegalModal,
 }) => {
   const { user, userProfile } = useAuth();
+  const { promptInstall, isInstalled } = usePwa();
+  const { versionInfo } = useSystemUpdate();
 
   const navItems = [
     {
@@ -92,11 +106,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const cloudProviders: { id: CloudProvider; name: string; color: string }[] = [
-    { id: 'aws', name: 'AWS', color: 'hover:border-amber-500/40 hover:text-amber-300' },
-    { id: 'azure', name: 'Azure', color: 'hover:border-blue-500/40 hover:text-blue-300' },
-    { id: 'gcp', name: 'GCP', color: 'hover:border-emerald-500/40 hover:text-emerald-300' },
-    { id: 'ibm', name: 'IBM', color: 'hover:border-indigo-500/40 hover:text-indigo-300' },
-    { id: 'nvidia', name: 'NVIDIA', color: 'hover:border-green-500/40 hover:text-green-300' },
+    { id: 'aws', name: 'AWS', color: 'hover:border-amber-500/40 hover:text-amber-500 dark:hover:text-amber-300' },
+    { id: 'azure', name: 'Azure', color: 'hover:border-blue-500/40 hover:text-blue-500 dark:hover:text-blue-300' },
+    { id: 'gcp', name: 'GCP', color: 'hover:border-emerald-500/40 hover:text-emerald-500 dark:hover:text-emerald-300' },
+    { id: 'ibm', name: 'IBM', color: 'hover:border-indigo-500/40 hover:text-indigo-500 dark:hover:text-indigo-300' },
+    { id: 'nvidia', name: 'NVIDIA', color: 'hover:border-green-500/40 hover:text-green-500 dark:hover:text-green-300' },
   ];
 
   const handleProviderClick = (provider: CloudProvider) => {
@@ -119,16 +133,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <aside
         id="app-sidebar"
-        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-[#0a0e18]/95 backdrop-blur-xl border-r border-[#1c1f2a] flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-white/95 dark:bg-[#0a0e18]/95 backdrop-blur-xl border-r border-slate-200 dark:border-[#1c1f2a] flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Header Section */}
-        <div className="p-5 flex flex-col gap-6">
+        <div className="p-4 sm:p-5 flex flex-col gap-4 overflow-y-auto">
           <div className="flex items-center justify-between">
             <button
               onClick={() => {
-                onNavigate('catalogue');
+                onNavigate('today');
                 if (onCloseMobile) onCloseMobile();
               }}
               className="text-left focus:outline-none"
@@ -138,44 +152,65 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {onCloseMobile && (
               <button
                 onClick={onCloseMobile}
-                className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
           </div>
 
+          {/* Categorized Hamburger Menu Trigger in Sidebar */}
+          {onOpenHamburgerMenu && (
+            <button
+              id="sidebar-btn-hamburger"
+              onClick={() => {
+                onOpenHamburgerMenu();
+                if (onCloseMobile) onCloseMobile();
+              }}
+              className="w-full p-2.5 rounded-xl bg-blue-50 dark:bg-blue-600/10 hover:bg-blue-100 dark:hover:bg-blue-600/20 border border-blue-200 dark:border-blue-500/30 text-blue-700 dark:text-blue-300 transition-all flex items-center justify-between text-xs font-mono font-bold shadow-sm"
+            >
+              <div className="flex items-center gap-2">
+                <Menu className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>Menu Catégorisé</span>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+
           {/* Active Target Banner */}
           <div 
-            onClick={() => onNavigate('profile')}
-            className="group relative p-3.5 rounded-xl bg-gradient-to-br from-[#171b26] to-[#1c1f2a] border border-[#262a35] hover:border-indigo-500/40 transition-all cursor-pointer shadow-sm"
+            onClick={() => {
+              onNavigate('profile');
+              if (onCloseMobile) onCloseMobile();
+            }}
+            className="group relative p-3 rounded-xl bg-slate-50 dark:bg-gradient-to-br dark:from-[#171b26] dark:to-[#1c1f2a] border border-slate-200 dark:border-[#262a35] hover:border-blue-500/40 transition-all cursor-pointer shadow-sm"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20">
                 <Sparkles className="w-2.5 h-2.5" />
                 Cible Active
               </span>
-              <span className="flex items-center gap-1 text-[11px] font-mono font-medium text-amber-400">
-                <Flame className="w-3 h-3 text-amber-400 fill-amber-400" />
-                {userProfile?.streakDays ?? 12}j
+              <span className="flex items-center gap-1 text-[11px] font-mono font-medium text-amber-500 dark:text-amber-400">
+                <Flame className="w-3 h-3 fill-amber-400 text-amber-400" />
+                {userProfile?.streakDays ?? 14}j
               </span>
             </div>
 
-            <div className="font-semibold text-xs text-white group-hover:text-indigo-200 transition-colors flex items-center justify-between">
+            <div className="font-semibold text-xs text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-indigo-200 transition-colors flex items-center justify-between">
               <span className="truncate pr-1">{userProfile?.targetExamTitle || 'Azure AI-102 • Architecte'}</span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
             </div>
 
-            <div className="mt-2.5">
-              <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+            <div className="mt-2">
+              <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-1">
                 <span>Préparation globale</span>
-                <span className="font-mono font-semibold text-emerald-400">
+                <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
                   {userProfile?.readinessIndex ?? 78}%
                 </span>
               </div>
-              <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-slate-200 dark:bg-[#0a0e18] rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all duration-500"
                   style={{ width: `${userProfile?.readinessIndex ?? 78}%` }}
                 />
               </div>
@@ -183,7 +218,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Navigation Items */}
-          <nav className="flex flex-col gap-1.5" aria-label="Navigation principale">
+          <nav className="flex flex-col gap-1" aria-label="Navigation principale">
             {navItems.map((item) => {
               const isActive = currentScreen === item.id;
               const Icon = item.icon;
@@ -195,24 +230,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onNavigate(item.id);
                     if (onCloseMobile) onCloseMobile();
                   }}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all ${
                     isActive
-                      ? 'bg-blue-600/15 text-blue-300 border border-blue-500/30 shadow-sm shadow-blue-500/10'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-[#171b26]/70 border border-transparent'
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20 font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#171b26]/70'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                  <div className="flex items-center gap-2.5">
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
                     <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-semibold ${
+                      className={`text-[9px] font-mono px-1.5 py-0.5 rounded-md font-semibold ${
                         item.highlightBadge
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                          ? isActive 
+                            ? 'bg-white/20 text-white' 
+                            : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30'
                           : isActive
-                          ? 'bg-blue-500/20 text-blue-300'
-                          : 'bg-[#1c1f2a] text-slate-400'
+                          ? 'bg-white/20 text-white'
+                          : 'bg-slate-100 dark:bg-[#1c1f2a] text-slate-500 dark:text-slate-400'
                       }`}
                     >
                       {item.badge}
@@ -224,28 +261,60 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
         </div>
 
-        {/* Bottom Cloud Ecosystems Section */}
-        <div className="p-5 border-t border-[#1c1f2a]/80 bg-[#0a0e18]/50">
-          <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-300 mb-2.5">
-            Fournisseurs Cloud
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {cloudProviders.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => handleProviderClick(p.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-medium bg-[#171b26] text-slate-300 border border-[#262a35] transition-all ${p.color}`}
-              >
-                {p.name}
-              </button>
-            ))}
+        {/* Bottom Cloud Ecosystems & Actions Section */}
+        <div className="p-4 border-t border-slate-200 dark:border-[#1c1f2a]/80 bg-slate-50/50 dark:bg-[#0a0e18]/50 space-y-3">
+          <div>
+            <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              Fournisseurs Cloud
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {cloudProviders.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => handleProviderClick(p.id)}
+                  className={`px-2 py-0.5 rounded-md text-[11px] font-mono font-medium bg-white dark:bg-[#171b26] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#262a35] transition-all ${p.color}`}
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-[#1c1f2a] flex items-center justify-between text-[11px] text-slate-300">
-            <span className="font-mono">CertifAI v3.4</span>
-            <span className="inline-flex items-center gap-1 text-emerald-400 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              API Synced
+          {/* Quick Buttons: Install PWA + System Settings + Legal */}
+          <div className="pt-2 border-t border-slate-200 dark:border-[#1c1f2a] grid grid-cols-3 gap-1 text-[10px] font-mono">
+            <button
+              onClick={promptInstall}
+              className="p-1.5 rounded-lg bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-500 flex flex-col items-center justify-center gap-0.5 transition-colors"
+              title="Installer l'application"
+            >
+              <Download className="w-3.5 h-3.5 text-blue-500" />
+              <span>{isInstalled ? 'Installé' : 'Installer'}</span>
+            </button>
+
+            <button
+              onClick={onOpenSystemSettings}
+              className="p-1.5 rounded-lg bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-500 flex flex-col items-center justify-center gap-0.5 transition-colors"
+              title="Paramètres Système & Mises à Jour"
+            >
+              <Settings className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+              <span>Système</span>
+            </button>
+
+            <button
+              onClick={onOpenLegalModal}
+              className="p-1.5 rounded-lg bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-500 flex flex-col items-center justify-center gap-0.5 transition-colors"
+              title="Mentions Légales & Non-responsabilité"
+            >
+              <Scale className="w-3.5 h-3.5 text-amber-500" />
+              <span>Légal</span>
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+            <span>CertifIA {versionInfo.version}</span>
+            <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Auto-Sync ON
             </span>
           </div>
         </div>

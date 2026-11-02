@@ -44,6 +44,7 @@ import {
   formatSRSDisplay,
   getTodayDateString 
 } from '../lib/srsAlgorithm';
+import { InfoTooltip } from './InfoTooltip';
 
 interface TodayViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -363,13 +364,20 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 {/* 1. 17 Cartes à réviser */}
                 <div 
                   onClick={() => onNavigate('flashcards')}
-                  className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-blue-500/40 transition-all cursor-pointer group/card flex flex-col justify-between"
+                  className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-blue-500/40 transition-all cursor-pointer group/card flex flex-col justify-between relative"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-2xl">🧠</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-bold">
-                      SM-2
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20 font-bold">
+                        SM-2
+                      </span>
+                      <InfoTooltip
+                        title="Cartes SRS à réviser (SM-2)"
+                        content="Ces 17 cartes ont atteint leur seuil d'oubli critique calculé par l'algorithme SuperMemo-2 / FSRS. Les revoir aujourd'hui maximise votre rétention sans surcharger votre mémoire."
+                        example="Carte #127 programmée pour aujourd'hui avec intervalle de 3 jours."
+                      />
+                    </div>
                   </div>
                   <div className="mt-3">
                     <div className="text-2xl font-extrabold text-white font-mono">17</div>
@@ -385,13 +393,20 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 {/* 2. 8 Notions fragiles */}
                 <div 
                   onClick={() => onNavigate('flashcards')}
-                  className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-amber-500/40 transition-all cursor-pointer group/card flex flex-col justify-between"
+                  className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-amber-500/40 transition-all cursor-pointer group/card flex flex-col justify-between relative"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-2xl">⚠️</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-bold">
-                      Priorité 4-5/5
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-bold">
+                        Priorité 4-5/5
+                      </span>
+                      <InfoTooltip
+                        title="Notions Fragiles & Pièges"
+                        content="Concepts à fort coefficient d'examen où vos réponses précédentes ont montré des hésitations, des erreurs répétées ou une difficulté supérieure à 3/5."
+                        example="Différence entre Index Hybride BM25 et Recherche Vectorielle pure."
+                      />
+                    </div>
                   </div>
                   <div className="mt-3">
                     <div className="text-2xl font-extrabold text-amber-400 font-mono">8</div>
@@ -407,13 +422,20 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 {/* 3. 12 Questions non maîtrisées */}
                 <div 
                   onClick={() => onNavigate('quiz')}
-                  className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-rose-500/40 transition-all cursor-pointer group/card flex flex-col justify-between"
+                  className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-rose-500/40 transition-all cursor-pointer group/card flex flex-col justify-between relative"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-2xl">❓</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 font-bold">
-                      QCM
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 font-bold">
+                        QCM
+                      </span>
+                      <InfoTooltip
+                        title="QCM d'Architecture Ciblés"
+                        content="12 questions d'examen représentatives sélectionnées pour tester votre capacité à appliquer vos connaissances théoriques dans des cas réels d'entreprise."
+                        example="Choix entre SageMaker JumpStart et Amazon Bedrock selon les contraintes de latence."
+                      />
+                    </div>
                   </div>
                   <div className="mt-3">
                     <div className="text-2xl font-extrabold text-rose-400 font-mono">12</div>
@@ -435,6 +457,10 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                     <span className="text-sm font-bold text-white font-headline">
                       {currentCert.code} — {currentCert.title}
                     </span>
+                    <InfoTooltip
+                      title="Certification Active"
+                      content="L'examen officiel ciblé par vos sessions quotidiennes. Vous pouvez changer d'examen cible en un clic via la barre supérieure."
+                    />
                   </div>
                   <div className="text-xs font-mono font-bold text-emerald-400">
                     Progression : {currentProgressPct} %
