@@ -2,26 +2,30 @@ import React, { useState } from 'react';
 import { 
   X, 
   Search, 
+  Home,
   Target, 
-  Sparkles, 
   Compass, 
+  Sparkles, 
+  Scale,
   CheckSquare, 
   Layers, 
   Clock, 
   BarChart3, 
+  TrendingUp,
+  History,
+  Bot, 
+  BookOpen, 
+  PieChart,
   User, 
   Settings, 
   Download, 
   Moon, 
   Sun, 
   HelpCircle, 
-  Scale, 
+  FileText, 
   ChevronRight, 
-  Award,
   Zap,
-  BookOpen,
-  ArrowRight,
-  PieChart
+  ArrowRight
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { CertifAILogo } from './CertifAILogo';
@@ -29,6 +33,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useGuide } from '../context/GuideContext';
 import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
+import { NAV_CATEGORIES, NAV_ITEMS, NavCategoryId, NavItemConfig } from '../navigation/navigationConfig';
 
 interface CategorizedHamburgerMenuProps {
   isOpen: boolean;
@@ -38,6 +43,8 @@ interface CategorizedHamburgerMenuProps {
   onOpenSystemSettings: () => void;
   onOpenBlueprint?: (certId: string) => void;
   onOpenFlashcardsDistribution?: () => void;
+  onOpenComparator?: () => void;
+  onOpenAIAssistant?: () => void;
   onSelectCertFlashcards?: (certId: 'c1000177' | 'gcpmle' | 'aifc01' | 'mlsc01' | 'ai900' | 'ai102') => void;
 }
 
@@ -49,6 +56,8 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
   onOpenSystemSettings,
   onOpenBlueprint,
   onOpenFlashcardsDistribution,
+  onOpenComparator,
+  onOpenAIAssistant,
   onSelectCertFlashcards,
 }) => {
   const [filterQuery, setFilterQuery] = useState('');
@@ -59,312 +68,87 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
 
   if (!isOpen) return null;
 
-  interface MenuItem {
-    id: string;
-    label: string;
-    subtitle: string;
-    icon: React.ComponentType<{ className?: string }>;
-    badge?: string;
-    badgeColor?: string;
-    onClick?: () => void;
-  }
-
-  interface MenuCategory {
-    id: string;
-    title: string;
-    description: string;
-    items: MenuItem[];
-  }
-
-  const categories: MenuCategory[] = [
-    {
-      id: 'session',
-      title: '🎯 Session & Orientation',
-      description: 'Pilotage quotidien et trajectoire personnalisée',
-      items: [
-        {
-          id: 'today',
-          label: "Aujourd'hui",
-          subtitle: 'Votre session quotidienne (17 cartes SM-2 + 8 fragiles + 12 QCM)',
-          icon: Target,
-          badge: '🎯 Prioritaire',
-          badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/20',
-          onClick: () => {
-            onNavigate('today');
-            onClose();
-          },
-        },
-        {
-          id: 'recommendation',
-          label: 'Parcours IA',
-          subtitle: 'Moteur d’orientation sur-mesure du Niveau 1 au Niveau 4',
-          icon: Sparkles,
-          badge: '4 Niveaux',
-          badgeColor: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border-indigo-500/20',
-          onClick: () => {
-            onNavigate('recommendation');
-            onClose();
-          },
-        },
-      ],
-    },
-    {
-      id: 'flashcards-distribution',
-      title: '🗂️ Répartition des Flashcards',
-      description: 'Inventaire officiel et répartition des 2 800 cartes par certification',
-      items: [
-        {
-          id: 'distribution-overview',
-          label: 'Répartition des flashcards par certification',
-          subtitle: 'Inventaire complet des 2 800 fiches (Azure, AWS, GCP, IBM) et domaines',
-          icon: PieChart,
-          badge: '2 800 Cartes',
-          badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20',
-          onClick: () => {
-            onClose();
-            if (onOpenFlashcardsDistribution) {
-              onOpenFlashcardsDistribution();
-            }
-          },
-        },
-        {
-          id: 'distribution-azure',
-          label: 'Microsoft Azure (1 000 fiches)',
-          subtitle: 'AI-102 (500 fiches) & AI-900 (500 fiches)',
-          icon: Layers,
-          badge: '1 000 Cartes',
-          badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/20',
-          onClick: () => {
-            onClose();
-            if (onSelectCertFlashcards) {
-              onSelectCertFlashcards('ai102');
-            } else {
-              onNavigate('flashcards');
-            }
-          },
-        },
-        {
-          id: 'distribution-aws',
-          label: 'Amazon Web Services (900 fiches)',
-          subtitle: 'AIF-C01 (500 fiches) & MLS-C01 (400 fiches)',
-          icon: Layers,
-          badge: '900 Cartes',
-          badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20',
-          onClick: () => {
-            onClose();
-            if (onSelectCertFlashcards) {
-              onSelectCertFlashcards('aifc01');
-            } else {
-              onNavigate('flashcards');
-            }
-          },
-        },
-        {
-          id: 'distribution-gcp',
-          label: 'Google Cloud (500 fiches)',
-          subtitle: 'GCP-PMLE (500 fiches MLOps & Vertex AI)',
-          icon: Layers,
-          badge: '500 Cartes',
-          badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20',
-          onClick: () => {
-            onClose();
-            if (onSelectCertFlashcards) {
-              onSelectCertFlashcards('gcpmle');
-            } else {
-              onNavigate('flashcards');
-            }
-          },
-        },
-        {
-          id: 'distribution-ibm',
-          label: 'IBM watsonx.ai (400 fiches)',
-          subtitle: 'C1000-177 (400 fiches Studio, Lakehouse, AI Act)',
-          icon: Layers,
-          badge: '400 Cartes',
-          badgeColor: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border-indigo-500/20',
-          onClick: () => {
-            onClose();
-            if (onSelectCertFlashcards) {
-              onSelectCertFlashcards('c1000177');
-            } else {
-              onNavigate('flashcards');
-            }
-          },
-        },
-      ],
-    },
-    {
-      id: 'study',
-      title: '📚 Révisions & Entraînement',
-      description: 'Apprentissage granulaire et répétition espacée',
-      items: [
-        {
-          id: 'catalogue',
-          label: 'Catalogue Certifications',
-          subtitle: '18 référentiels officiels Azure, AWS, Google Cloud, IBM',
-          icon: Compass,
-          badge: '18 Certifs',
-          badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20',
-          onClick: () => {
-            onNavigate('catalogue');
-            onClose();
-          },
-        },
-        {
-          id: 'quiz',
-          label: 'Entraînement QCM',
-          subtitle: 'Questions d’architecture corrigées avec pièges officiels',
-          icon: CheckSquare,
-          badge: 'QCM Examen',
-          badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20',
-          onClick: () => {
-            onNavigate('quiz');
-            onClose();
-          },
-        },
-        {
-          id: 'flashcards',
-          label: 'Fiches Mémo SRS',
-          subtitle: 'Algorithme SuperMemo-2 / FSRS au seuil d’oubli calculé',
-          icon: Layers,
-          badge: 'SM-2 Actif',
-          badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/20',
-          onClick: () => {
-            onNavigate('flashcards');
-            onClose();
-          },
-        },
-        {
-          id: 'glossary',
-          label: 'Glossaire & Encyclopédie IA',
-          subtitle: 'Concepts clés, pièges d\'examen et correspondances multi-cloud (A-Z)',
-          icon: BookOpen,
-          badge: 'A-Z & Fiches',
-          badgeColor: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border-indigo-500/20',
-          onClick: () => {
-            onNavigate('glossary');
-            onClose();
-          },
-        },
-      ],
-    },
-    {
-      id: 'evaluation',
-      title: '⏱️ Évaluation & Spécifications',
-      description: 'Mesure en conditions réelles et référentiels officiels',
-      items: [
-        {
-          id: 'exam',
-          label: 'Examen Blanc Chronométré',
-          subtitle: 'Épreuve live chronométrée 90 min (seuil éliminatoire 700 pts)',
-          icon: Clock,
-          badge: 'Live Simulation',
-          badgeColor: 'bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/20',
-          onClick: () => {
-            onNavigate('exam');
-            onClose();
-          },
-        },
-      ],
-    },
-    {
-      id: 'tracking',
-      title: '📊 Télémétrie & Compte',
-      description: 'Analytics de progression et synchronisation cloud',
-      items: [
-        {
-          id: 'analytics',
-          label: 'Analytics & Rétention',
-          subtitle: 'Courbes de progression, séries (streak) et indice de préparation',
-          icon: BarChart3,
-          badge: 'Télémétrie',
-          badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/20',
-          onClick: () => {
-            onNavigate('analytics');
-            onClose();
-          },
-        },
-        {
-          id: 'profile',
-          label: 'Mon Profil & Objectifs',
-          subtitle: 'Connexion Firebase, calendrier cible et volume hebdomadaire',
-          icon: User,
-          badge: 'Profil Cloud',
-          badgeColor: 'bg-slate-500/10 text-slate-600 dark:text-slate-300 border-slate-500/20',
-          onClick: () => {
-            onNavigate('profile');
-            onClose();
-          },
-        },
-      ],
-    },
-  ];
-
-  const handleSelectItem = (item: MenuItem) => {
-    if (item.onClick) {
-      item.onClick();
+  const handleAction = (item: NavItemConfig) => {
+    if (item.actionKey === 'open-settings') {
+      onOpenSystemSettings();
+    } else if (item.actionKey === 'open-distribution' && onOpenFlashcardsDistribution) {
+      onOpenFlashcardsDistribution();
+    } else if (item.actionKey === 'open-comparator' && onOpenComparator) {
+      onOpenComparator();
+    } else if (item.actionKey === 'open-guide') {
+      toggleGuideMode();
+    } else if (item.actionKey === 'open-legal') {
+      openLegalModal();
+    } else if (item.actionKey === 'open-pwa') {
+      promptInstall();
+    } else if (item.category === 'assistant' && onOpenAIAssistant) {
+      onOpenAIAssistant();
     } else {
-      onNavigate(item.id as AppScreen);
-      onClose();
+      onNavigate(item.screen);
     }
+    onClose();
   };
 
-  const filteredCategories = filterQuery.trim()
-    ? categories
-        .map((cat) => ({
-          ...cat,
-          items: cat.items.filter(
-            (item) =>
-              item.label.toLowerCase().includes(filterQuery.toLowerCase()) ||
-              item.subtitle.toLowerCase().includes(filterQuery.toLowerCase()) ||
-              cat.title.toLowerCase().includes(filterQuery.toLowerCase())
-          ),
-        }))
-        .filter((cat) => cat.items.length > 0)
-    : categories;
+  const categoriesOrder: NavCategoryId[] = [
+    'accueil',
+    'certifications',
+    'apprentissage',
+    'progression',
+    'assistant',
+    'plus'
+  ];
+
+  const q = filterQuery.trim().toLowerCase();
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-start bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-      
-      {/* Click outside backdrop */}
-      <div className="absolute inset-0" onClick={onClose} />
-
-      {/* Slide-out Drawer Container */}
-      <div className="relative w-full max-w-md sm:max-w-lg bg-white dark:bg-[#0c101b] text-slate-800 dark:text-slate-100 h-full shadow-2xl border-r border-slate-200 dark:border-[#1c1f2a] flex flex-col z-10 animate-in slide-in-from-left duration-250">
-        
-        {/* Top Header of Drawer */}
-        <div className="p-5 border-b border-slate-200 dark:border-[#1c1f2a] bg-slate-50 dark:bg-[#080b13] flex items-center justify-between gap-3">
+    <div 
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-start animate-in fade-in duration-200"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu principal catégorisé"
+    >
+      <div 
+        className="w-full max-w-md bg-white dark:bg-[#111520] h-full shadow-2xl flex flex-col border-r border-slate-200 dark:border-[#22283a] overflow-hidden animate-in slide-in-from-left duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Drawer Header */}
+        <div className="p-4 border-b border-slate-200 dark:border-[#22283a] flex items-center justify-between bg-slate-50/70 dark:bg-[#141824]/70">
           <div className="flex items-center gap-3">
-            <CertifAILogo />
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-bold">
-              Menu Catégorisé
-            </span>
+            <CertifAILogo showSubtitle={false} />
+            <div>
+              <div className="font-extrabold text-slate-900 dark:text-white text-base">
+                Certif<span className="text-blue-600 dark:text-blue-400">IA</span>
+              </div>
+              <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                Architecture de navigation unifiée
+              </div>
+            </div>
           </div>
-
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#1a2030] transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#20273c] transition-all"
             aria-label="Fermer le menu"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Quick Filter Search Input */}
-        <div className="p-4 border-b border-slate-200 dark:border-[#1c1f2a] bg-white dark:bg-[#0c101b]">
-          <div className="relative flex items-center">
-            <Search className="absolute left-3 w-4 h-4 text-slate-400 pointer-events-none" />
+        {/* Search filter input inside menu */}
+        <div className="p-3 border-b border-slate-200 dark:border-[#22283a] bg-slate-100/50 dark:bg-[#0e121c]/50">
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              placeholder="Filtrer les fonctionnalités (ex: SRS, QCM, Examen)..."
-              className="w-full pl-9 pr-8 py-2 text-xs bg-slate-100 dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] rounded-xl text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500 font-sans"
+              placeholder="Filtrer une rubrique, examen, outil..."
+              className="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-white dark:bg-[#171c2b] border border-slate-200 dark:border-[#2a3044] text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {filterQuery && (
               <button
                 onClick={() => setFilterQuery('')}
-                className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white p-0.5"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -372,185 +156,136 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
           </div>
         </div>
 
-        {/* Main Categorized Items List (Scrollable) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-6 text-xs">
-          {filteredCategories.map((cat) => (
-            <div key={cat.id} className="space-y-2">
-              <div className="flex items-center justify-between px-1">
-                <span className="font-mono font-bold uppercase tracking-wider text-[11px] text-slate-500 dark:text-slate-400">
-                  {cat.title}
-                </span>
-                <span className="text-[10px] text-slate-400">
-                  {cat.items.length} module{cat.items.length > 1 ? 's' : ''}
-                </span>
-              </div>
+        {/* Navigation Categories and Items List */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-5">
+          {categoriesOrder.map((catId) => {
+            const cat = NAV_CATEGORIES[catId];
+            const items = NAV_ITEMS.filter((item) => {
+              if (item.category !== catId) return false;
+              if (!q) return true;
+              return (
+                item.label.toLowerCase().includes(q) ||
+                item.description.toLowerCase().includes(q) ||
+                cat.label.toLowerCase().includes(q)
+              );
+            });
 
-              <div className="space-y-1.5">
-                {cat.items.map((item) => {
-                  const isActive = currentScreen === item.id;
-                  const Icon = item.icon;
+            if (items.length === 0) return null;
 
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleSelectItem(item)}
-                      className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between gap-3 group ${
-                        isActive
-                          ? 'bg-blue-50 dark:bg-blue-600/15 border-blue-500/40 text-blue-700 dark:text-blue-300 shadow-sm'
-                          : 'bg-slate-50/70 hover:bg-slate-100 dark:bg-[#131722] dark:hover:bg-[#1c2233] border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+            return (
+              <div key={catId} className="space-y-1.5">
+                {/* Category Header */}
+                <div className="flex items-center justify-between px-2 pt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      {cat.title}
+                    </span>
+                    {cat.badge && (
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                        {cat.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-slate-400 truncate max-w-[150px]">
+                    {cat.description}
+                  </span>
+                </div>
+
+                {/* Items in Category */}
+                <div className="space-y-1">
+                  {items.map((item) => {
+                    const IconComponent = item.icon;
+                    const isActive = currentScreen === item.screen && !item.actionKey;
+
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleAction(item)}
+                        className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition-all group ${
                           isActive
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white dark:bg-[#0a0e18] text-slate-600 dark:text-slate-400 group-hover:text-blue-500 border border-slate-200 dark:border-[#262a35]'
-                        }`}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-2">
-                            <span>{item.label}</span>
-                            {item.badge && (
-                              <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border font-semibold ${item.badgeColor}`}>
-                                {item.badge}
-                              </span>
-                            )}
+                            ? 'bg-blue-600 text-white font-semibold shadow-sm'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1a2030]'
+                        }`}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        <div className="flex items-center gap-3 truncate">
+                          <div className={`p-1.5 rounded-lg shrink-0 ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : 'bg-slate-100 dark:bg-[#1f2538] text-slate-500 dark:text-slate-400 group-hover:text-blue-500'
+                          }`}>
+                            <IconComponent className="w-4 h-4" />
                           </div>
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1">
-                            {item.subtitle}
+                          <div className="truncate">
+                            <div className="text-xs truncate flex items-center gap-2">
+                              <span>{item.label}</span>
+                              {item.badge && (
+                                <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
+                                  isActive
+                                    ? 'bg-white/25 text-white'
+                                    : item.badgeColor || 'bg-slate-200 dark:bg-[#28314a] text-slate-600 dark:text-slate-300'
+                                }`}>
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <div className={`text-[10px] truncate ${
+                              isActive ? 'text-blue-100' : 'text-slate-400 dark:text-slate-400'
+                            }`}>
+                              {item.description}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <ChevronRight className={`w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-                        isActive ? 'text-blue-500' : 'text-slate-400'
-                      }`} />
-                    </button>
-                  );
-                })}
+                        <ChevronRight className={`w-4 h-4 shrink-0 transition-transform ${
+                          isActive ? 'text-white translate-x-0.5' : 'text-slate-400 group-hover:translate-x-0.5'
+                        }`} />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
-
-          {/* Quick Blueprint Jump Box */}
-          {onOpenBlueprint && (
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 dark:from-[#131722] dark:to-[#0a0e18] border border-slate-200 dark:border-[#262a35] space-y-2.5">
-              <div className="flex items-center justify-between text-xs font-mono font-bold text-slate-700 dark:text-slate-300">
-                <span className="flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-blue-500" />
-                  Accès Direct Blueprints Officiels
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                {[
-                  { id: 'ai102', code: 'AI-102' },
-                  { id: 'aifc01', code: 'AIF-C01' },
-                  { id: 'gcpmle', code: 'GCP-PMLE' },
-                  { id: 'watsonx', code: 'watsonx' },
-                  { id: 'mlsc01', code: 'MLS-C01' },
-                  { id: 'ai900', code: 'AI-900' },
-                ].map((b) => (
-                  <button
-                    key={b.id}
-                    onClick={() => {
-                      onOpenBlueprint(b.id);
-                      onClose();
-                    }}
-                    className="p-1.5 rounded-lg text-center font-mono text-[11px] font-bold bg-white dark:bg-[#1a2030] hover:bg-blue-50 dark:hover:bg-blue-950/40 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-[#262a35] transition-colors"
-                  >
-                    {b.code}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+            );
+          })}
         </div>
 
-        {/* Bottom Quick Tools & System Actions */}
-        <div className="p-4 border-t border-slate-200 dark:border-[#1c1f2a] bg-slate-50 dark:bg-[#080b13] space-y-2">
-          
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-            {/* Toggle Theme: Clair / Sombre */}
+        {/* Drawer Footer with Quick Theme Toggle and System Status */}
+        <div className="p-3 border-t border-slate-200 dark:border-[#22283a] bg-slate-50/90 dark:bg-[#0f131d]/90 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2">
             <button
-              id="hamburger-btn-theme"
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl border border-slate-200 dark:border-[#262a35] bg-white dark:bg-[#131722] hover:bg-slate-100 dark:hover:bg-[#1a2030] text-slate-700 dark:text-slate-200 transition-colors flex items-center justify-center gap-2"
-              title="Basculer Thème Clair / Thème Sombre"
+              className="p-2 rounded-xl bg-white dark:bg-[#1a2030] border border-slate-200 dark:border-[#2a3146] text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center gap-1.5 font-medium"
+              aria-label="Basculer thème clair/sombre"
             >
-              {theme === 'dark' ? (
-                <>
-                  <Sun className="w-4 h-4 text-amber-400" />
-                  <span>Thème Clair</span>
-                </>
-              ) : (
-                <>
-                  <Moon className="w-4 h-4 text-blue-500" />
-                  <span>Thème Sombre</span>
-                </>
-              )}
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-500" />}
+              <span className="text-[11px]">{theme === 'dark' ? 'Clair' : 'Sombre'}</span>
             </button>
 
-            {/* Toggle Guide Novice */}
-            <button
-              id="hamburger-btn-guide"
-              onClick={toggleGuideMode}
-              className={`p-2.5 rounded-xl border transition-colors flex items-center justify-center gap-1.5 ${
-                isGuideModeActive
-                  ? 'border-blue-500/40 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 font-bold'
-                  : 'border-slate-200 dark:border-[#262a35] bg-white dark:bg-[#131722] text-slate-500 dark:text-slate-400'
-              }`}
-              title="Activer/Désactiver les infobulles contextuelles pour débutants"
-            >
-              <HelpCircle className="w-4 h-4 text-blue-500" />
-              <span>{isGuideModeActive ? 'Guide : ON' : 'Guide : OFF'}</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
-            {/* Paramètres Système */}
             <button
               onClick={() => {
                 onClose();
                 onOpenSystemSettings();
               }}
-              className="p-2 rounded-xl bg-white dark:bg-[#131722] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-200 hover:text-blue-500 flex items-center justify-center gap-1.5 transition-colors"
+              className="p-2 rounded-xl bg-white dark:bg-[#1a2030] border border-slate-200 dark:border-[#2a3146] text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center gap-1.5 font-medium"
             >
-              <Settings className="w-3.5 h-3.5 text-blue-500" />
-              <span>Système</span>
+              <Settings className="w-4 h-4 text-slate-400" />
+              <span className="text-[11px] font-mono">{versionInfo.version}</span>
             </button>
+          </div>
 
-            {/* Mentions Légales */}
-            <button
-              onClick={() => {
-                onClose();
-                openLegalModal();
-              }}
-              className="p-2 rounded-xl bg-white dark:bg-[#131722] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-200 hover:text-blue-500 flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Scale className="w-3.5 h-3.5 text-amber-500" />
-              <span>Mentions</span>
-            </button>
-
-            {/* Installer PWA */}
+          {!isInstalled && (
             <button
               onClick={() => {
                 onClose();
                 promptInstall();
               }}
-              className="p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold flex items-center justify-center gap-1.5 transition-colors shadow-sm"
-              title="Installer sur l'écran d'accueil"
+              className="px-2.5 py-1.5 rounded-xl bg-blue-600 text-white font-semibold text-[11px] flex items-center gap-1 shadow hover:bg-blue-500"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Installer</span>
+              <span>Installer PWA</span>
             </button>
-          </div>
-
-          <div className="pt-1 text-center text-[10px] font-mono text-slate-400">
-            CertifIA {versionInfo.version} • Mises à jour auto actives
-          </div>
+          )}
         </div>
-
       </div>
     </div>
   );

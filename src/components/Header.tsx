@@ -24,6 +24,7 @@ import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
 import { certificationsData } from '../data/certificationsData';
+import { getBreadcrumbForScreen } from '../navigation/navigationConfig';
 
 interface HeaderProps {
   currentScreen: AppScreen;
@@ -55,21 +56,9 @@ export const Header: React.FC<HeaderProps> = ({
   // Active target certification
   const currentCert = certificationsData.find((c) => c.id === (activeCertId || 'ai102')) || certificationsData[0];
 
-  // Screen title & breadcrumb label
-  const screenMetadata: Record<AppScreen, { title: string; section: string }> = {
-    today: { title: "Session du jour", section: "Accueil" },
-    catalogue: { title: "Catalogue & Blueprints", section: "Certifications" },
-    recommendation: { title: "Parcours recommandés", section: "Certifications" },
-    quiz: { title: "Quiz & Entraînements", section: "Apprentissage" },
-    flashcards: { title: "Fiches Mémo SRS", section: "Apprentissage" },
-    exam: { title: "Examen Blanc", section: "Apprentissage" },
-    analytics: { title: "Tableau de bord", section: "Progression" },
-    assistant: { title: "Assistant Pédagogique IA", section: "Assistance" },
-    glossary: { title: "Glossaire & Encyclopédie", section: "Ressources" },
-    profile: { title: "Mon Profil & Synchronisation", section: "Compte" },
-  };
-
-  const meta = screenMetadata[currentScreen] || { title: "CertifIA", section: "Accueil" };
+  // Dynamic breadcrumb from centralized navigation config
+  const breadcrumb = getBreadcrumbForScreen(currentScreen);
+  const BreadcrumbIcon = breadcrumb.categoryIcon;
 
   return (
     <header
@@ -80,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <button
           onClick={onOpenHamburgerMenu}
-          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#171b26] dark:hover:bg-[#262a35] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#262a35] transition-all flex items-center gap-2"
+          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#171b26] dark:hover:bg-[#262a35] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#262a35] transition-all flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           aria-label="Ouvrir le menu complet"
           title="Menu complet des rubriques"
         >
@@ -88,14 +77,17 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden xl:inline font-mono text-xs font-semibold">Menu</span>
         </button>
 
-        {/* Dynamic Breadcrumb */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-slate-500 dark:text-slate-400">
-          <span className="font-semibold text-slate-700 dark:text-slate-300">{meta.section}</span>
+        {/* Dynamic Breadcrumb with WCAG AA semantic markup */}
+        <nav aria-label="Fil d’Ariane" className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
+            <BreadcrumbIcon className="w-3.5 h-3.5 text-blue-500" />
+            <span>{breadcrumb.categoryLabel}</span>
+          </div>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600" />
-          <span className="text-slate-900 dark:text-white font-bold truncate max-w-[140px] md:max-w-xs">
-            {meta.title}
+          <span className="text-slate-900 dark:text-white font-bold truncate max-w-[140px] md:max-w-xs" aria-current="page">
+            {breadcrumb.itemLabel}
           </span>
-        </div>
+        </nav>
       </div>
 
       {/* Middle: Global Quick Search Button (Command Palette) */}

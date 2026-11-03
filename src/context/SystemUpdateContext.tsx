@@ -9,20 +9,17 @@ export interface VersionInfo {
 }
 
 export const APP_VERSION_INFO: VersionInfo = {
-  version: 'v2.6.0',
-  releaseDate: '2 Novembre 2026',
-  buildNumber: '20261102.3',
+  version: 'v2.7.0',
+  releaseDate: '3 Novembre 2026',
+  buildNumber: '20261103.1',
   channel: 'production',
   highlights: [
-    'Restructuration complète de la navigation autour de 5 piliers majeurs',
-    'Accueil personnalisé avec bouton « Reprendre mon apprentissage » en 1 clic',
-    'Tuteur Pédagogique IA contextuel (explications, pièges officiels, mnémotechniques)',
-    'Comparateur de certifications officiel côte à côte (Azure, AWS, GCP, IBM, NVIDIA)',
-    'Command Palette globale (Cmd+K / Ctrl+K) avec recherche instantanée',
-    'Barre latérale rétractable (mode complet & mode icônes avec tooltips)',
-    'Barre de navigation mobile inférieure normalisée (zones tactiles ≥ 44px)',
-    'Passerelles pédagogiques après chaque question (SRS, Quiz, Examen Blanc, Tuteur IA)',
-    'Glossaire & Encyclopédie de l’Intelligence Artificielle',
+    'Unification complète de la navigation via le moteur centralisé navigationConfig.ts',
+    'Organisation stricte en 6 rubriques : Accueil, Certifications, Apprentissage, Progression, Assistant IA, Plus',
+    'Fil d’Ariane sémantique et dynamique (WCAG AA) avec icônes de rubriques',
+    'Indexation multi-sources intégrale dans la Command Palette (Cmd+K)',
+    'Zones tactiles mobiles normalisées (≥ 48px) avec tiroir « Plus » fluide',
+    'Synchronisation parfaite des états actifs et des compteurs de fiches SRS',
   ],
 };
 

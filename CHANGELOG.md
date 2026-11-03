@@ -4,6 +4,27 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 
 ---
 
+## [2.7.0] - 2026-11-03 • Unification Intégrale de la Navigation & Configuration Centralisée
+
+### 🧭 Unification & Architecture Fonctionnelle Unique
+* **Configuration Centralisée de Navigation (`src/navigation/navigationConfig.ts`) :**
+  * Source de vérité unique pour toutes les rubriques, sous-items, icônes Lucide, libellés, raccourcis et cibles d'écrans.
+  * Structure normalisée en 6 catégories directes :
+    1. **ACCUEIL** : « Aujourd'hui » (reprise immédiate, session SRS du jour).
+    2. **CERTIFICATIONS** : « Catalogue », « Comparateur » et « Parcours recommandés » (Niveau 1 à Niveau 4).
+    3. **APPRENTISSAGE** : « Quiz et entraînements », « Flashcards et SRS », « Répartition des flashcards » (modal inventaire 2 800 fiches), « Examens blancs » (chronométré 90 min) et « Glossaire & notions ».
+    4. **PROGRESSION** : « Tableau de bord » (Analytics cognitifs, diagnostic forces/faiblesses).
+    5. **ASSISTANT IA** : « Assistant pédagogique » (Tuteur d'examen interactif, explications de pièges).
+    6. **PLUS** : « Mon profil », « Paramètres système » (mises à jour automatiques en tâche de fond), « Guide novice », « Mentions légales » et « Installer l'application ».
+* **Harmonisation Cohérente Multi-Supports :**
+  * **Barre Latérale (`Sidebar.tsx`)** : Sous-sections accordéon unifiées, compteurs badges temps réel, suppression des duplications.
+  * **Menu Hamburger Catégorisé (`CategorizedHamburgerMenu.tsx`)** : Consommation directe de `NAV_CATEGORIES` et `NAV_ITEMS`, filtres rapides, état actif synchrone.
+  * **Barre Mobile Inférieure (`MobileBottomNav.tsx`)** : 5 accès principaux clairs avec zones tactiles ergonomiques ($\ge 48\text{px}$), bouton « Plus » avec tiroir modal fluide respectant les safe areas iOS/Android.
+  * **Fil d'Ariane Dynamique (`Header.tsx`)** : Balisage sémantique WCAG AA avec `aria-current="page"`, icônes de rubriques et intitulé exact de la vue en cours.
+  * **Command Palette (`CommandPaletteModal.tsx` • `Cmd+K` / `Ctrl+K`)** : Recherche dynamique multi-niveaux connectée à `getSearchableNavItems()`, aux 18 certifications et aux concepts du glossaire avec navigation fléchée clavier.
+
+---
+
 ## [2.6.0] - 2026-11-02 • Restructuration Majeure de la Navigation & UX/UI
 
 ### 🏛️ Restructuration Piliers & Navigation

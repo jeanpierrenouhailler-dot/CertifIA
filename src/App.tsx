@@ -257,6 +257,9 @@ function AppContent() {
         currentScreen={currentScreen}
         onNavigate={(screen) => setCurrentScreen(screen)}
         onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
+        onOpenSystemSettings={() => setIsSystemSettingsOpen(true)}
+        onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
+        onOpenComparator={() => setIsComparatorOpen(true)}
         onOpenMenu={() => setIsHamburgerOpen(true)}
       />
 
