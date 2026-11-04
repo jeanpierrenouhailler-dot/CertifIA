@@ -26,12 +26,16 @@ import {
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { 
-  GLOSSARY_ENTRIES, 
-  GLOSSARY_CATEGORIES, 
   GlossaryEntry, 
   GlossaryCategory, 
   GlossaryProvider 
 } from '../data/glossaryData';
+import { 
+  getLocalizedGlossaryCategories, 
+  getLocalizedGlossaryEntries 
+} from '../data/localizedGlossaryData';
+import { useTranslation } from 'react-i18next';
+import { SupportedLanguage } from '../i18n';
 import { InfoTooltip } from './InfoTooltip';
 
 interface GlossaryViewProps {
@@ -43,6 +47,11 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
   onNavigate,
   onOpenBlueprint,
 }) => {
+  const { t, i18n } = useTranslation(['learning', 'common']);
+  const currentLang = (i18n.language === 'en' ? 'en' : 'fr') as SupportedLanguage;
+  const glossaryEntries = useMemo(() => getLocalizedGlossaryEntries(currentLang), [currentLang]);
+  const glossaryCategories = useMemo(() => getLocalizedGlossaryCategories(currentLang), [currentLang]);
+
   const [activeTab, setActiveTab] = useState<'glossary' | 'encyclopedia'>('glossary');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<GlossaryCategory | 'all'>('all');
@@ -50,7 +59,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
   const [selectedLetter, setSelectedLetter] = useState<string | 'all'>('all');
   const [selectedTargetCert, setSelectedTargetCert] = useState<string>('all');
   const [onlyBookmarks, setOnlyBookmarks] = useState(false);
-  const [selectedEntryId, setSelectedEntryId] = useState<string>(GLOSSARY_ENTRIES[0].id);
+  const [selectedEntryId, setSelectedEntryId] = useState<string>(() => glossaryEntries[0]?.id || 'rag');
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -88,16 +97,16 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
   // Alphabet list for quick letter jumping
   const alphabet = useMemo(() => {
     const letters = new Set<string>();
-    GLOSSARY_ENTRIES.forEach(e => {
+    glossaryEntries.forEach(e => {
       const firstLetter = (e.acronym || e.term).charAt(0).toUpperCase();
       if (/[A-Z]/.test(firstLetter)) letters.add(firstLetter);
     });
     return Array.from(letters).sort();
-  }, []);
+  }, [glossaryEntries]);
 
   // Filtered entries
   const filteredEntries = useMemo(() => {
-    return GLOSSARY_ENTRIES.filter(entry => {
+    return glossaryEntries.filter(entry => {
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -140,12 +149,12 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
 
       return true;
     });
-  }, [searchQuery, selectedCategory, selectedProvider, selectedTargetCert, selectedLetter, onlyBookmarks, bookmarkedIds]);
+  }, [glossaryEntries, searchQuery, selectedCategory, selectedProvider, selectedTargetCert, selectedLetter, onlyBookmarks, bookmarkedIds]);
 
   // Selected entry for encyclopedia view
   const currentEncyclopediaEntry = useMemo(() => {
-    return GLOSSARY_ENTRIES.find(e => e.id === selectedEntryId) || filteredEntries[0] || GLOSSARY_ENTRIES[0];
-  }, [selectedEntryId, filteredEntries]);
+    return glossaryEntries.find(e => e.id === selectedEntryId) || filteredEntries[0] || glossaryEntries[0];
+  }, [glossaryEntries, selectedEntryId, filteredEntries]);
 
   const selectAndOpenEncyclopedia = (id: string) => {
     setSelectedEntryId(id);
@@ -171,7 +180,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
   };
 
   const getCategoryMeta = (catId: GlossaryCategory) => {
-    return GLOSSARY_CATEGORIES.find(c => c.id === catId) || GLOSSARY_CATEGORIES[0];
+    return glossaryCategories.find(c => c.id === catId) || glossaryCategories[0];
   };
 
   return (
@@ -183,38 +192,37 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" />
-                Référentiel Transversal Multi-Cloud
+                {t('learning:glossary.badgeCrossCloud', 'Référentiel Transversal Multi-Cloud')}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                18 Certifications Couvertes
+                {t('learning:glossary.badgeCertsCovered', '18 Certifications Couvertes')}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              Glossaire & Encyclopédie de l'IA
+              {t('learning:glossary.title', "Glossaire & Notions Clés de l'IA")}
               <InfoTooltip 
-                title="Glossaire & Encyclopédie"
+                title={t('learning:glossary.title', "Glossaire & Notions Clés")}
                 content="Référentiel des concepts clés énoncés dans toutes les certifications (Azure, AWS, GCP, IBM, NVIDIA). Contient les définitions rapides A-Z, les pièges d'examen officiels et les fiches architecturales détaillées." 
               />
             </h1>
             <p className="text-slate-600 dark:text-slate-300 max-w-2xl text-sm sm:text-base leading-relaxed">
-              Maîtrisez les concepts, formules mathématiques, métriques et pièges d'examen récurrents.
-              Passez instantanément du mémo rapide A-Z à l'analyse architecturale approfondie.
+              {t('learning:glossary.subtitle', "Maîtrisez les concepts, formules mathématiques, métriques et pièges d'examen récurrents.")}
             </p>
           </div>
 
           {/* Quick Metrics */}
           <div className="flex items-center gap-3 self-start md:self-center">
             <div className="px-4 py-3 rounded-xl bg-slate-900/60 dark:bg-slate-950/60 border border-slate-700/60 text-center shadow-inner">
-              <div className="text-xl sm:text-2xl font-black text-blue-400">{GLOSSARY_ENTRIES.length}</div>
-              <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Concepts Clés</div>
+              <div className="text-xl sm:text-2xl font-black text-blue-400">{glossaryEntries.length}</div>
+              <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">{t('learning:glossary.keyConcepts', 'Concepts Clés')}</div>
             </div>
             <div className="px-4 py-3 rounded-xl bg-slate-900/60 dark:bg-slate-950/60 border border-slate-700/60 text-center shadow-inner">
               <div className="text-xl sm:text-2xl font-black text-amber-400">100%</div>
-              <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pièges Inclus</div>
+              <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">{t('learning:glossary.trapsIncluded', 'Pièges Inclus')}</div>
             </div>
             <div className="px-4 py-3 rounded-xl bg-slate-900/60 dark:bg-slate-950/60 border border-slate-700/60 text-center shadow-inner">
               <div className="text-xl sm:text-2xl font-black text-emerald-400">{bookmarkedIds.length}</div>
-              <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Vos Favoris</div>
+              <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">{t('learning:glossary.yourBookmarks', 'Vos Favoris')}</div>
             </div>
           </div>
         </div>
@@ -281,7 +289,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Rechercher un concept, acronyme (RAG, LoRA), formule ou piège d'examen..."
+              placeholder={t('learning:glossary.searchPlaceholder', "Rechercher un concept, acronyme (RAG, LoRA), formule ou piège d'examen...")}
               className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all"
             />
             {searchQuery && (
@@ -302,13 +310,13 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               onChange={(e) => setSelectedProvider(e.target.value as any)}
               className="px-3 py-2 text-xs font-semibold rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
             >
-              <option value="all">🌐 Tous Fournisseurs</option>
+              <option value="all">{t('learning:glossary.allProviders', '🌐 Tous Fournisseurs')}</option>
               <option value="azure">🔷 Azure AI (AI-102/900)</option>
               <option value="aws">🟧 AWS AI (AIF-C01/MLS)</option>
               <option value="gcp">🟩 Google Cloud Vertex</option>
               <option value="ibm">🟦 IBM watsonx (C1000-177)</option>
               <option value="nvidia">🟩 NVIDIA AI</option>
-              <option value="general">🧠 Théorie & Fondamentaux</option>
+              <option value="general">🧠 {t('common:theoryFoundations', 'Théorie & Fondamentaux')}</option>
             </select>
 
             {/* Target Cert Filter */}
@@ -317,7 +325,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               onChange={(e) => setSelectedTargetCert(e.target.value)}
               className="px-3 py-2 text-xs font-semibold rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer"
             >
-              <option value="all">🎯 Toutes Certifications</option>
+              <option value="all">{t('learning:glossary.allCerts', '🎯 Toutes Certifications')}</option>
               <option value="ai102">Microsoft AI-102</option>
               <option value="ai900">Microsoft AI-900</option>
               <option value="aifc01">AWS AI Practitioner AIF-C01</option>
@@ -338,10 +346,10 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                   setOnlyBookmarks(false);
                 }}
                 className="flex items-center gap-1 px-3 py-2 text-xs font-semibold rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all"
-                title="Réinitialiser les filtres"
+                title={t('learning:glossary.clearFilters', 'Effacer')}
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Effacer</span>
+                <span className="hidden sm:inline">{t('learning:glossary.clearFilters', 'Effacer')}</span>
               </button>
             )}
           </div>
@@ -357,10 +365,10 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                 : 'bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Toutes Catégories ({GLOSSARY_ENTRIES.length})
+            {t('common:allCategories', 'Toutes Catégories')} ({glossaryEntries.length})
           </button>
-          {GLOSSARY_CATEGORIES.map(cat => {
-            const count = GLOSSARY_ENTRIES.filter(e => e.category === cat.id).length;
+          {glossaryCategories.map(cat => {
+            const count = glossaryEntries.filter(e => e.category === cat.id).length;
             const isSelected = selectedCategory === cat.id;
             return (
               <button
@@ -863,7 +871,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {currentEncyclopediaEntry.relatedTermIds.map(relId => {
-                      const relEntry = GLOSSARY_ENTRIES.find(e => e.id === relId);
+                      const relEntry = glossaryEntries.find((e: GlossaryEntry) => e.id === relId);
                       if (!relEntry) return null;
                       return (
                         <button

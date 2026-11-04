@@ -4,6 +4,32 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 
 ---
 
+## [2.8.0] - 2026-11-04 • Version Anglaise & Internationalisation Complète (i18n)
+
+### 🌐 Internationalisation (i18n) & Bilinguisme Français / English
+* **Architecture i18n Centralisée & Offline-First (`src/i18n/`) :**
+  - Intégration de `i18next` et `react-i18next` avec 13 namespaces JSON statiquement packagés sous `src/i18n/locales/{fr,en}/` : `common`, `navigation`, `dashboard`, `certifications`, `learning`, `quizzes`, `flashcards`, `examinations`, `progress`, `assistant`, `settings`, `errors`, `notifications`.
+  - Zéro dépendance réseau au runtime, compatibilité totale PWA et mode hors-ligne.
+* **Sélecteur de Langue Dynamique (`LanguageSelector.tsx`) :**
+  - Présent dans la barre supérieure (`Header.tsx`), le menu des paramètres système (`SystemSettingsModal.tsx`), le menu hamburger catégorisé et la barre mobile inférieure (« Plus »).
+  - Changement de langue instantané sans rechargement de page, préservant l'état des réponses, les compteurs de temps et la progression dans les quiz et flashcards.
+* **Traductions Intégrales des Contenus Pédagogiques :**
+  - **18 Certifications Officielles (`src/data/localizedCertifications.ts`)** : Titres, prérequis, audiences cibles, pondérations et domaines d'examen traduits et alignés sur les guides officiels vendeurs (Azure AI-102/900, AWS AIF-C01/MLS-C01, GCP PMLE, IBM C1000-177).
+  - **QCM & Quiz Scénarisés (`src/data/localizedQuizData.ts`)** : Questions d'architecture complexes, options A/B/C/D, explications détaillées, pièges d'examen et documentations de référence.
+  - **Examens Blancs 90 min (`src/data/localizedExamData.ts`)** : Énoncés d'épreuve et intitulés de domaine traduits.
+  - **Glossaire & Encyclopédie de l'IA (`src/data/localizedGlossaryData.ts`)** : Catégories transversales, concepts A-Z et fiches architecturales.
+  - **Tuteur Pédagogique IA (`AIAssistantDrawer.tsx` & `AIAssistantView.tsx`)** : Salutations, amorces de révision et synthèses bilingues (RAG vs Fine-Tuning, algorithme SM-2, architectures cloud).
+* **Formatage Culturel Natif (`Intl`) :**
+  - Dates (`15 mars 2026` vs `March 15, 2026`), heures (`14:30` vs `2:30 PM`), nombres (`1 250 000` vs `1,250,000`), pourcentages (`85 %` vs `85%`) et devises (`165,00 $US` vs `$165.00`).
+* **Persistance & Synchronisation Profil :**
+  - Stockage local dans `localStorage` (`certifia_language`).
+  - Synchronisation avec le profil utilisateur Firestore (`userProfile.preferredLanguage`).
+  - Synchronisation automatique de la balise HTML `document.documentElement.lang`.
+* **Vérification Programmatique de Parité (`src/i18n/verifyI18nParity.ts`) :**
+  - Script automatisé validant la stricte correspondance 1:1 de l'intégralité des 378 clés françaises et 378 clés anglaises réparties sur les 13 namespaces.
+
+---
+
 ## [2.7.0] - 2026-11-03 • Unification Intégrale de la Navigation & Configuration Centralisée
 
 ### 🧭 Unification & Architecture Fonctionnelle Unique

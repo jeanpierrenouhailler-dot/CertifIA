@@ -1,0 +1,101 @@
+{
+  "categories": {
+    "accueil": "Accueil",
+    "certifications": "Certifications",
+    "apprentissage": "Apprentissage",
+    "progression": "Progression",
+    "assistant": "Assistant IA",
+    "plus": "Plus"
+  },
+  "items": {
+    "today": {
+      "label": "Aujourd’hui",
+      "shortLabel": "Aujourd’hui",
+      "description": "Cockpit du jour : 17 cartes SM-2, 8 notions fragiles, 12 QCM ciblés"
+    },
+    "catalogue": {
+      "label": "Catalogue des certifications",
+      "shortLabel": "Catalogue",
+      "description": "18 certifications majeures IA (Azure, AWS, GCP, IBM, NVIDIA)"
+    },
+    "comparator": {
+      "label": "Comparateur d'examens",
+      "shortLabel": "Comparateur",
+      "description": "Analyse comparative côte à côte des examens, pondérations et coûts"
+    },
+    "recommendation": {
+      "label": "Parcours recommandés",
+      "shortLabel": "Parcours IA",
+      "description": "Curriculum sur-mesure calculé du Niveau 1 au Niveau 4"
+    },
+    "quiz": {
+      "label": "Quiz et entraînements",
+      "shortLabel": "Quiz & QCM",
+      "description": "Questions scénarisées avec explications et analyse des pièges"
+    },
+    "flashcards": {
+      "label": "Flashcards et SRS",
+      "shortLabel": "Fiches mémo",
+      "description": "Répétition espacée SM-2 avec maîtrise adaptative des notions"
+    },
+    "distribution": {
+      "label": "Répartition des flashcards",
+      "shortLabel": "Répartition",
+      "description": "Inventaire détaillé et statistiques des 2 800 fiches mémo"
+    },
+    "exam": {
+      "label": "Examens blancs",
+      "shortLabel": "Examen blanc",
+      "description": "Épreuve chronométrée de 90 min en conditions d'examen réelles"
+    },
+    "glossary": {
+      "label": "Glossaire & notions",
+      "shortLabel": "Glossaire IA",
+      "description": "Encyclopédie exhaustive des concepts, formules et pièges d'examen"
+    },
+    "analytics": {
+      "label": "Tableau de bord & Progression",
+      "shortLabel": "Tableau de bord",
+      "description": "Indicateurs d'assimilation, radar de compétences et historique"
+    },
+    "assistant": {
+      "label": "Assistant pédagogique",
+      "shortLabel": "Tuteur IA",
+      "description": "Tuteur interactif pour explications ciblées et pièges d'examen"
+    },
+    "profile": {
+      "label": "Mon profil & Objectifs",
+      "shortLabel": "Profil",
+      "description": "Gestion du compte, certifications cibles et synchronisation"
+    },
+    "settings": {
+      "label": "Paramètres système",
+      "shortLabel": "Paramètres",
+      "description": "Version, vérification des mises à jour automatiques et diagnostic"
+    },
+    "guide": {
+      "label": "Guide & Aide contextuelle",
+      "shortLabel": "Guide novice",
+      "description": "Activer le mode guide débutant et infobulles explicatives"
+    },
+    "legal": {
+      "label": "Mentions légales & Avertissement",
+      "shortLabel": "Mentions légales",
+      "description": "Cadre d’utilisation, sources officielles et non-responsabilité des données"
+    },
+    "pwa": {
+      "label": "Installer l’application",
+      "shortLabel": "Installer",
+      "description": "Ajouter CertifIA à votre écran d’accueil mobile ou bureau"
+    }
+  },
+  "search": {
+    "placeholder": "Rechercher une certification, un QCM, le tuteur IA, ou un concept...",
+    "commandKey": "Ctrl+K",
+    "noResults": "Aucun résultat trouvé pour « {{query}} »",
+    "instructions": "↑↓ Naviguer • ↵ Ouvrir • ESC Quitter"
+  },
+  "breadcrumb": {
+    "home": "Accueil"
+  }
+}

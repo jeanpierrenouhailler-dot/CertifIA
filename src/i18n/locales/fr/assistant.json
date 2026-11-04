@@ -1,0 +1,23 @@
+{
+  "title": "Assistant Pédagogique IA",
+  "subtitle": "Tuteur spécialisé en architecture d'IA Cloud, décryptage de pièges et mnémotechniques.",
+  "status": "Tuteur CertifIA en ligne",
+  "inputPlaceholder": "Posez une question sur une notion, une architecture ou un piège...",
+  "send": "Envoyer",
+  "typing": "L'assistant analyse votre requête...",
+  "tabs": {
+    "concepts": "Concepts Clés",
+    "traps": "Pièges d'Examen",
+    "mnemonics": "Mnémotechniques",
+    "custom": "Questions Libres"
+  },
+  "suggestionsTitle": "Suggestions recommandées :",
+  "suggestedPrompts": [
+    "Expliquer la différence entre RAG et Fine-Tuning",
+    "Comment fonctionne l'algorithme SRS SM-2 ?",
+    "Quels sont les pièges fréquents sur AI-102 ?",
+    "Quelles métriques ML retenir pour l'examen GCP ?"
+  ],
+  "contextBanner": "Contexte actif : {{topic}} ({{certCode}})",
+  "clearChat": "Réinitialiser la conversation"
+}

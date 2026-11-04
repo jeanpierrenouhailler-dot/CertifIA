@@ -1,0 +1,18 @@
+{
+  "title": "Tableau de Bord & Progression Cognitive",
+  "subtitle": "Indicateurs de préparation, maîtrise par domaine et historique des entraînements.",
+  "readinessIndex": "Indice de Préparation Globale",
+  "readinessHelp": "Calculé sur la base de vos scores de quiz, des répétitions espacées SM-2 et des examens blancs.",
+  "cardsReviewed": "Cartes mémo révisées",
+  "questionsAnswered": "Questions traitées",
+  "successRate": "Taux de réussite global",
+  "currentStreak": "Série quotidienne active",
+  "days": "jours consécutifs",
+  "domainBreakdown": "Maîtrise par domaine d'évaluation",
+  "examHistory": "Historique des examens blancs",
+  "attemptNumber": "Tentative n°{{number}}",
+  "date": "Date de l'épreuve",
+  "score": "Score",
+  "status": "Résultat",
+  "disclaimer": "Clause de transparence : Les indices de préparation et scores de simulation sont fournis à titre pédagogique et ne constituent pas une garantie officielle de réussite auprès des organismes certificateurs."
+}

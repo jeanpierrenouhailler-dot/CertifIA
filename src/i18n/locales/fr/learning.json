@@ -1,0 +1,85 @@
+{
+  "title": "Moteur de Recommandation & Parcours IA",
+  "subtitle": "Construisez votre roadmap personnalisée selon votre métier, niveau et objectifs.",
+  "survey": {
+    "title": "Votre profil d'apprentissage",
+    "levelQuestion": "Quel est votre niveau actuel ?",
+    "levels": {
+      "debutant": "Débutant",
+      "intermediaire": "Intermédiaire",
+      "avance": "Avancé"
+    },
+    "roleQuestion": "Quel est votre métier ?",
+    "roles": {
+      "developpeur": "Développeur",
+      "data_scientist": "Data Scientist",
+      "architecte": "Architecte",
+      "chef_de_projet": "Chef de projet",
+      "consultant": "Consultant",
+      "autre": "Autre"
+    },
+    "goalQuestion": "Quel est votre objectif principal ?",
+    "goals": {
+      "comprendre_ia": "Comprendre l'IA",
+      "ia_generative": "IA Générative",
+      "cloud_ai": "Cloud AI",
+      "machine_learning": "Machine Learning",
+      "mlops": "MLOps"
+    },
+    "budgetQuestion": "Votre budget de certification ?",
+    "budgets": {
+      "gratuit_eco": "Gratuit / Économique",
+      "standard": "Standard (Prise en charge entreprise)",
+      "illimite": "Illimité"
+    },
+    "timeQuestion": "Temps disponible par semaine ?",
+    "times": {
+      "express": "Express (2 à 4h / semaine)",
+      "standard": "Régulier (5 à 8h / semaine)",
+      "intensif": "Intensif (10h+ / semaine)"
+    },
+    "careerQuestion": "Votre finalité professionnelle ?",
+    "careers": {
+      "montee_competence": "Montée en compétences",
+      "reconversion_job": "Reconversion professionnelle",
+      "appel_offre_partenaire": "Répondre aux exigences partenaires",
+      "certif_express_60j": "Certification express sous 60 jours"
+    },
+    "submit": "Calculer mon parcours personnalisé"
+  },
+  "pathway": {
+    "title": "Votre parcours IA personnalisé",
+    "level1": "Niveau 1 : AI Fundamentals",
+    "level2": "Niveau 2 : Generative AI",
+    "level3": "Niveau 3 : Cloud AI",
+    "level4": "Niveau 4 : Machine Learning & MLOps",
+    "estimatedDuration": "Durée estimée : {{weeks}} semaines ({{hours}}h au total)",
+    "matchScore": "Adéquation avec votre profil : {{score}}%",
+    "startStep": "Commencer cette étape",
+    "stepCompleted": "Étape validée",
+    "stepInProgress": "En cours d'étude",
+    "stepLocked": "Étape suivante"
+  },
+  "glossary": {
+    "title": "Glossaire & Notions Clés de l'IA",
+    "subtitle": "Maîtrisez les concepts, formules mathématiques, métriques et pièges d'examen récurrents.",
+    "badgeCrossCloud": "Référentiel Transversal Multi-Cloud",
+    "badgeCertsCovered": "18 Certifications Couvertes",
+    "keyConcepts": "Concepts Clés",
+    "trapsIncluded": "Pièges Inclus",
+    "yourBookmarks": "Vos Favoris",
+    "tabGlossary": "Glossaire A-Z",
+    "tabEncyclopedia": "Fiches Détaillées",
+    "searchPlaceholder": "Rechercher un concept, acronyme (RAG, LoRA), formule ou piège d'examen...",
+    "allProviders": "🌐 Tous Fournisseurs",
+    "allCerts": "🎯 Toutes Certifications",
+    "clearFilters": "Effacer",
+    "examTrap": "Piège d'examen fréquent",
+    "keyMetrics": "Métriques & Spécifications",
+    "officialSource": "Source officielle",
+    "addToBookmarks": "Enregistrer dans mes favoris",
+    "removeFromBookmarks": "Retirer des favoris",
+    "shareTerm": "Copier la fiche",
+    "copied": "Copié !"
+  }
+}

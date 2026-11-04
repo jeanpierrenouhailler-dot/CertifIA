@@ -17,8 +17,9 @@ import {
   DollarSign
 } from 'lucide-react';
 import { Certification, CloudProvider, CertificationLevel, AppScreen } from '../types';
-import { certificationsData } from '../data/certificationsData';
+import { getLocalizedCertifications } from '../data/localizedCertifications';
 import { PageHeader } from './ui/PageHeader';
+import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface CatalogueViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -35,6 +36,9 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   onOpenAIAssistant,
   initialProviderFilter = 'Tous',
 }) => {
+  const { t } = useTranslation(['certifications', 'common']);
+  const lang = getCurrentLanguage();
+  const certs = getLocalizedCertifications(lang);
   const [providerFilter, setProviderFilter] = useState<CloudProvider>(initialProviderFilter);
   const [levelFilter, setLevelFilter] = useState<CertificationLevel>('all');
   const [domainFilter, setDomainFilter] = useState<'all' | 'genai' | 'cloud_ai' | 'ml'>('all');
@@ -44,15 +48,15 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   const [isCohortModalOpen, setIsCohortModalOpen] = useState(false);
 
   const providerCounts = {
-    Tous: certificationsData.length,
-    azure: certificationsData.filter((c) => c.provider === 'azure').length,
-    aws: certificationsData.filter((c) => c.provider === 'aws').length,
-    gcp: certificationsData.filter((c) => c.provider === 'gcp').length,
-    ibm: certificationsData.filter((c) => c.provider === 'ibm').length,
+    Tous: certs.length,
+    azure: certs.filter((c) => c.provider === 'azure').length,
+    aws: certs.filter((c) => c.provider === 'aws').length,
+    gcp: certs.filter((c) => c.provider === 'gcp').length,
+    ibm: certs.filter((c) => c.provider === 'ibm').length,
     nvidia: 2,
   };
 
-  const filteredCertifications = certificationsData
+  const filteredCertifications = certs
     .filter((c) => {
       if (providerFilter !== 'Tous' && c.provider !== providerFilter) return false;
       if (levelFilter !== 'all' && c.level !== levelFilter) return false;

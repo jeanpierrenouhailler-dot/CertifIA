@@ -19,8 +19,10 @@ import {
 } from 'lucide-react';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useGuide } from '../context/GuideContext';
-import { useTheme } from '../context/ThemeContext';
 import { usePwa } from '../context/PwaContext';
+import { useTheme } from '../context/ThemeContext';
+import { LanguageSelector } from './LanguageSelector';
+import { useTranslation, formatLocalizedDate } from '../i18n';
 
 interface SystemSettingsModalProps {
   isOpen: boolean;
@@ -46,6 +48,7 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
   const { isGuideModeActive, toggleGuideMode, openLegalModal } = useGuide();
   const { theme, toggleTheme } = useTheme();
   const { isInstalled, promptInstall } = usePwa();
+  const { t } = useTranslation(['settings', 'common']);
   const [activeTab, setActiveTab] = useState<'system' | 'changelog' | 'cache'>('system');
 
   if (!isOpen) return null;
@@ -304,6 +307,21 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
 
           {activeTab === 'cache' && (
             <div className="space-y-4">
+              {/* Language Selection Card */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#0f131d] border border-slate-200 dark:border-[#262a35] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs">
+                      {t('languageSection.title', 'Langue de l\'application (Internationalisation)')}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      {t('languageSection.description', 'Choisissez la langue d\'affichage de l\'interface et du contenu pédagogique.')}
+                    </p>
+                  </div>
+                </div>
+                <LanguageSelector variant="expanded" />
+              </div>
+
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#0f131d] border border-slate-200 dark:border-[#262a35] space-y-3">
                 <h4 className="font-bold text-slate-900 dark:text-white text-xs">
                   Thème d'affichage actif

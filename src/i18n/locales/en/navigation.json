@@ -1,0 +1,101 @@
+{
+  "categories": {
+    "accueil": "Home",
+    "certifications": "Certifications",
+    "apprentissage": "Learning",
+    "progression": "Progress",
+    "assistant": "AI Assistant",
+    "plus": "More"
+  },
+  "items": {
+    "today": {
+      "label": "Today",
+      "shortLabel": "Today",
+      "description": "Daily cockpit: 17 SM-2 cards, 8 weak topics, 12 targeted exam questions"
+    },
+    "catalogue": {
+      "label": "Certification Catalog",
+      "shortLabel": "Catalog",
+      "description": "18 major AI certifications (Azure, AWS, GCP, IBM, NVIDIA)"
+    },
+    "comparator": {
+      "label": "Exam Comparator",
+      "shortLabel": "Comparator",
+      "description": "Side-by-side analysis of exams, domain weights, passing scores and costs"
+    },
+    "recommendation": {
+      "label": "Recommended Pathways",
+      "shortLabel": "AI Pathway",
+      "description": "Tailored career curriculum calculated from Level 1 to Level 4"
+    },
+    "quiz": {
+      "label": "Quizzes & Practice",
+      "shortLabel": "Quizzes & MCQs",
+      "description": "Scenario-based questions with in-depth explanations and trap breakdown"
+    },
+    "flashcards": {
+      "label": "Flashcards & SRS",
+      "shortLabel": "Flashcards",
+      "description": "SM-2 spaced repetition system for adaptive concept retention"
+    },
+    "distribution": {
+      "label": "Flashcards Breakdown",
+      "shortLabel": "Breakdown",
+      "description": "Detailed inventory and statistics across all 2,800 review cards"
+    },
+    "exam": {
+      "label": "Mock Examinations",
+      "shortLabel": "Mock Exam",
+      "description": "90-minute timed exam simulating real testing center conditions"
+    },
+    "glossary": {
+      "label": "Glossary & Concepts",
+      "shortLabel": "AI Glossary",
+      "description": "Comprehensive encyclopedia of terms, formulas, and exam traps"
+    },
+    "analytics": {
+      "label": "Dashboard & Progress",
+      "shortLabel": "Dashboard",
+      "description": "Mastery metrics, skills radar chart, and learning attempt history"
+    },
+    "assistant": {
+      "label": "Pedagogical Assistant",
+      "shortLabel": "AI Tutor",
+      "description": "Interactive AI tutor for targeted explanations and exam pitfall tips"
+    },
+    "profile": {
+      "label": "My Profile & Goals",
+      "shortLabel": "Profile",
+      "description": "Account management, target certification, and cloud synchronization"
+    },
+    "settings": {
+      "label": "System Settings",
+      "shortLabel": "Settings",
+      "description": "Version, automated background updates, and diagnostic tools"
+    },
+    "guide": {
+      "label": "Guide & Contextual Help",
+      "shortLabel": "Beginner Guide",
+      "description": "Toggle novice guidance mode and explanatory field tooltips"
+    },
+    "legal": {
+      "label": "Legal Notices & Disclaimer",
+      "shortLabel": "Legal",
+      "description": "Terms of use, official sources disclaimer, and educational framework"
+    },
+    "pwa": {
+      "label": "Install Application",
+      "shortLabel": "Install",
+      "description": "Add CertifIA to your mobile or desktop home screen"
+    }
+  },
+  "search": {
+    "placeholder": "Search certification, MCQ question, AI tutor, or concept...",
+    "commandKey": "Ctrl+K",
+    "noResults": "No results found for “{{query}}”",
+    "instructions": "↑↓ Navigate • ↵ Open • ESC Close"
+  },
+  "breadcrumb": {
+    "home": "Home"
+  }
+}

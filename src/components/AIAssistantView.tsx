@@ -18,6 +18,7 @@ import {
 import { AppScreen } from '../types';
 import { PageHeader } from './ui/PageHeader';
 import { certificationsData } from '../data/certificationsData';
+import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface AIAssistantViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -32,8 +33,10 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
   const [selectedTopic, setSelectedTopic] = useState('RAG & Recherche Hybride');
   const [queryInput, setQueryInput] = useState('');
   const [activeTab, setActiveTab] = useState<'concepts' | 'traps' | 'mnemonics' | 'custom'>('concepts');
+  const { t } = useTranslation(['assistant', 'common']);
+  const isEn = getCurrentLanguage() === 'en';
 
-  const topicsByCert: Record<string, string[]> = {
+  const topicsByCertFr: Record<string, string[]> = {
     ai102: [
       'RAG & Recherche Hybride Vectorielle',
       'Content Safety & Regex Custom Blocklists',
@@ -70,18 +73,58 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
     ],
   };
 
+  const topicsByCertEn: Record<string, string[]> = {
+    ai102: [
+      'RAG & Hybrid Vector Search',
+      'Content Safety & Regex Custom Blocklists',
+      'Azure AI Search Semantic Ranker',
+      'LoRA Fine-Tuning vs In-Context Learning',
+      'Document Intelligence & Pretrained Models',
+      'VNet Network Isolation & Private Endpoints',
+    ],
+    aifc01: [
+      'AWS Bedrock & Foundation Models Fundamentals',
+      'Guardrails for Amazon Bedrock',
+      'Amazon Kendra vs OpenSearch Vector Differences',
+      'Shared Responsibility Model in Cloud AI',
+      'Amazon Q Business & Enterprise Use Cases',
+    ],
+    gcpmle: [
+      'Vertex AI Feature Store & Kubeflow Pipelines',
+      'Vizier Hyperparameter Optimization',
+      'Data Drift Detection & Live Monitoring',
+      'TensorFlow Serving vs TorchServe on GKE',
+      'Explainable AI & Shapley Values',
+    ],
+    ai900: [
+      'Microsoft Responsible AI 6 Pillars',
+      'Computer Vision: Classification vs Object Detection',
+      'Speech & Language: Translation & Speech Synthesis',
+      'Azure Machine Learning Studio Automated ML',
+    ],
+    c1000177: [
+      'watsonx.ai Model Studio & Foundation Inference',
+      'watsonx.governance Factsheets & Data Lineage',
+      'watsonx.data Lakehouse & Apache Iceberg',
+      'IBM Hallucination & Toxicity Detection',
+    ],
+  };
+
+  const topicsByCert = isEn ? topicsByCertEn : topicsByCertFr;
   const currentTopics = topicsByCert[selectedCert] || topicsByCert.ai102;
   const currentCertData = certificationsData.find((c) => c.id === selectedCert) || certificationsData[0];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
       <PageHeader
-        title="Assistant Pédagogique IA"
-        subtitle="Tuteur intelligent calibré sur les référentiels officiels Cloud AI pour accélérer votre assimilation et déjouer les pièges d’examen."
-        badge="Accompagnement IA"
+        title={isEn ? "AI Pedagogical Assistant" : "Assistant Pédagogique IA"}
+        subtitle={isEn 
+          ? "Intelligent tutor calibrated on official Cloud AI blueprints to accelerate retention and conquer exam traps." 
+          : "Tuteur intelligent calibré sur les référentiels officiels Cloud AI pour accélérer votre assimilation et déjouer les pièges d’examen."}
+        badge={isEn ? "AI Guidance" : "Accompagnement IA"}
         breadcrumbs={[
-          { label: 'Accueil', onClick: () => onNavigate('today') },
-          { label: 'Assistant IA', active: true },
+          { label: isEn ? 'Home' : 'Accueil', onClick: () => onNavigate('today') },
+          { label: isEn ? 'AI Assistant' : 'Assistant IA', active: true },
         ]}
         actions={
           <div className="flex items-center gap-2">

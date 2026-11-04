@@ -1,0 +1,43 @@
+{
+  "title": "AI Certification Catalog",
+  "subtitle": "Explore 18 industry-standard certifications in Artificial Intelligence and Cloud AI.",
+  "filterAll": "All",
+  "filterByProvider": "Vendor / Organization",
+  "filterByLevel": "Difficulty Level",
+  "filterBySearch": "Search by keyword, exam code...",
+  "comparatorTitle": "Certification Comparator",
+  "compareButton": "Compare",
+  "addToCompare": "Add to comparison",
+  "removeFromCompare": "Remove from comparison",
+  "compareLimit": "You can compare up to 3 certifications simultaneously.",
+  "sideBySide": "Side-by-side comparison",
+  "officialCode": "Official Code",
+  "provider": "Provider",
+  "level": "Level",
+  "passScore": "Passing Score",
+  "duration": "Exam Duration",
+  "questionsCount": "Number of Questions",
+  "averagePassRate": "Average Pass Rate",
+  "targetAudience": "Target Audience",
+  "domains": "Exam Domains",
+  "actions": {
+    "train": "Practice Now",
+    "viewBlueprint": "View Blueprint",
+    "setAsTarget": "Set as target",
+    "activeTarget": "Active Target"
+  },
+  "levels": {
+    "all": "All levels",
+    "fondamental": "Fundamental",
+    "associate": "Associate",
+    "expert": "Expert / Advanced"
+  },
+  "providers": {
+    "all": "All providers",
+    "azure": "Microsoft Azure",
+    "aws": "Amazon Web Services",
+    "gcp": "Google Cloud",
+    "ibm": "IBM watsonx",
+    "nvidia": "NVIDIA DLI"
+  }
+}

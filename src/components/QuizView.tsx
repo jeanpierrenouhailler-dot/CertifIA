@@ -21,7 +21,9 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { QuizQuestion, AppScreen } from '../types';
-import { quizQuestionsData, quizMatrixItems } from '../data/quizData';
+import { quizMatrixItems } from '../data/quizData';
+import { getLocalizedQuizQuestions } from '../data/localizedQuizData';
+import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface QuizViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -30,6 +32,9 @@ interface QuizViewProps {
 }
 
 export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint, onOpenAIAssistant }) => {
+  const { t } = useTranslation(['quizzes', 'common']);
+  const lang = getCurrentLanguage();
+  const questions = getLocalizedQuizQuestions(lang);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(1); // Index 1 is Q7 in our set
   const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D' | null>('A');
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(true);
@@ -51,7 +56,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentQ: QuizQuestion = quizQuestionsData[activeQuestionIndex] || quizQuestionsData[1];
+  const currentQ: QuizQuestion = questions[activeQuestionIndex] || questions[1];
 
   const handleSelectOption = (key: 'A' | 'B' | 'C' | 'D') => {
     setSelectedOption(key);
@@ -62,7 +67,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
   };
 
   const handleNext = () => {
-    if (activeQuestionIndex < quizQuestionsData.length - 1) {
+    if (activeQuestionIndex < questions.length - 1) {
       setActiveQuestionIndex((prev) => prev + 1);
       setSelectedOption(null);
       setIsAnswerRevealed(false);
@@ -349,7 +354,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
 
             <button
               onClick={handleNext}
-              disabled={activeQuestionIndex >= quizQuestionsData.length - 1}
+              disabled={activeQuestionIndex >= questions.length - 1}
               className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-40 transition-colors shadow-md shadow-blue-600/20"
             >
               <span>Suivante (Q8)</span>

@@ -18,13 +18,15 @@ import {
   Scale,
   Clock,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Globe
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useGuide } from '../context/GuideContext';
 import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface MobileBottomNavProps {
   currentScreen: AppScreen;
@@ -327,6 +329,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </button>
+
+                  <div className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-[#171c2b] border border-slate-200/80 dark:border-[#22283a] flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <Globe className="w-4 h-4 text-blue-500" />
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Langue / Language</span>
+                    </div>
+                    <LanguageSelector variant="compact" />
+                  </div>
 
                   <button
                     onClick={() => {

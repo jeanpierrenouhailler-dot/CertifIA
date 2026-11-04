@@ -1,0 +1,9 @@
+{
+  "updateChecking": "Checking for new versions...",
+  "updateAvailable": "A new release of CertifIA is available!",
+  "updateLatest": "Your application is fully up to date ({{version}}).",
+  "updateInstalled": "Update applied successfully.",
+  "cardReviewed": "Flashcard saved into your SM-2 study schedule.",
+  "examSubmitted": "Practice exam submitted and scored.",
+  "targetCertChanged": "Target certification updated: {{cert}}."
+}

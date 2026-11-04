@@ -1,0 +1,8 @@
+{
+  "general": "An unexpected error occurred. Please try again.",
+  "network": "Network connectivity issue. Your local offline data remains safe.",
+  "notFound": "The requested resource could not be found.",
+  "unauthorized": "Please sign in to access this feature.",
+  "examIncomplete": "Please answer all questions before submitting the exam.",
+  "aiTimeout": "The AI tutor did not respond in time. Please resubmit your request."
+}

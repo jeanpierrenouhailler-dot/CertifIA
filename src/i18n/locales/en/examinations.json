@@ -1,0 +1,31 @@
+{
+  "title": "Mock Examination in Real Conditions",
+  "subtitle": "90-minute timed test • 50 questions • 70% passing threshold.",
+  "instructions": {
+    "title": "Mock Examination Instructions",
+    "rule1": "You have 90 minutes to complete 50 questions covering all official blueprint domains.",
+    "rule2": "You can flag questions for review and navigate back to them at any time before submitting.",
+    "rule3": "Once submitted, an in-depth analytical breakdown by domain and weakness will be generated.",
+    "start": "Start Timed Exam"
+  },
+  "inProgress": {
+    "timeRemaining": "Time Remaining",
+    "question": "Question {{current}} / {{total}}",
+    "flagForReview": "Flag for Review",
+    "unflag": "Remove Flag",
+    "finishExam": "Submit Exam",
+    "confirmFinish": "Are you sure you want to submit your exam? Unanswered questions will be marked incorrect."
+  },
+  "results": {
+    "title": "Mock Examination Performance Report",
+    "passed": "Congratulations! Exam Passed",
+    "failed": "Exam Not Passed - Targeted Practice Recommended",
+    "score": "Final Score: {{score}} / 1000",
+    "passScoreRequired": "Passing score required: 700 / 1000 (70%)",
+    "duration": "Time elapsed: {{duration}}",
+    "weakDomain": "Priority domain to strengthen:",
+    "recommendations": "Targeted pedagogical recommendations:",
+    "reviewAnswers": "Review detailed answers and explanations",
+    "retakeExam": "Start a new practice attempt"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "appName": "CertifIA",
+  "appTagline": "Elite Cloud AI Certification Preparation Platform",
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "selectLanguage": "Select language",
+    "switchSuccess": "Language changed successfully"
+  },
+  "actions": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "continue": "Continue",
+    "start": "Start",
+    "restart": "Restart",
+    "finish": "Finish",
+    "apply": "Apply",
+    "reset": "Reset",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "share": "Share",
+    "install": "Install app",
+    "checkUpdates": "Check for updates",
+    "learnMore": "Learn more",
+    "resumeLearning": "Resume my learning",
+    "viewDetails": "View details",
+    "openBlueprint": "View blueprint"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "success": "Operation successful",
+    "error": "An error occurred",
+    "offline": "Offline mode active",
+    "online": "Connected",
+    "upToDate": "Up to date",
+    "newVersionAvailable": "New version available",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "locked": "Locked",
+    "recommended": "Recommended"
+  },
+  "units": {
+    "days": "days",
+    "weeks": "weeks",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds",
+    "questions": "questions",
+    "cards": "cards",
+    "points": "points"
+  },
+  "feedback": {
+    "emptyState": "No data available at this time.",
+    "noResults": "No results found for your search.",
+    "retry": "Try again"
+  }
+}

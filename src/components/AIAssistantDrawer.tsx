@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { certificationsData } from '../data/certificationsData';
+import { useTranslation, getCurrentLanguage, formatLocalizedTime } from '../i18n';
 
 export interface AIAssistantContext {
   certId?: string;
@@ -61,46 +62,76 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   // Seed default welcome message or contextual greeting
   useEffect(() => {
     if (isOpen) {
+      const lang = getCurrentLanguage();
+      const isEn = lang === 'en';
       let initialMsg: ChatMessage;
+
       if (context?.questionText) {
         initialMsg = {
           id: 'ctx-q',
           sender: 'assistant',
-          content: `Bonjour ! Je vois que vous travaillez sur la question suivante :\n\n> "${context.questionText.slice(0, 120)}..."\n\nSouhaitez-vous une explication détaillée de la bonne réponse, les pièges classiques ou une astuce mnémotechnique ?`,
-          timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-          suggestions: [
-            'Expliquer pourquoi cette réponse est la bonne',
-            'Quels sont les pièges typiques d’examen ?',
-            'Donne-moi une astuce mnémotechnique',
-            'Quelle est la différence clé à retenir ?',
-          ],
+          content: isEn
+            ? `Hello! I see you are working on the following question:\n\n> "${context.questionText.slice(0, 120)}..."\n\nWould you like an architectural breakdown of the correct answer, analysis of exam traps, or a memory mnemonic?`
+            : `Bonjour ! Je vois que vous travaillez sur la question suivante :\n\n> "${context.questionText.slice(0, 120)}..."\n\nSouhaitez-vous une explication détaillée de la bonne réponse, les pièges classiques ou une astuce mnémotechnique ?`,
+          timestamp: formatLocalizedTime(new Date()),
+          suggestions: isEn
+            ? [
+                'Explain why this answer is correct',
+                'What are typical exam pitfalls here?',
+                'Give me a memory mnemonic',
+                'What is the key takeaway to remember?',
+              ]
+            : [
+                'Expliquer pourquoi cette réponse est la bonne',
+                'Quels sont les pièges typiques d’examen ?',
+                'Donne-moi une astuce mnémotechnique',
+                'Quelle est la différence clé à retenir ?',
+              ],
         };
       } else if (context?.certId) {
         const cert = certificationsData.find((c) => c.id === context.certId);
         initialMsg = {
           id: 'ctx-cert',
           sender: 'assistant',
-          content: `Bonjour ! Je suis votre tuteur dédié pour la certification **${cert?.code || 'IA'} - ${cert?.title || 'Certification'}**.\n\nQuel domaine ou concept souhaitez-vous approfondir aujourd'hui ?`,
-          timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-          suggestions: [
-            'Quels sont les domaines les plus pondérés ?',
-            'Conseils pour réussir le jour de l’examen',
-            'Différence entre les services cognitifs clés',
-            'Proposer un plan de révision express',
-          ],
+          content: isEn
+            ? `Hello! I am your dedicated tutor for the **${cert?.code || 'AI'} - ${cert?.title || 'Certification'}** exam.\n\nWhich domain or technical concept would you like to explore today?`
+            : `Bonjour ! Je suis votre tuteur dédié pour la certification **${cert?.code || 'IA'} - ${cert?.title || 'Certification'}**.\n\nQuel domaine ou concept souhaitez-vous approfondir aujourd'hui ?`,
+          timestamp: formatLocalizedTime(new Date()),
+          suggestions: isEn
+            ? [
+                'Which domains have the highest weight?',
+                'Tips for passing on exam day',
+                'Key differences between cognitive services',
+                'Suggest an express revision plan',
+              ]
+            : [
+                'Quels sont les domaines les plus pondérés ?',
+                'Conseils pour réussir le jour de l’examen',
+                'Différence entre les services cognitifs clés',
+                'Proposer un plan de révision express',
+              ],
         };
       } else {
         initialMsg = {
           id: 'init-1',
           sender: 'assistant',
-          content: `Bonjour ! Je suis votre **Assistant Pédagogique CertifIA** 🧠.\n\nJe suis calibré sur les examens officiels d’IA (Azure AI-102 & AI-900, AWS AIF-C01 & MLS-C01, GCP Professional ML Engineer, IBM watsonx).\n\nPosez-moi une question sur une notion complexe, un schéma d’architecture ou demandez une explication pas à pas.`,
-          timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-          suggestions: [
-            'Expliquer le RAG vs le Fine-Tuning',
-            'Comment fonctionne l’algorithme SRS SM-2 ?',
-            'Quels sont les pièges fréquents sur AI-102 ?',
-            'Quelles métriques ML retenir pour l’examen GCP ?',
-          ],
+          content: isEn
+            ? `Hello! I am your **CertifIA Pedagogical AI Tutor** 🧠.\n\nI am calibrated against official AI certification blueprints (Azure AI-102 & AI-900, AWS AIF-C01 & MLS-C01, Google Cloud Professional ML Engineer, IBM watsonx).\n\nAsk me about complex architectural patterns, trade-offs, or exam traps!`
+            : `Bonjour ! Je suis votre **Assistant Pédagogique CertifIA** 🧠.\n\nJe suis calibré sur les examens officiels d’IA (Azure AI-102 & AI-900, AWS AIF-C01 & MLS-C01, GCP Professional ML Engineer, IBM watsonx).\n\nPosez-moi une question sur une notion complexe, un schéma d’architecture ou demandez une explication pas à pas.`,
+          timestamp: formatLocalizedTime(new Date()),
+          suggestions: isEn
+            ? [
+                'Explain RAG vs Fine-Tuning trade-offs',
+                'How does the SM-2 SRS algorithm work?',
+                'What are common traps on AI-102?',
+                'Which ML metrics to memorize for GCP exam?',
+              ]
+            : [
+                'Expliquer le RAG vs le Fine-Tuning',
+                'Comment fonctionne l’algorithme SRS SM-2 ?',
+                'Quels sont les pièges fréquents sur AI-102 ?',
+                'Quelles métriques ML retenir pour l’examen GCP ?',
+              ],
         };
       }
       setMessages([initialMsg]);
@@ -120,7 +151,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
       id: `usr-${Date.now()}`,
       sender: 'user',
       content: text,
-      timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      timestamp: formatLocalizedTime(new Date()),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -129,44 +160,76 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
 
     // Pedagogical response logic grounded in AI certs
     setTimeout(() => {
+      const lang = getCurrentLanguage();
+      const isEn = lang === 'en';
       let replyText = '';
       let nextSuggestions: string[] = [];
 
       const query = text.toLowerCase();
 
       if (query.includes('rag') || query.includes('fine-tuning') || query.includes('finetuning')) {
-        replyText = `### RAG vs Fine-Tuning pour l'Examen 🎯\n\n- **RAG (Retrieval-Augmented Generation)** : Utilisez-le quand les données changent fréquemment, nécessitent une traçabilité des sources (grounding), ou doivent respecter des permissions d'accès strictes (RBAC/VNet). Ne met pas à jour les poids du modèle.\n- **Fine-Tuning (LoRA / SFT)** : Utilisez-le pour adapter le **style**, le format de sortie ou un vocabulaire ultra-spécifique (ex: jargon juridique). ⚠️ Ce n'est PAS la bonne solution pour enseigner des faits récents au modèle.\n\n💡 **Règle d'or d'examen** : Si la question mentionne "données dynamiques" ou "citer la source exacte", la réponse est toujours **RAG** !`;
-        nextSuggestions = [
-          'Qu’est-ce que le Semantic Reranker ?',
-          'Différence entre indexation vectorielle et hybride',
-          'Voir la fiche AI-102',
-        ];
+        replyText = isEn
+          ? `### RAG vs Fine-Tuning for Exam Blueprints 🎯\n\n- **RAG (Retrieval-Augmented Generation)**: Use when data changes frequently, requires verifiable source grounding, or must enforce strict document-level security ACLs (RBAC/VNet). Does NOT update model weights.\n- **Fine-Tuning (LoRA / SFT)**: Use to adjust output **style**, domain-specific formatting, or specialized legal/medical vocabulary. ⚠️ NOT suitable for injecting dynamic recent facts into the model.\n\n💡 **Exam Golden Rule**: If the question specifies "dynamic internal data" or "must cite exact sources", the answer is always **RAG**!`
+          : `### RAG vs Fine-Tuning pour l'Examen 🎯\n\n- **RAG (Retrieval-Augmented Generation)** : Utilisez-le quand les données changent fréquemment, nécessitent une traçabilité des sources (grounding), ou doivent respecter des permissions d'accès strictes (RBAC/VNet). Ne met pas à jour les poids du modèle.\n- **Fine-Tuning (LoRA / SFT)** : Utilisez-le pour adapter le **style**, le format de sortie ou un vocabulaire ultra-spécifique (ex: jargon juridique). ⚠️ Ce n'est PAS la bonne solution pour enseigner des faits récents au modèle.\n\n💡 **Règle d'or d'examen** : Si la question mentionne "données dynamiques" ou "citer la source exacte", la réponse est toujours **RAG** !`;
+        nextSuggestions = isEn
+          ? [
+              'What is the Semantic Ranker?',
+              'Hybrid Search vs Pure Vector Search',
+              'View AI-102 Blueprint',
+            ]
+          : [
+              'Qu’est-ce que le Semantic Reranker ?',
+              'Différence entre indexation vectorielle et hybride',
+              'Voir la fiche AI-102',
+            ];
       } else if (query.includes('srs') || query.includes('sm-2') || query.includes('repetition')) {
-        replyText = `### Algorithme SRS SM-2 & Répétition Espacée 🧠\n\nLe système de CertifIA s'appuie sur la courbe de l'oubli d'Ebbinghaus :\n1. **Facteur de facilité (Ease Factor)** : commence à 2.5 et s'ajuste selon votre vitesse et taux de réussite.\n2. **Intervalles progressifs** : 1 jour ➔ 3 jours ➔ 7 jours ➔ 14 jours ➔ 30 jours.\n3. **Ciblage des cartes dues** : Chaque matin, l'algorithme sélectionne les 17 notions dont la mémoire est sur le point de fléchir. Réviser 10 min par jour à ce moment précis augmente la rétention de 80 % !`;
-        nextSuggestions = [
-          'Voir mes 17 cartes dues aujourd’hui',
-          'Comment sont calculées les notions fragiles ?',
-        ];
-      } else if (query.includes('piege') || query.includes('piège') || query.includes('ai-102') || query.includes('astuce')) {
-        replyText = `### 3 Pièges Classiques en Examen d’Architecture IA ⚠️\n\n1. **Confondre Content Filters & Custom Blocklists** : Sur Azure OpenAI, les filtres par défaut bloquent la haine/violence. Mais pour interdire les données confidentielles de l’entreprise (n° de compte), il faut créer des Regex / Custom Blocklists !\n2. **Reranker vs Recherche Vectorielle pure** : La recherche hybride (Vectorielle + BM25) combinée à un *Semantic Ranker* (RRF) surpasse toujours la recherche vectorielle seule.\n3. **Clés d'API en clair** : Tout examen sanctionne le hardcodage de clés. La bonne réponse implique toujours un coffre-fort managé (Azure Key Vault, AWS Secrets Manager, GCP Secret Manager) ou une identité managée (Entra ID, IAM).`;
-        nextSuggestions = [
-          'Proposer une question d’entraînement',
-          'Comment gérer l’isolation réseau VNet ?',
-        ];
+        replyText = isEn
+          ? `### SM-2 SRS Algorithm & Spaced Repetition 🧠\n\nCertifIA utilizes the Ebbinghaus forgetting curve:\n1. **Ease Factor**: Starts at 2.5 and dynamically adapts to your recall speed and accuracy.\n2. **Progressive Intervals**: 1 day ➔ 3 days ➔ 7 days ➔ 14 days ➔ 30 days.\n3. **Targeting Due Flashcards**: Each morning, the algorithm identifies the exact concepts on the verge of memory decay. 10 minutes of targeted review boosts long-term exam retention by over 80%!`
+          : `### Algorithme SRS SM-2 & Répétition Espacée 🧠\n\nLe système de CertifIA s'appuie sur la courbe de l'oubli d'Ebbinghaus :\n1. **Facteur de facilité (Ease Factor)** : commence à 2.5 et s'ajuste selon votre vitesse et taux de réussite.\n2. **Intervalles progressifs** : 1 jour ➔ 3 jours ➔ 7 jours ➔ 14 jours ➔ 30 jours.\n3. **Ciblage des cartes dues** : Chaque matin, l'algorithme sélectionne les 17 notions dont la mémoire est sur le point de fléchir. Réviser 10 min par jour à ce moment précis augmente la rétention de 80 % !`;
+        nextSuggestions = isEn
+          ? [
+              'View my 17 cards due today',
+              'How are weak concepts calculated?',
+            ]
+          : [
+              'Voir mes 17 cartes dues aujourd’hui',
+              'Comment sont calculées les notions fragiles ?',
+            ];
+      } else if (query.includes('piege') || query.includes('piège') || query.includes('trap') || query.includes('ai-102') || query.includes('tip')) {
+        replyText = isEn
+          ? `### 3 Classic Exam Pitfalls in Cloud AI Architecture ⚠️\n\n1. **Confusing Content Filters with Custom Blocklists**: On Azure OpenAI, default safety filters handle hate and violence. But to prevent leaks of proprietary account numbers, you MUST define Custom Regex Blocklists!\n2. **Semantic Ranker vs Pure Vector Search**: Hybrid Search (Vector + BM25) combined with Reciprocal Rank Fusion (RRF) and Semantic Reranking consistently outperforms pure vector similarity.\n3. **Cleartext API Keys**: Never hardcode credentials. Official exam answers mandate Azure Key Vault, AWS Secrets Manager, GCP Secret Manager, or Managed Identity (Microsoft Entra ID / IAM).`
+          : `### 3 Pièges Classiques en Examen d’Architecture IA ⚠️\n\n1. **Confondre Content Filters & Custom Blocklists** : Sur Azure OpenAI, les filtres par défaut bloquent la haine/violence. Mais pour interdire les données confidentielles de l’entreprise (n° de compte), il faut créer des Regex / Custom Blocklists !\n2. **Reranker vs Recherche Vectorielle pure** : La recherche hybride (Vectorielle + BM25) combinée à un *Semantic Ranker* (RRF) surpasse toujours la recherche vectorielle seule.\n3. **Clés d'API en clair** : Tout examen sanctionne le hardcodage de clés. La bonne réponse implique toujours un coffre-fort managé (Azure Key Vault, AWS Secrets Manager, GCP Secret Manager) ou une identité managée (Entra ID, IAM).`;
+        nextSuggestions = isEn
+          ? [
+              'Give me a practice question',
+              'How to configure VNet isolation?',
+            ]
+          : [
+              'Proposer une question d’entraînement',
+              'Comment gérer l’isolation réseau VNet ?',
+            ];
       } else {
-        replyText = `Excellente question pédagogique ! Concernant **"${text}"** :\n\nDans le contexte des certifications Cloud AI (Microsoft, AWS, Google Cloud, IBM) :\n\n1. **Principe architectural clé** : Prioriser la modularité, le découplage des pipelines d'inférence et la gouvernance responsable (détection des biais, auditabilité).\n2. **Vérification d’examen** : Vérifiez toujours si la question exige le coût minimal (modèles SLM / serverless) ou la latence minimale (déploiement sur instances GPU dédiées).\n3. **Recommandation** : Associez toujours cette notion à une fiche mémo SRS pour consolider vos repères mnémotechniques.`;
-        nextSuggestions = [
-          'Créer un exemple concret',
-          'Quelles sont les questions fréquentes liées ?',
-          'Accéder aux fiches mémo',
-        ];
+        replyText = isEn
+          ? `Great pedagogical question! Regarding **"${text}"**:\n\nIn the context of Cloud AI certifications (Microsoft, AWS, Google Cloud, IBM):\n\n1. **Core Architectural Principle**: Prioritize modularity, decoupled inference pipelines, and Responsible AI governance (bias detection, safety logging, and auditability).\n2. **Exam Trade-Offs**: Always identify whether the prompt prioritizes cost minimization (Serverless / SLM models) or latency SLAs (dedicated GPU instances).\n3. **Recommendation**: Pair this concept with an SM-2 flashcard to cement your mnemonic recall.`
+          : `Excellente question pédagogique ! Concernant **"${text}"** :\n\nDans le contexte des certifications Cloud AI (Microsoft, AWS, Google Cloud, IBM) :\n\n1. **Principe architectural clé** : Prioriser la modularité, le découplage des pipelines d'inférence et la gouvernance responsable (détection des biais, auditabilité).\n2. **Vérification d’examen** : Vérifiez toujours si la question exige le coût minimal (modèles SLM / serverless) ou la latence minimale (déploiement sur instances GPU dédiées).\n3. **Recommandation** : Associez toujours cette notion à une fiche mémo SRS pour consolider vos repères mnémotechniques.`;
+        nextSuggestions = isEn
+          ? [
+              'Show a practical architecture example',
+              'What related questions often appear?',
+              'Review flashcards',
+            ]
+          : [
+              'Créer un exemple concret',
+              'Quelles sont les questions fréquentes liées ?',
+              'Accéder aux fiches mémo',
+            ];
       }
 
       const botReply: ChatMessage = {
         id: `ast-${Date.now()}`,
         sender: 'assistant',
         content: replyText,
-        timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        timestamp: formatLocalizedTime(new Date()),
         suggestions: nextSuggestions,
       };
 
@@ -199,14 +262,16 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white font-headline">
-                    Assistant Pédagogique IA
+                    {getCurrentLanguage() === 'en' ? 'AI Pedagogical Assistant' : 'Assistant Pédagogique IA'}
                   </h3>
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-500/15 text-blue-600 dark:text-blue-300 font-semibold border border-blue-500/30">
                     CertifIA Tutor
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {context?.certCode ? `Contextualisé sur ${context.certCode}` : 'Explications, mnémotechniques et pièges d’examens'}
+                  {context?.certCode 
+                    ? (getCurrentLanguage() === 'en' ? `Focused on ${context.certCode}` : `Contextualisé sur ${context.certCode}`)
+                    : (getCurrentLanguage() === 'en' ? 'Architectural insights, mnemonics & exam traps' : 'Explications, mnémotechniques et pièges d’examens')}
                 </p>
               </div>
             </div>
@@ -318,18 +383,18 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           {/* Quick Action Buttons strip */}
           <div className="p-2.5 border-t border-slate-200 dark:border-[#262a35] bg-slate-50 dark:bg-[#10141f] flex items-center gap-2 overflow-x-auto text-xs">
             <button
-              onClick={() => handleSendMessage('Expliquer les pièges d’examen')}
+              onClick={() => handleSendMessage(getCurrentLanguage() === 'en' ? 'Explain key exam pitfalls' : 'Expliquer les pièges d’examen')}
               className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-xs shrink-0 flex items-center gap-1"
             >
               <AlertTriangle className="w-3 h-3 text-amber-500" />
-              Pièges d’examen
+              {getCurrentLanguage() === 'en' ? 'Exam Pitfalls' : 'Pièges d’examen'}
             </button>
             <button
-              onClick={() => handleSendMessage('Donne-moi une astuce mnémotechnique')}
+              onClick={() => handleSendMessage(getCurrentLanguage() === 'en' ? 'Give me a memory mnemonic' : 'Donne-moi une astuce mnémotechnique')}
               className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-xs shrink-0 flex items-center gap-1"
             >
               <Lightbulb className="w-3 h-3 text-blue-500" />
-              Mnémotechnique
+              {getCurrentLanguage() === 'en' ? 'Mnemonic Trick' : 'Mnémotechnique'}
             </button>
             <button
               onClick={() => {
@@ -341,7 +406,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               className="px-2.5 py-1 rounded-lg bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 text-xs shrink-0 flex items-center gap-1"
             >
               <BookOpen className="w-3 h-3 text-emerald-500" />
-              Fiches Mémo
+              {getCurrentLanguage() === 'en' ? 'Flashcards' : 'Fiches Mémo'}
             </button>
           </div>
 
@@ -358,20 +423,22 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
                 type="text"
                 value={inputPrompt}
                 onChange={(e) => setInputPrompt(e.target.value)}
-                placeholder="Posez une question sur une certification ou un concept..."
+                placeholder={getCurrentLanguage() === 'en' ? 'Ask a question about a certification or concept...' : 'Posez une question sur une certification ou un concept...'}
                 className="flex-1 px-3.5 py-2.5 text-xs sm:text-sm bg-slate-100 dark:bg-[#1a2030] border border-slate-200 dark:border-[#2a3045] rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
               <button
                 type="submit"
                 disabled={!inputPrompt.trim() || isTyping}
                 className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white transition-all shadow-md shadow-blue-500/20"
-                aria-label="Envoyer"
+                aria-label={getCurrentLanguage() === 'en' ? 'Send' : 'Envoyer'}
               >
                 <Send className="w-4 h-4" />
               </button>
             </form>
             <p className="text-[10px] text-slate-400 text-center mt-2">
-              Assistance basée sur les blueprints officiels. Les estimations de niveau ne constituent pas une garantie de passage.
+              {getCurrentLanguage() === 'en'
+                ? 'Assistance based on official blueprints. Readiness estimates do not guarantee exam passing.'
+                : 'Assistance basée sur les blueprints officiels. Les estimations de niveau ne constituent pas une garantie de passage.'}
             </p>
           </div>
         </div>

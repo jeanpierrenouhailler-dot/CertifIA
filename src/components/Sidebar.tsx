@@ -31,6 +31,7 @@ import { useGuide } from '../context/GuideContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
 import { NAV_CATEGORIES } from '../navigation/navigationConfig';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
   currentScreen: AppScreen;
@@ -68,6 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { versionInfo } = useSystemUpdate();
   const { certProgress } = useProgress();
+  const { t } = useTranslation(['navigation', 'common', 'settings']);
 
   const [localCollapsed, setLocalCollapsed] = useState(false);
   const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : localCollapsed;
@@ -134,8 +136,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={toggleCollapse}
             className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1c202d] transition-colors"
-            title={isCollapsed ? 'Développer la barre latérale' : 'Réduire la barre latérale'}
-            aria-label={isCollapsed ? 'Développer la barre latérale' : 'Réduire la barre latérale'}
+            title={isCollapsed ? t('common:expandSidebar', 'Développer la barre latérale') : t('common:collapseSidebar', 'Réduire la barre latérale')}
+            aria-label={isCollapsed ? t('common:expandSidebar', 'Développer la barre latérale') : t('common:collapseSidebar', 'Réduire la barre latérale')}
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -145,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={onCloseMobile}
               className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1c202d]"
-              aria-label="Fermer"
+              aria-label={t('common:close', 'Fermer')}
             >
               <X className="w-5 h-5" />
             </button>
@@ -158,12 +160,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="space-y-1">
             {!isCollapsed && (
               <div className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
-                1. Accueil
+                1. {t('navigation:categories.accueil', 'Accueil')}
               </div>
             )}
             <button
               onClick={() => handleNav('today')}
-              title={isCollapsed ? "Accueil - Aujourd'hui" : undefined}
+              title={isCollapsed ? t('navigation:items.today.label', "Aujourd'hui") : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 currentScreen === 'today'
                   ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -174,7 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Home className={`w-4 h-4 shrink-0 ${currentScreen === 'today' ? 'text-white' : 'text-blue-500'}`} />
               {!isCollapsed && (
                 <div className="flex items-center justify-between w-full truncate">
-                  <span className="truncate">Aujourd’hui</span>
+                  <span className="truncate">{t('navigation:items.today.shortLabel', 'Aujourd’hui')}</span>
                   <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
                     currentScreen === 'today' ? 'bg-white/20 text-white' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                   }`}>
@@ -192,7 +194,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => toggleSubmenu('certifications')}
                 className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 flex items-center justify-between cursor-pointer select-none"
               >
-                <span>2. Certifications</span>
+                <span>2. {t('navigation:categories.certifications', 'Certifications')}</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSubmenus.certifications ? 'rotate-180' : ''}`} />
               </div>
             ) : null}
@@ -200,7 +202,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Catalogue */}
             <button
               onClick={() => handleNav('catalogue')}
-              title={isCollapsed ? "Catalogue des certifications" : undefined}
+              title={isCollapsed ? t('navigation:items.catalogue.label', 'Catalogue des certifications') : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 currentScreen === 'catalogue'
                   ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -211,7 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Compass className={`w-4 h-4 shrink-0 ${currentScreen === 'catalogue' ? 'text-white' : 'text-blue-500'}`} />
               {!isCollapsed && (
                 <div className="flex items-center justify-between w-full truncate">
-                  <span className="truncate">Catalogue</span>
+                  <span className="truncate">{t('navigation:items.catalogue.shortLabel', 'Catalogue')}</span>
                   <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
                     currentScreen === 'catalogue' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-[#202533] text-slate-500 dark:text-slate-400'
                   }`}>
@@ -228,11 +230,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   if (onOpenComparator) onOpenComparator();
                   if (onCloseMobile) onCloseMobile();
                 }}
-                title={isCollapsed ? "Comparateur d'examens" : undefined}
+                title={isCollapsed ? t('navigation:items.comparator.label', "Comparateur d'examens") : undefined}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-all"
               >
                 <Scale className="w-4 h-4 shrink-0 text-amber-500" />
-                {!isCollapsed && <span className="truncate">Comparateur</span>}
+                {!isCollapsed && <span className="truncate">{t('navigation:items.comparator.shortLabel', 'Comparateur')}</span>}
               </button>
             )}
 
@@ -240,7 +242,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {(!isCollapsed ? openSubmenus.certifications : true) && (
               <button
                 onClick={() => handleNav('recommendation')}
-                title={isCollapsed ? "Parcours recommandés" : undefined}
+                title={isCollapsed ? t('navigation:items.recommendation.label', 'Parcours recommandés') : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                   currentScreen === 'recommendation'
                     ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -251,7 +253,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Sparkles className={`w-4 h-4 shrink-0 ${currentScreen === 'recommendation' ? 'text-white' : 'text-indigo-400'}`} />
                 {!isCollapsed && (
                   <div className="flex items-center justify-between w-full truncate">
-                    <span className="truncate">Parcours recommandés</span>
+                    <span className="truncate">{t('navigation:items.recommendation.shortLabel', 'Parcours recommandés')}</span>
                     <span className="text-[9px] font-mono font-bold px-1 py-0.2 rounded bg-indigo-500/10 text-indigo-500 dark:text-indigo-400">
                       Niv 1-4
                     </span>
@@ -268,7 +270,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => toggleSubmenu('apprentissage')}
                 className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 flex items-center justify-between cursor-pointer select-none"
               >
-                <span>3. Apprentissage</span>
+                <span>3. {t('navigation:categories.apprentissage', 'Apprentissage')}</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSubmenus.apprentissage ? 'rotate-180' : ''}`} />
               </div>
             ) : null}
@@ -276,7 +278,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Quiz & Entraînements */}
             <button
               onClick={() => handleNav('quiz')}
-              title={isCollapsed ? "Quiz et entraînements" : undefined}
+              title={isCollapsed ? t('navigation:items.quiz.label', 'Quiz et entraînements') : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 currentScreen === 'quiz'
                   ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -287,7 +289,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <CheckSquare className={`w-4 h-4 shrink-0 ${currentScreen === 'quiz' ? 'text-white' : 'text-emerald-500'}`} />
               {!isCollapsed && (
                 <div className="flex items-center justify-between w-full truncate">
-                  <span className="truncate">Quiz et entraînements</span>
+                  <span className="truncate">{t('navigation:items.quiz.shortLabel', 'Quiz et entraînements')}</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                     QCM
                   </span>
@@ -299,7 +301,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {(!isCollapsed ? openSubmenus.apprentissage : true) && (
               <button
                 onClick={() => handleNav('flashcards')}
-                title={isCollapsed ? "Flashcards et SRS" : undefined}
+                title={isCollapsed ? t('navigation:items.flashcards.label', 'Flashcards et SRS') : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                   currentScreen === 'flashcards'
                     ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -310,7 +312,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Layers className={`w-4 h-4 shrink-0 ${currentScreen === 'flashcards' ? 'text-white' : 'text-blue-500'}`} />
                 {!isCollapsed && (
                   <div className="flex items-center justify-between w-full truncate">
-                    <span className="truncate">Flashcards et SRS</span>
+                    <span className="truncate">{t('navigation:items.flashcards.shortLabel', 'Flashcards et SRS')}</span>
                     <span className="text-[10px] font-mono text-slate-400">
                       2 800
                     </span>
@@ -326,14 +328,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   if (onOpenFlashcardsDistribution) onOpenFlashcardsDistribution();
                   if (onCloseMobile) onCloseMobile();
                 }}
-                title={isCollapsed ? "Répartition des flashcards" : undefined}
+                title={isCollapsed ? t('navigation:items.distribution.label', 'Répartition des flashcards') : undefined}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-all"
               >
                 <PieChart className="w-4 h-4 shrink-0 text-emerald-500" />
                 {!isCollapsed && (
                   <div className="flex items-center justify-between w-full truncate">
-                    <span className="truncate">Répartition des fiches</span>
-                    <span className="text-[9px] font-mono text-slate-400">Inventaire</span>
+                    <span className="truncate">{t('navigation:items.distribution.shortLabel', 'Répartition des fiches')}</span>
+                    <span className="text-[9px] font-mono text-slate-400">2 800</span>
                   </div>
                 )}
               </button>
@@ -343,7 +345,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {(!isCollapsed ? openSubmenus.apprentissage : true) && (
               <button
                 onClick={() => handleNav('exam')}
-                title={isCollapsed ? "Examens blancs" : undefined}
+                title={isCollapsed ? t('navigation:items.exam.label', 'Examens blancs') : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                   currentScreen === 'exam'
                     ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -354,7 +356,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Clock className={`w-4 h-4 shrink-0 ${currentScreen === 'exam' ? 'text-white' : 'text-amber-500'}`} />
                 {!isCollapsed && (
                   <div className="flex items-center justify-between w-full truncate">
-                    <span className="truncate">Examens blancs</span>
+                    <span className="truncate">{t('navigation:items.exam.shortLabel', 'Examens blancs')}</span>
                     <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">
                       Chrono
                     </span>
@@ -367,7 +369,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {(!isCollapsed ? openSubmenus.apprentissage : true) && (
               <button
                 onClick={() => handleNav('glossary')}
-                title={isCollapsed ? "Glossaire & Encyclopédie" : undefined}
+                title={isCollapsed ? t('navigation:items.glossary.label', 'Glossaire & Encyclopédie') : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                   currentScreen === 'glossary'
                     ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -376,7 +378,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 aria-current={currentScreen === 'glossary' ? 'page' : undefined}
               >
                 <BookOpen className={`w-4 h-4 shrink-0 ${currentScreen === 'glossary' ? 'text-white' : 'text-blue-500'}`} />
-                {!isCollapsed && <span className="truncate">Glossaire & Notions</span>}
+                {!isCollapsed && <span className="truncate">{t('navigation:items.glossary.shortLabel', 'Glossaire & Notions')}</span>}
               </button>
             )}
           </div>
@@ -385,12 +387,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="space-y-1">
             {!isCollapsed && (
               <div className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
-                4. Progression
+                4. {t('navigation:categories.progression', 'Progression')}
               </div>
             )}
             <button
               onClick={() => handleNav('analytics')}
-              title={isCollapsed ? "Tableau de bord & Progression" : undefined}
+              title={isCollapsed ? t('navigation:items.analytics.label', 'Tableau de bord & Progression') : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 currentScreen === 'analytics'
                   ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -401,7 +403,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <BarChart3 className={`w-4 h-4 shrink-0 ${currentScreen === 'analytics' ? 'text-white' : 'text-emerald-500'}`} />
               {!isCollapsed && (
                 <div className="flex items-center justify-between w-full truncate">
-                  <span className="truncate">Tableau de bord</span>
+                  <span className="truncate">{t('navigation:items.analytics.shortLabel', 'Tableau de bord')}</span>
                   <span className="text-[10px] font-mono text-emerald-500 font-bold">
                     {certProgress ? `${certProgress.overallScore}%` : '74%'}
                   </span>
@@ -414,7 +416,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="space-y-1">
             {!isCollapsed && (
               <div className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
-                5. Assistant IA
+                5. {t('navigation:categories.assistant', 'Assistant IA')}
               </div>
             )}
             <button
@@ -425,7 +427,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   handleNav('assistant');
                 }
               }}
-              title={isCollapsed ? "Assistant pédagogique IA" : undefined}
+              title={isCollapsed ? t('navigation:items.assistant.label', 'Assistant pédagogique') : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 currentScreen === 'assistant'
                   ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-500/20'
@@ -436,9 +438,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Bot className={`w-4 h-4 shrink-0 ${currentScreen === 'assistant' ? 'text-white' : 'text-blue-500'}`} />
               {!isCollapsed && (
                 <div className="flex items-center justify-between w-full truncate">
-                  <span className="truncate">Assistant pédagogique</span>
+                  <span className="truncate">{t('navigation:items.assistant.shortLabel', 'Assistant pédagogique')}</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold">
-                    Tuteur
+                    {t('common:aiTutorBadge', 'Tuteur')}
                   </span>
                 </div>
               )}
@@ -452,7 +454,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => toggleSubmenu('plus')}
                 className="px-3 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1 flex items-center justify-between cursor-pointer select-none"
               >
-                <span>6. Plus</span>
+                <span>6. {t('navigation:categories.plus', 'Plus')}</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSubmenus.plus ? 'rotate-180' : ''}`} />
               </div>
             ) : null}
@@ -467,7 +469,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1a2030]"
                 >
                   <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="truncate">Mode Guide novice</span>
+                  <span className="truncate">{t('navigation:items.guide.shortLabel', 'Mode Guide novice')}</span>
                   <span className={`ml-auto text-[9px] font-mono px-1.5 py-0.2 rounded font-bold ${isGuideModeActive ? 'bg-emerald-500/20 text-emerald-500' : 'bg-slate-200 dark:bg-[#202533] text-slate-400'}`}>
                     {isGuideModeActive ? 'ON' : 'OFF'}
                   </span>
@@ -481,7 +483,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1a2030]"
                 >
                   <FileText className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="truncate">Mentions légales</span>
+                  <span className="truncate">{t('navigation:items.legal.shortLabel', 'Mentions légales')}</span>
                 </button>
 
                 {!isInstalled && (
@@ -493,7 +495,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-semibold"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span className="truncate">Installer l’application</span>
+                    <span className="truncate">{t('navigation:items.pwa.label', 'Installer l’application')}</span>
                   </button>
                 )}
               </div>
@@ -509,13 +511,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               if (onOpenSystemSettings) onOpenSystemSettings();
               if (onCloseMobile) onCloseMobile();
             }}
-            title={isCollapsed ? "Paramètres système & Mises à jour" : undefined}
+            title={isCollapsed ? t('navigation:items.settings.label', 'Paramètres système') : undefined}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1a2030] hover:text-slate-900 dark:hover:text-white transition-all"
           >
             <Settings className="w-4 h-4 shrink-0 text-slate-400" />
             {!isCollapsed && (
               <div className="flex items-center justify-between w-full truncate">
-                <span className="truncate">Paramètres</span>
+                <span className="truncate">{t('navigation:items.settings.shortLabel', 'Paramètres')}</span>
                 <span className="text-[10px] font-mono text-slate-400">{versionInfo.version}</span>
               </div>
             )}
@@ -524,7 +526,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* User profile button */}
           <button
             onClick={() => handleNav('profile')}
-            title={isCollapsed ? (user ? user.email || 'Mon Profil' : 'Connexion') : undefined}
+            title={isCollapsed ? (user ? user.email || t('navigation:items.profile.shortLabel', 'Mon Profil') : t('common:login', 'Connexion')) : undefined}
             className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium transition-all ${
               currentScreen === 'profile'
                 ? 'bg-slate-200 dark:bg-[#1a2030] text-slate-900 dark:text-white font-semibold'
@@ -536,10 +538,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex flex-col text-left truncate">
                 <span className="truncate font-semibold text-slate-900 dark:text-white">
-                  {user?.displayName || userProfile?.displayName || 'Apprenant IA'}
+                  {user?.displayName || userProfile?.displayName || t('common:learnerName', 'Apprenant IA')}
                 </span>
                 <span className="text-[10px] text-slate-400 truncate">
-                  {user ? 'Compte synchronisé' : 'Mode invité'}
+                  {user ? t('common:syncedAccount', 'Compte synchronisé') : t('common:guestMode', 'Mode invité')}
                 </span>
               </div>
             )}

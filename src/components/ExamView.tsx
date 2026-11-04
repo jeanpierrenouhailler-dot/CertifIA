@@ -16,14 +16,19 @@ import {
   Info
 } from 'lucide-react';
 import { AppScreen } from '../types';
-import { examQuestionsBank, getInitialExamGrid } from '../data/examData';
+import { getInitialExamGrid } from '../data/examData';
+import { getLocalizedExamQuestionsBank } from '../data/localizedExamData';
 import { useProgress } from '../context/ProgressContext';
+import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface ExamViewProps {
   onNavigate: (screen: AppScreen) => void;
 }
 
 export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
+  const { t } = useTranslation(['examinations', 'common']);
+  const lang = getCurrentLanguage();
+  const examBank = getLocalizedExamQuestionsBank(lang);
   const { recordExamAttempt } = useProgress();
   const [currentQNum, setCurrentQNum] = useState(28);
   const [gridItems, setGridItems] = useState(getInitialExamGrid);
@@ -56,7 +61,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
   };
 
   const currentItem = gridItems.find((item) => item.number === currentQNum) || gridItems[27];
-  const questionDetail = examQuestionsBank[currentQNum] || examQuestionsBank[28];
+  const questionDetail = examBank[currentQNum] || examBank[28];
 
   const answeredCount = gridItems.filter((i) => i.status === 'answered' || (i.status === 'flagged' && i.selectedOption)).length;
   const flaggedCount = gridItems.filter((i) => i.status === 'flagged').length;

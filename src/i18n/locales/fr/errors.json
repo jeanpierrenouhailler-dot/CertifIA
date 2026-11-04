@@ -1,0 +1,8 @@
+{
+  "general": "Une erreur inattendue est survenue. Veuillez réessayer.",
+  "network": "Problème de connexion réseau. Vos données locales restent disponibles.",
+  "notFound": "La ressource demandée est introuvable.",
+  "unauthorized": "Veuillez vous connecter pour accéder à cette fonctionnalité.",
+  "examIncomplete": "Veuillez répondre à toutes les questions avant de finaliser l'épreuve.",
+  "aiTimeout": "Le tuteur IA n'a pas répondu à temps. Veuillez relancer votre requête."
+}

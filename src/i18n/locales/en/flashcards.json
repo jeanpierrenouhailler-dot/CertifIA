@@ -1,0 +1,34 @@
+{
+  "title": "Flashcards & Spaced Repetition (SRS)",
+  "subtitle": "2,800 technical review cards calibrated for real exams using the SM-2 algorithm.",
+  "deckSelector": "Select certification deck:",
+  "allDecks": "All certifications",
+  "flipCard": "Click or press Spacebar to flip card",
+  "revealSolution": "Reveal Solution & Golden Rules",
+  "hideSolution": "Hide Solution",
+  "ratingTitle": "Assess your recall level (SM-2 / FSRS Algorithm)",
+  "ratingHint": "Keys [1] [2] [3] [4] to grade",
+  "scheduledAt": "Scheduled for: {{interval}}",
+  "rating": {
+    "again": "Again (1 day)",
+    "hard": "Hard (2 days)",
+    "good": "Good (4 days)",
+    "easy": "Mastered (7 days)",
+    "againBtn": "Again [1]",
+    "hardBtn": "Hard [2]",
+    "goodBtn": "Good [3]",
+    "easyBtn": "Easy [4]"
+  },
+  "metrics": "Key Metrics & Specifications",
+  "goldenRules": "Exam Golden Rules",
+  "distributionModal": {
+    "title": "Inventory & Breakdown of 2,800 Flashcards",
+    "totalCount": "Total: 2,800 cards across 6 major exams",
+    "azure": "Microsoft Azure (AI-102 & AI-900): 1,000 cards",
+    "aws": "Amazon Web Services (AIF-C01 & MLS-C01): 900 cards",
+    "gcp": "Google Cloud (Professional ML Engineer): 500 cards",
+    "ibm": "IBM (watsonx Generative AI C1000-177): 400 cards",
+    "filterByCert": "Filter flashcards for this certification",
+    "close": "Close inventory"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Paramètres Système & Préférences",
+  "subtitle": "Gestion de la version applicative, mises à jour automatiques, langue et stockage.",
+  "languageSection": {
+    "title": "Langue de l'application (Internationalisation)",
+    "description": "Choisissez la langue d'affichage de l'interface et du contenu pédagogique.",
+    "fr": "Français (French)",
+    "en": "English (Anglais)"
+  },
+  "themeSection": {
+    "title": "Thème visuel",
+    "description": "Basculez entre le mode sombre et le mode clair pour un confort de lecture optimal.",
+    "dark": "Mode Sombre",
+    "light": "Mode Clair"
+  },
+  "systemSection": {
+    "title": "Version & Mises à jour du système",
+    "currentVersion": "Version actuelle",
+    "releaseDate": "Date de sortie",
+    "lastCheckDate": "Dernière vérification",
+    "autoUpdates": "Mises à jour automatiques en arrière-plan",
+    "autoUpdatesDesc": "Vérifie régulièrement l'arrivée de nouvelles versions et les installe en toute transparence.",
+    "checkNow": "Vérifier les mises à jour",
+    "forceUpdate": "Forcer la mise à jour immédiate"
+  },
+  "guideSection": {
+    "title": "Guide Novice & Infobulles",
+    "description": "Affiche des explications détaillées et des repères visuels sur chaque écran pour les débutants.",
+    "toggle": "Activer le mode guide débutant"
+  },
+  "legalSection": {
+    "title": "Mentions Légales & Cadre d'Utilisation",
+    "open": "Consulter les mentions légales et l'avertissement de non-responsabilité"
+  },
+  "pwaSection": {
+    "title": "Application Web Progressive (PWA)",
+    "installed": "L'application est déjà installée sur cet appareil.",
+    "installButton": "Installer CertifIA sur mon écran d'accueil",
+    "instructions": "Profitez d'un accès hors-ligne, d'un affichage plein écran et de lancements instantanés."
+  }
+}

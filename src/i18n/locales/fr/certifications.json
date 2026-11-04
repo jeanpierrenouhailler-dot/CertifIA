@@ -1,0 +1,43 @@
+{
+  "title": "Catalogue des Certifications IA",
+  "subtitle": "Explorez les 18 certifications officielles en Intelligence Artificielle et Cloud AI.",
+  "filterAll": "Tous",
+  "filterByProvider": "Organisme / Fournisseur",
+  "filterByLevel": "Niveau de difficulté",
+  "filterBySearch": "Recherche par mot-clé, code d'examen...",
+  "comparatorTitle": "Comparateur de Certifications",
+  "compareButton": "Comparer",
+  "addToCompare": "Ajouter au comparateur",
+  "removeFromCompare": "Retirer du comparateur",
+  "compareLimit": "Vous pouvez comparer jusqu'à 3 certifications simultanément.",
+  "sideBySide": "Comparaison face à face",
+  "officialCode": "Code officiel",
+  "provider": "Organisme",
+  "level": "Niveau",
+  "passScore": "Score de passage",
+  "duration": "Durée de l'épreuve",
+  "questionsCount": "Nombre de questions",
+  "averagePassRate": "Taux de réussite moyen",
+  "targetAudience": "Public cible",
+  "domains": "Domaines d'évaluation",
+  "actions": {
+    "train": "S'entraîner",
+    "viewBlueprint": "Voir le blueprint",
+    "setAsTarget": "Définir comme cible",
+    "activeTarget": "Cible active"
+  },
+  "levels": {
+    "all": "Tous les niveaux",
+    "fondamental": "Fondamental",
+    "associate": "Associate",
+    "expert": "Expert / Avancé"
+  },
+  "providers": {
+    "all": "Tous les fournisseurs",
+    "azure": "Microsoft Azure",
+    "aws": "Amazon Web Services",
+    "gcp": "Google Cloud",
+    "ibm": "IBM watsonx",
+    "nvidia": "NVIDIA DLI"
+  }
+}

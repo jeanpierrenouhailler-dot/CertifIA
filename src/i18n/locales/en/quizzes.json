@@ -1,0 +1,22 @@
+{
+  "title": "Scenario Practice & MCQs",
+  "subtitle": "Real-world cloud architectures, step-by-step reasoning, and exam trap analysis.",
+  "singleChoice": "Single Choice Question (SCQ)",
+  "multipleChoice": "Multiple Choice Question (MCQ)",
+  "questionNumber": "Question {{current}} of {{total}}",
+  "points": "{{count}} points",
+  "validateAnswer": "Submit Answer",
+  "nextQuestion": "Next Question",
+  "previousQuestion": "Previous Question",
+  "correctAnswer": "Correct answer!",
+  "incorrectAnswer": "Incorrect answer",
+  "explanation": "Detailed Architectural Explanation",
+  "officialDoc": "Official Reference Documentation",
+  "trapsTitle": "Exam Pitfalls & Trap Analysis",
+  "askTutorAboutQuestion": "Ask AI Tutor about this question",
+  "reviewInFlashcard": "Review this concept as an SRS Flashcard",
+  "sessionSummary": "Quiz Session Summary",
+  "score": "Score: {{score}} / {{maxScore}} ({{percentage}}%)",
+  "restartQuiz": "Restart Quiz",
+  "returnToCatalog": "Return to Catalog"
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Dashboard & Cognitive Progress",
+  "subtitle": "Readiness index, domain-by-domain mastery, and comprehensive study telemetry.",
+  "readinessIndex": "Overall Readiness Index",
+  "readinessHelp": "Calculated based on your quiz scores, SM-2 spaced repetition, and timed mock exam results.",
+  "cardsReviewed": "Flashcards reviewed",
+  "questionsAnswered": "Questions answered",
+  "successRate": "Overall success rate",
+  "currentStreak": "Current daily streak",
+  "days": "consecutive days",
+  "domainBreakdown": "Mastery by Exam Domain",
+  "examHistory": "Mock Exam History",
+  "attemptNumber": "Attempt #{{number}}",
+  "date": "Date of attempt",
+  "score": "Score",
+  "status": "Result",
+  "disclaimer": "Transparency Disclaimer: Readiness indices and simulation scores are provided for educational purposes and do not represent a legal guarantee of passing official vendor examinations."
+}

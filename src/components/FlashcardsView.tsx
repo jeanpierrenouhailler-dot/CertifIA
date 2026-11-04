@@ -53,6 +53,7 @@ import {
 } from '../data/flashcardsData';
 
 import { FlashcardCertId } from './FlashcardsDistributionModal';
+import { useTranslation } from 'react-i18next';
 
 interface FlashcardsViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -65,6 +66,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   initialCert,
   onOpenDistributionModal
 }) => {
+  const { t } = useTranslation(['flashcards', 'common']);
   const {
     reviews,
     bookmarkedCardIds,
@@ -1379,10 +1381,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-400 font-mono text-[11px] uppercase flex items-center gap-1.5">
                 <Brain className="w-3.5 h-3.5 text-blue-400" />
-                Évaluez votre niveau de rétention (Algorithme SM-2 / FSRS)
+                {t('flashcards:ratingTitle', 'Évaluez votre niveau de rétention (Algorithme SM-2 / FSRS)')}
               </span>
               <span className="font-mono text-emerald-400 text-xs">
-                {ratedInterval ? `Planifié à : ${ratedInterval}` : 'Touches [1] [2] [3] [4] pour noter'}
+                {ratedInterval ? t('flashcards:scheduledAt', { interval: ratedInterval, defaultValue: `Planifié à : ${ratedInterval}` }) : t('flashcards:ratingHint', 'Touches [1] [2] [3] [4] pour noter')}
               </span>
             </div>
 
@@ -1391,7 +1393,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 onClick={() => handleRate('revoir', predictedIntervals.revoir.days, `${predictedIntervals.revoir.days}j (À revoir)`)}
                 className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-rose-400">À revoir [1]</div>
+                <div className="font-mono text-sm font-bold text-rose-400">{t('flashcards:rating.againBtn', 'À revoir [1]')}</div>
                 <div className="text-[11px] text-rose-300/90 font-mono mt-0.5 font-bold">
                   {predictedIntervals.revoir.label} • Remise à zéro
                 </div>
@@ -1402,7 +1404,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 onClick={() => handleRate('difficile', predictedIntervals.difficile.days, `${predictedIntervals.difficile.days}j (Difficile)`)}
                 className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-amber-400">Difficile [2]</div>
+                <div className="font-mono text-sm font-bold text-amber-400">{t('flashcards:rating.hardBtn', 'Difficile [2]')}</div>
                 <div className="text-[11px] text-amber-300/90 font-mono mt-0.5 font-bold">
                   {predictedIntervals.difficile.label} • Réduction
                 </div>
@@ -1413,7 +1415,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 onClick={() => handleRate('moyen', predictedIntervals.moyen.days, `${predictedIntervals.moyen.days}j (Bien)`)}
                 className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 text-blue-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-blue-400">Bien [3]</div>
+                <div className="font-mono text-sm font-bold text-blue-400">{t('flashcards:rating.goodBtn', 'Bien [3]')}</div>
                 <div className="text-[11px] text-blue-300/90 font-mono mt-0.5 font-bold">
                   {predictedIntervals.moyen.label} • Standard SM-2
                 </div>
@@ -1424,7 +1426,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 onClick={() => handleRate('facile', predictedIntervals.facile.days, `${predictedIntervals.facile.days}j (Facile)`)}
                 className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold text-center transition-all group"
               >
-                <div className="font-mono text-sm font-bold text-emerald-400">Facile [4]</div>
+                <div className="font-mono text-sm font-bold text-emerald-400">{t('flashcards:rating.easyBtn', 'Facile [4]')}</div>
                 <div className="text-[11px] text-emerald-300/90 font-mono mt-0.5 font-bold">
                   {predictedIntervals.facile.label} • Boost rétention
                 </div>

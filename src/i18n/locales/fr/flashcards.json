@@ -1,0 +1,34 @@
+{
+  "title": "Fiches Mémo & Répétition Espacée (SRS)",
+  "subtitle": "2 800 fiches techniques calibrées sur les examens réels avec l'algorithme SM-2.",
+  "deckSelector": "Sélectionner un deck de certification :",
+  "allDecks": "Toutes les certifications",
+  "flipCard": "Cliquer ou appuyer sur Espace pour retourner la carte",
+  "revealSolution": "Afficher la solution & règles d'or",
+  "hideSolution": "Masquer la solution",
+  "ratingTitle": "Évaluez votre niveau de rétention (Algorithme SM-2 / FSRS)",
+  "ratingHint": "Touches [1] [2] [3] [4] pour noter",
+  "scheduledAt": "Planifié à : {{interval}}",
+  "rating": {
+    "again": "À revoir (1 jour)",
+    "hard": "Difficile (2 jours)",
+    "good": "Correct (4 jours)",
+    "easy": "Maîtrisé (7 jours)",
+    "againBtn": "À revoir [1]",
+    "hardBtn": "Difficile [2]",
+    "goodBtn": "Bien [3]",
+    "easyBtn": "Facile [4]"
+  },
+  "metrics": "Métriques & Spécifications clés",
+  "goldenRules": "Règles d'or pour l'examen",
+  "distributionModal": {
+    "title": "Inventaire & Répartition des 2 800 Flashcards",
+    "totalCount": "Total : 2 800 cartes réparties sur 6 examens majeurs",
+    "azure": "Microsoft Azure (AI-102 & AI-900) : 1 000 cartes",
+    "aws": "Amazon Web Services (AIF-C01 & MLS-C01) : 900 cartes",
+    "gcp": "Google Cloud (Professional ML Engineer) : 500 cartes",
+    "ibm": "IBM (watsonx Generative AI C1000-177) : 400 cartes",
+    "filterByCert": "Filtrer les cartes de cette certification",
+    "close": "Fermer l'inventaire"
+  }
+}

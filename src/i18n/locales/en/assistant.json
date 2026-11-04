@@ -1,0 +1,23 @@
+{
+  "title": "AI Pedagogical Assistant",
+  "subtitle": "Dedicated tutor specialized in Cloud AI architectures, exam trap analysis, and mnemonics.",
+  "status": "CertifIA Tutor Online",
+  "inputPlaceholder": "Ask a question about a concept, architecture, or exam trap...",
+  "send": "Send",
+  "typing": "Tutor is analyzing your request...",
+  "tabs": {
+    "concepts": "Key Concepts",
+    "traps": "Exam Pitfalls",
+    "mnemonics": "Mnemonics",
+    "custom": "Open Questions"
+  },
+  "suggestionsTitle": "Recommended questions:",
+  "suggestedPrompts": [
+    "Explain the difference between RAG and Fine-Tuning",
+    "How does the SM-2 SRS spaced repetition algorithm work?",
+    "What are common pitfalls on the AI-102 exam?",
+    "Which ML metrics should I memorize for the GCP exam?"
+  ],
+  "contextBanner": "Active Context: {{topic}} ({{certCode}})",
+  "clearChat": "Reset chat history"
+}

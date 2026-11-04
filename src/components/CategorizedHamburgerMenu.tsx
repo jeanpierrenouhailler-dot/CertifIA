@@ -34,6 +34,8 @@ import { useGuide } from '../context/GuideContext';
 import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { NAV_CATEGORIES, NAV_ITEMS, NavCategoryId, NavItemConfig } from '../navigation/navigationConfig';
+import { LanguageSelector } from './LanguageSelector';
+import { useTranslation } from '../i18n';
 
 interface CategorizedHamburgerMenuProps {
   isOpen: boolean;
@@ -271,6 +273,8 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
               <Settings className="w-4 h-4 text-slate-400" />
               <span className="text-[11px] font-mono">{versionInfo.version}</span>
             </button>
+
+            <LanguageSelector variant="compact" />
           </div>
 
           {!isInstalled && (

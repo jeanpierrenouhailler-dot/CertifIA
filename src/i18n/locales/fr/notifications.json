@@ -1,0 +1,9 @@
+{
+  "updateChecking": "Vérification de la disponibilité de nouvelles versions...",
+  "updateAvailable": "Une nouvelle version de CertifIA est disponible !",
+  "updateLatest": "Votre application est parfaitement à jour ({{version}}).",
+  "updateInstalled": "Mise à jour appliquée avec succès.",
+  "cardReviewed": "Carte enregistrée dans votre planning SRS.",
+  "examSubmitted": "Examen blanc soumis et noté.",
+  "targetCertChanged": "Certification cible mise à jour : {{cert}}."
+}

@@ -6,7 +6,8 @@
 
 ### *Plateforme intelligente de préparation certifiante et de télémétrie cognitive pour examens Cloud & IA*
 
-[![Version](https://img.shields.io/badge/Version-v2.6.0-blue.svg?style=for-the-badge&logo=semver)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-v2.7.0-blue.svg?style=for-the-badge&logo=semver)](CHANGELOG.md)
+[![Languages](https://img.shields.io/badge/Languages-Français%20%7C%20English-success.svg?style=for-the-badge&logo=translate)](src/i18n/config.ts)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-emerald.svg?style=for-the-badge&logo=pwa)](public/manifest.webmanifest)
 [![SM-2 Algorithm](https://img.shields.io/badge/Algorithm-SM--2%20%2F%20FSRS-purple.svg?style=for-the-badge)](src/lib/srsAlgorithm.ts)
 [![Theme](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-amber.svg?style=for-the-badge)](src/context/ThemeContext.tsx)
@@ -16,17 +17,38 @@
 
 ---
 
-## 📸 Aperçu de l'Interface & Nouvelle Architecture (v2.6.0)
+## 📸 Aperçu de l'Interface & Nouvelle Architecture (v2.7.0)
 
 <div align="center">
-  <img src="/assets/certifai-screenshot.svg" alt="Capture d'écran CertifIA v2.6.0" width="100%" style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" />
+  <img src="/assets/certifai-screenshot.svg" alt="Capture d'écran CertifIA v2.7.0" width="100%" style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" />
 </div>
 
-> **Aperçu visuel complet :** L'architecture unifiée structurée autour des **5 Piliers Majeurs** (*Accueil*, *Certifications*, *Apprentissage*, *Progression*, *Assistant IA*), la **Barre latérale rétractable** (mode étendu & icônes avec tooltips), la **Barre supérieure avec Fil d'Ariane**, la **Command Palette `Cmd+K`**, le **Comparateur de certifications** et le **Tuteur Pédagogique IA contextuel**.
+> **Aperçu visuel complet :** L'architecture unifiée structurée autour des **5 Piliers Majeurs** (*Accueil / Home*, *Certifications*, *Apprentissage / Learning*, *Progression / Progress*, *Assistant IA / AI Tutor*), la **Barre latérale rétractable**, le **Sélecteur de langue instantané (FR/EN)**, la **Barre supérieure avec Fil d'Ariane**, la **Command Palette `Cmd+K`**, le **Comparateur de certifications** et le **Tuteur Pédagogique IA contextuel**.
 
 ---
 
-## 🚀 Dernières Nouveautés • Version 2.6.0 (Novembre 2026)
+## 🌐 Internationalisation Complète & Version Anglaise • Version 2.7.0
+
+CertifIA est désormais une application **100% bilingue (Français & English)** :
+
+* 🔄 **Bascule Instantanée Sans Rechargement** : Changez de langue en 1 clic depuis le Header, le modal Paramètres Système ou le menu mobile « Plus » sans jamais perdre votre progression dans un quiz, le décompte d'un chrono ou la carte SRS en cours d'étude.
+* 📦 **Architecture Hors-Ligne Bundled (PWA Compliant)** : 13 namespaces JSON intégrés directement au bundle applicatif sous `src/i18n/locales/{fr,en}/` pour une disponibilité totale sans aucune latence réseau.
+* 🎓 **Contenus Pédagogiques Entièrement Bilingues** :
+  - **18 Certifications** : titres, prérequis, modules d'examen et pondérations officielles en français et anglais.
+  - **QCM Scénarisés** : questions d'architecture réelles, pièges fréquents, justifications techniques et références officielles.
+  - **Glossaire & Notions Clés** : 6 catégories transversales, fiches architecturales, formules mathématiques et pièges d'examen.
+  - **Tuteur IA Contextuel** : suggestions d'amorces et réponses pédagogiques adaptées à la langue active.
+* 🔢 **Formatage Natif `Intl` Conforme aux Locales** :
+  - Dates : `15 mars 2026` (FR) vs `March 15, 2026` (EN).
+  - Nombres : `1 250 000` (espace insécable FR) vs `1,250,000` (virgule EN).
+  - Pourcentages : `85 %` (FR) vs `85%` (EN).
+  - Devises : `165,00 $US` (FR) vs `$165.00` (EN).
+* 🛡️ **Parité Programmatique Garantie** : Script de vérification automatisé `src/i18n/verifyI18nParity.ts` garantissant un ratio de parité 1:1 parfait (378 clés FR $\leftrightarrow$ 378 clés EN).
+* 💾 **Persistance Double Niveau** : Sauvegarde immédiate dans `localStorage` et synchronisation automatique avec le profil Cloud Firestore (`userProfile.preferredLanguage`).
+
+---
+
+## 🚀 Fonctionnalités Majeures de CertifIA
 
 * 🏛️ **Restructuration Complète de la Navigation (5 Piliers Majeurs)** :
   1. 🏠 **ACCUEIL** : Tableau de bord épuré avec accueil personnalisé post-connexion, indicateur de certification cible, bouton d'action principal « Reprendre mon apprentissage » en un clic, récapitulatif des 17 cartes SM-2 dues, 8 notions fragiles, 12 questions ciblées, flux des activités récentes et prochaines étapes recommandées.

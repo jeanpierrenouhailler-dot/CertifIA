@@ -120,3 +120,50 @@ Restructuration fondée sur 5 piliers cardinaux et un design anti-slop à haute 
 * **Barre Supérieure Légère & Fil d'Ariane Dynamique** : Titre contextuel, fil d'Ariane, certification cible active, Command Palette (`Cmd+K`) et accès profil.
 * **Barre Inférieure Mobile (`MobileBottomNav.tsx`)** : 5 destinations tactiles conformes ($\ge 44\text{px}$) + menu tiroir pour les options secondaires.
 * **Composants d'État Réutilisables** : `PageHeader.tsx`, `EmptyState.tsx`, `LoadingState.tsx`, `ErrorState.tsx`.
+
+---
+
+## 9. Architecture d'Internationalisation (i18n) & Bilinguisme FR/EN (v2.7.0)
+
+CertifIA intègre un système d'internationalisation de niveau production conçu pour être robuste, sans régression et conforme aux contraintes PWA offline :
+
+### 9.1 Organisation des Ressources & Namespaces
+Les traductions sont découpées en **13 namespaces sémantiques** statiquement bundlés sous `src/i18n/locales/{fr,en}/` :
+1. `common.json` : Actions universelles, statuts, badges, boutons génériques.
+2. `navigation.json` : Les 5 catégories majeures, libellés courts et longs des 16 écrans, raccourcis.
+3. `dashboard.json` : Cockpit du jour (« Aujourd'hui »), cartes SM-2 dues, indicateurs et flux d'activité.
+4. `certifications.json` : Filtres, statuts, niveaux, comparateur et fiches Blueprints.
+5. `learning.json` : Moteur de recommandation, questionnaire 4 niveaux, parcours IA et glossaire.
+6. `quizzes.json` : Questions d'examen, options A/B/C/D, explications, analyse des pièges et références.
+7. `flashcards.json` : Système SM-2, boutons d'évaluation 1-4, métriques et répartition des 2 800 fiches.
+8. `examinations.json` : Examens blancs 90 min, décompte chrono, pondérations par domaine et résultats.
+9. `progress.json` : Télémétrie cognitive, radar de compétences, courbe d'oubli et historique.
+10. `assistant.json` : Tuteur pédagogique IA, suggestions d'amorces, cas pratiques et pièges.
+11. `settings.json` : Paramètres système, surveillance des versions, diagnostic et cache.
+12. `errors.json` : Codes d'erreur, pannes réseau et messages de secours.
+13. `notifications.json` : Toasts d'action, synchronisation Firebase et rappels d'étude.
+
+### 9.2 Composants & Passerelles Utilisateur
+* **`LanguageSelector.tsx`** :
+  - Variante `'header'` : Sélecteur épuré compact avec drapeaux et étiquettes FR / EN.
+  - Variante `'expanded'` : Tuiles radio interactives pour le modal Paramètres Système.
+  - Variante `'compact'` : Bouton minimaliste pour le menu hamburger et le tiroir mobile.
+* **Synchronisation Document & Persistance** :
+  - `document.documentElement.lang` mis à jour instantanément (`fr` $\leftrightarrow$ `en`).
+  - Sauvegarde `localStorage` (`certifia_language`).
+  - Synchronisation Cloud Firestore sur le document utilisateur (`preferredLanguage`).
+* **Formatage Localisé `Intl` (`src/i18n/index.ts`)** :
+  - `formatLocalizedDate(date, options, langOverride)` : formatage adapté (ex: `15 mars 2026` vs `March 15, 2026`).
+  - `formatLocalizedTime(time, langOverride)` : formatage horaire `14:30` vs `2:30 PM`.
+  - `formatLocalizedNumber(num, options, langOverride)` : séparateurs de milliers conformes (`1 250 000` vs `1,250,000`).
+  - `formatLocalizedPercent(num, langOverride)` : symboles de pourcentage avec ou sans espace.
+  - `formatLocalizedCurrency(amount, currency, langOverride)` : devises formatées (`165,00 $US` vs `$165.00`).
+
+### 9.3 Guide d'Ajout d'une Nouvelle Langue (ex: Espagnol `es`)
+1. Créer le sous-répertoire `src/i18n/locales/es/`.
+2. Dupliquer les 13 fichiers JSON de `src/i18n/locales/en/` vers `src/i18n/locales/es/` et traduire les chaînes.
+3. Déclarer la langue dans `src/i18n/index.ts` : ajouter `'es'` au type `SupportedLanguage`.
+4. Importer les 13 namespaces dans `src/i18n/config.ts` et les rattacher à l'objet `resources.es`.
+5. Ajouter l'option dans `src/components/LanguageSelector.tsx` (`{ code: 'es', label: 'Español', flag: '🇪🇸' }`).
+6. Exécuter le script de parité `npx tsx src/i18n/verifyI18nParity.ts` pour valider l'intégrité 1:1.
+

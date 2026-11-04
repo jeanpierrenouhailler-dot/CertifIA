@@ -45,6 +45,7 @@ import {
   getTodayDateString 
 } from '../lib/srsAlgorithm';
 import { InfoTooltip } from './InfoTooltip';
+import { useTranslation, getCurrentLanguage, formatLocalizedNumber } from '../i18n';
 
 interface TodayViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -52,6 +53,7 @@ interface TodayViewProps {
 }
 
 export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprint }) => {
+  const { t } = useTranslation(['dashboard', 'common']);
   const { user, userProfile } = useAuth();
   const { 
     activeCertId, 
@@ -264,11 +266,11 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-headline tracking-tight">
-            Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">{learnerName}</span>
+            {t('dashboard:greeting', { name: learnerName, defaultValue: `Bonjour, ${learnerName}` })}
           </h1>
 
           <p className="text-sm text-slate-300 mt-1.5 max-w-2xl">
-            CertifIA a analysé ta courbe d'oubli SM-2 et ton historique pour composer ta session d'entraînement optimale.
+            {t('dashboard:subtitle', 'CertifIA a analysé votre courbe d’oubli SM-2 et votre historique pour composer votre session d’entraînement optimale.')}
           </p>
         </div>
 
@@ -338,7 +340,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                       Algorithme CertifIA • Session Sur-Mesure
                     </span>
                     <h2 className="text-xl sm:text-2xl font-bold text-white font-headline">
-                      Votre session du jour
+                      {t('dashboard:dailySessionTitle', 'Votre session du jour')}
                     </h2>
                   </div>
                 </div>
@@ -382,10 +384,10 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                   <div className="mt-3">
                     <div className="text-2xl font-extrabold text-white font-mono">17</div>
                     <div className="text-xs font-semibold text-slate-200 mt-0.5">
-                      cartes à réviser
+                      {t('dashboard:cardsToReview', 'cartes à réviser')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      Au seuil d'oubli calculé
+                      {t('dashboard:cardsToReviewDesc', "Au seuil d'oubli calculé")}
                     </div>
                   </div>
                 </div>
@@ -411,10 +413,10 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                   <div className="mt-3">
                     <div className="text-2xl font-extrabold text-amber-400 font-mono">8</div>
                     <div className="text-xs font-semibold text-slate-200 mt-0.5">
-                      notions fragiles
+                      {t('dashboard:fragileConcepts', 'notions fragiles')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      Hésitations &amp; pièges d'examen
+                      {t('dashboard:fragileConceptsDesc', "Hésitations & pièges d'examen")}
                     </div>
                   </div>
                 </div>
@@ -440,10 +442,10 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                   <div className="mt-3">
                     <div className="text-2xl font-extrabold text-rose-400 font-mono">12</div>
                     <div className="text-xs font-semibold text-slate-200 mt-0.5">
-                      questions non maîtrisées
+                      {t('dashboard:unmasteredQuestions', 'questions non maîtrisées')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      Cas pratiques d'architecture
+                      {t('dashboard:unmasteredQuestionsDesc', "Cas pratiques d'architecture")}
                     </div>
                   </div>
                 </div>
@@ -488,7 +490,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-bold font-headline text-base shadow-xl shadow-blue-600/30 hover:shadow-blue-600/40 border border-blue-400/40 transition-all flex items-center justify-center gap-3 group/btn"
               >
                 <Play className="w-5 h-5 fill-white text-white group-hover/btn:scale-110 transition-transform" />
-                <span>Reprendre mon apprentissage</span>
+                <span>{t('dashboard:resumeLearning', 'Reprendre mon apprentissage')}</span>
                 <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>

@@ -1,0 +1,41 @@
+{
+  "title": "System Settings & Preferences",
+  "subtitle": "Manage application version, background auto-updates, language, and offline storage.",
+  "languageSection": {
+    "title": "Application Language (Internationalization)",
+    "description": "Choose your preferred display language for UI navigation and educational content.",
+    "fr": "Français (French)",
+    "en": "English"
+  },
+  "themeSection": {
+    "title": "Visual Theme",
+    "description": "Switch between Dark and Light mode for optimal visual comfort.",
+    "dark": "Dark Mode",
+    "light": "Light Mode"
+  },
+  "systemSection": {
+    "title": "Version & System Updates",
+    "currentVersion": "Current Version",
+    "releaseDate": "Release Date",
+    "lastCheckDate": "Last Checked",
+    "autoUpdates": "Background automatic updates",
+    "autoUpdatesDesc": "Periodically checks for new releases and updates seamlessly in the background.",
+    "checkNow": "Check for updates now",
+    "forceUpdate": "Force immediate update"
+  },
+  "guideSection": {
+    "title": "Beginner Guide & Tooltips",
+    "description": "Displays contextual help and explanatory callouts on each screen for beginners.",
+    "toggle": "Enable beginner guidance mode"
+  },
+  "legalSection": {
+    "title": "Legal Notices & Framework",
+    "open": "View legal notices and vendor disclaimer"
+  },
+  "pwaSection": {
+    "title": "Progressive Web App (PWA)",
+    "installed": "The application is already installed on this device.",
+    "installButton": "Install CertifIA to Home Screen",
+    "instructions": "Enjoy offline access, full-screen experience, and lightning-fast loading."
+  }
+}

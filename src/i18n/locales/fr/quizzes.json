@@ -1,0 +1,22 @@
+{
+  "title": "Entraînement Scénarisé & QCM",
+  "subtitle": "Cas réels d'architecture, analyse pas à pas et décryptage des pièges d'examen.",
+  "singleChoice": "Choix Unique (SCQ)",
+  "multipleChoice": "Choix Multiple (MCQ)",
+  "questionNumber": "Question {{current}} sur {{total}}",
+  "points": "{{count}} points",
+  "validateAnswer": "Valider ma réponse",
+  "nextQuestion": "Question suivante",
+  "previousQuestion": "Question précédente",
+  "correctAnswer": "Excellente réponse !",
+  "incorrectAnswer": "Réponse incorrecte",
+  "explanation": "Explication détaillée de l'architecture",
+  "officialDoc": "Documentation officielle de référence",
+  "trapsTitle": "Décryptage des pièges classiques",
+  "askTutorAboutQuestion": "Demander l'avis du Tuteur IA sur cette question",
+  "reviewInFlashcard": "Transformer cette notion en fiche mémo SRS",
+  "sessionSummary": "Bilan de la session de quiz",
+  "score": "Score obtenu : {{score}} / {{maxScore}} ({{percentage}}%)",
+  "restartQuiz": "Recommencer le quiz",
+  "returnToCatalog": "Retour au catalogue"
+}

@@ -30,6 +30,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateUserGoal: (targetExam: string, targetExamTitle: string) => Promise<void>;
   updateDisplayName: (name: string) => Promise<void>;
+  updatePreferredLanguage: (lang: 'fr' | 'en') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -166,6 +167,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updatePreferredLanguage = async (lang: 'fr' | 'en') => {
+    try {
+      const { changeLanguage } = await import('../i18n');
+      await changeLanguage(lang);
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, {
+          preferredLanguage: lang,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.warn('[AuthContext] Failed to persist preferredLanguage to Firestore:', err);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -176,7 +193,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loginWithGoogle,
         logout,
         updateUserGoal,
-        updateDisplayName
+        updateDisplayName,
+        updatePreferredLanguage
       }}
     >
       {children}

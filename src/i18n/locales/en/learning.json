@@ -1,0 +1,85 @@
+{
+  "title": "Recommendation Engine & AI Learning Paths",
+  "subtitle": "Build your personalized roadmap based on your role, current level, and target goals.",
+  "survey": {
+    "title": "Your Learning Profile",
+    "levelQuestion": "What is your current level?",
+    "levels": {
+      "debutant": "Beginner",
+      "intermediaire": "Intermediate",
+      "avance": "Advanced"
+    },
+    "roleQuestion": "What is your job role?",
+    "roles": {
+      "developpeur": "Developer",
+      "data_scientist": "Data Scientist",
+      "architecte": "Architect",
+      "chef_de_projet": "Project Manager",
+      "consultant": "Consultant",
+      "autre": "Other"
+    },
+    "goalQuestion": "What is your primary goal?",
+    "goals": {
+      "comprendre_ia": "Understand AI",
+      "ia_generative": "Generative AI",
+      "cloud_ai": "Cloud AI",
+      "machine_learning": "Machine Learning",
+      "mlops": "MLOps"
+    },
+    "budgetQuestion": "Your certification budget?",
+    "budgets": {
+      "gratuit_eco": "Free / Budget-friendly",
+      "standard": "Standard (Company sponsored)",
+      "illimite": "Unlimited"
+    },
+    "timeQuestion": "Available time per week?",
+    "times": {
+      "express": "Express (2 to 4h / week)",
+      "standard": "Standard (5 to 8h / week)",
+      "intensif": "Intensive (10h+ / week)"
+    },
+    "careerQuestion": "Your career objective?",
+    "careers": {
+      "montee_competence": "Upskilling in current role",
+      "reconversion_job": "Career change / New job",
+      "appel_offre_partenaire": "Meet partner tier requirements",
+      "certif_express_60j": "Fast-track certification under 60 days"
+    },
+    "submit": "Calculate My Tailored Pathway"
+  },
+  "pathway": {
+    "title": "Your Custom AI Pathway",
+    "level1": "Level 1: AI Fundamentals",
+    "level2": "Level 2: Generative AI",
+    "level3": "Level 3: Cloud AI",
+    "level4": "Level 4: Machine Learning & MLOps",
+    "estimatedDuration": "Estimated duration: {{weeks}} weeks ({{hours}}h total)",
+    "matchScore": "Profile alignment: {{score}}%",
+    "startStep": "Start this milestone",
+    "stepCompleted": "Completed",
+    "stepInProgress": "Currently studying",
+    "stepLocked": "Next milestone"
+  },
+  "glossary": {
+    "title": "AI Glossary & Key Concepts",
+    "subtitle": "Master key concepts, formulas, metrics, and recurrent exam traps across major vendors.",
+    "badgeCrossCloud": "Cross-Cloud Unified Taxonomy",
+    "badgeCertsCovered": "18 Certifications Covered",
+    "keyConcepts": "Key Concepts",
+    "trapsIncluded": "Exam Traps",
+    "yourBookmarks": "Bookmarks",
+    "tabGlossary": "A-Z Glossary",
+    "tabEncyclopedia": "Detailed Factsheets",
+    "searchPlaceholder": "Search concept, acronym (RAG, LoRA), formula or exam trap...",
+    "allProviders": "🌐 All Providers",
+    "allCerts": "🎯 All Certifications",
+    "clearFilters": "Clear",
+    "examTrap": "Common Exam Trap",
+    "keyMetrics": "Key Metrics & Specs",
+    "officialSource": "Official Vendor Source",
+    "addToBookmarks": "Save to Bookmarks",
+    "removeFromBookmarks": "Remove from Bookmarks",
+    "shareTerm": "Copy Factsheet",
+    "copied": "Copied!"
+  }
+}

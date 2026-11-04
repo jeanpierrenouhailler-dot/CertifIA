@@ -353,6 +353,8 @@ export interface BreadcrumbInfo {
   itemLabel: string;
   categoryIcon: LucideIcon;
   screen: AppScreen;
+  categoryKey: string;
+  itemKey: string;
 }
 
 export function getBreadcrumbForScreen(screen: AppScreen, actionKey?: string): BreadcrumbInfo {
@@ -366,6 +368,8 @@ export function getBreadcrumbForScreen(screen: AppScreen, actionKey?: string): B
         itemLabel: itemByAction.label,
         categoryIcon: itemByAction.icon,
         screen: itemByAction.screen,
+        categoryKey: itemByAction.category,
+        itemKey: itemByAction.id.replace('nav-', ''),
       };
     }
   }
@@ -381,6 +385,8 @@ export function getBreadcrumbForScreen(screen: AppScreen, actionKey?: string): B
     itemLabel: matchedItem.label,
     categoryIcon: matchedItem.icon,
     screen: matchedItem.screen,
+    categoryKey: matchedItem.category,
+    itemKey: matchedItem.id.replace('nav-', ''),
   };
 }
 

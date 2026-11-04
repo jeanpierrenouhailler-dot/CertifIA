@@ -94,6 +94,7 @@ export interface UserProfile {
   questionsSolved?: number;
   averageScore?: number;
   readinessIndex?: number;
+  preferredLanguage?: 'fr' | 'en';
   createdAt?: string;
   updatedAt?: string;
 }

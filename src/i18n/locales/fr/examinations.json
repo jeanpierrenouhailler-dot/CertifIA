@@ -1,0 +1,31 @@
+{
+  "title": "Examen Blanc en Conditions Réelles",
+  "subtitle": "Épreuve chronométrée de 90 minutes • 50 questions • Seuil de réussite à 70%.",
+  "instructions": {
+    "title": "Consignes de l'Examen Blanc",
+    "rule1": "Vous disposez de 90 minutes pour répondre à 50 questions réparties sur l'ensemble des domaines officiels.",
+    "rule2": "Vous pouvez marquer les questions pour relecture et y revenir à tout moment avant la fin du temps imparti.",
+    "rule3": "Une fois l'examen validé, le rapport d'analyse détaillé des domaines et des lacunes sera généré.",
+    "start": "Démarrer l'examen chronométré"
+  },
+  "inProgress": {
+    "timeRemaining": "Temps restant",
+    "question": "Question {{current}} / {{total}}",
+    "flagForReview": "Marquer pour relecture",
+    "unflag": "Retirer le marqueur",
+    "finishExam": "Terminer l'examen",
+    "confirmFinish": "Êtes-vous certain de vouloir soumettre votre copie ? Les questions non répondues seront comptées comme fausses."
+  },
+  "results": {
+    "title": "Rapport de Performance à l'Examen Blanc",
+    "passed": "Félicitations ! Examen Réussi",
+    "failed": "Examen Non Validé - Entraînement Recommandé",
+    "score": "Score final : {{score}} / 1000",
+    "passScoreRequired": "Score minimum requis : 700 / 1000 (70%)",
+    "duration": "Temps écoulé : {{duration}}",
+    "weakDomain": "Domaine prioritaire à renforcer :",
+    "recommendations": "Recommandations pédagogiques ciblées :",
+    "reviewAnswers": "Passer en revue les réponses détaillées",
+    "retakeExam": "Recommencer une nouvelle épreuve"
+  }
+}
