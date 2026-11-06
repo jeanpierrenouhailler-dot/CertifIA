@@ -103,13 +103,13 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
       {/* Standard Page Header */}
       <PageHeader
-        title="Catalogue des Certifications IA"
-        subtitle="Référentiel officiel Cloud AI, pondérations d’examens, fiches blueprints et passerelles d’entraînement adaptées aux architectes et ingénieurs."
-        badge="18 Certifications 2025"
+        title={t('certifications:title')}
+        subtitle={t('certifications:subtitle')}
+        badge={t('certifications:badgeCount', '18 Certifications 2025')}
         breadcrumbs={[
-          { label: 'Accueil', onClick: () => onNavigate('today') },
-          { label: 'Certifications', active: true },
-          { label: 'Catalogue', active: true },
+          { label: t('navigation:items.today.label'), onClick: () => onNavigate('today') },
+          { label: t('navigation:categories.certifications.label'), active: true },
+          { label: t('navigation:items.catalogue.label'), active: true },
         ]}
         actions={
           <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#171b26] dark:hover:bg-[#202533] border border-slate-200 dark:border-[#262a35] text-xs font-semibold text-slate-700 dark:text-slate-300 transition-all flex items-center gap-1.5 shadow-sm"
               >
                 <Scale className="w-4 h-4 text-amber-500" />
-                <span>Comparateur</span>
+                <span>{t('certifications:compareButton')}</span>
               </button>
             )}
             <button
@@ -127,7 +127,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Parcours Recommandés</span>
+              <span>{t('navigation:items.recommendation.label')}</span>
             </button>
           </div>
         }
@@ -137,7 +137,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
       <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] space-y-4 shadow-sm">
         {/* Provider Filters */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-          <span className="font-mono text-slate-400 uppercase text-[10px] font-bold mr-1 shrink-0">Fournisseur :</span>
+          <span className="font-mono text-slate-400 uppercase text-[10px] font-bold mr-1 shrink-0">{t('certifications:filterByProvider')} :</span>
           <button
             onClick={() => setProviderFilter('Tous')}
             className={`px-3 py-1.5 rounded-xl font-medium whitespace-nowrap transition-all ${
@@ -146,7 +146,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 : 'bg-slate-100 dark:bg-[#202533] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#262c3d]'
             }`}
           >
-            Tous ({providerCounts.Tous})
+            {t('certifications:filterAll')} ({providerCounts.Tous})
           </button>
           <button
             onClick={() => setProviderFilter('azure')}
@@ -156,7 +156,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 : 'bg-slate-100 dark:bg-[#202533] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#262c3d]'
             }`}
           >
-            Microsoft Azure ({providerCounts.azure})
+            {t('certifications:providers.azure')} ({providerCounts.azure})
           </button>
           <button
             onClick={() => setProviderFilter('aws')}
@@ -166,7 +166,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 : 'bg-slate-100 dark:bg-[#202533] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#262c3d]'
             }`}
           >
-            AWS ({providerCounts.aws})
+            {t('certifications:providers.aws')} ({providerCounts.aws})
           </button>
           <button
             onClick={() => setProviderFilter('gcp')}
@@ -176,7 +176,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 : 'bg-slate-100 dark:bg-[#202533] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#262c3d]'
             }`}
           >
-            Google Cloud ({providerCounts.gcp})
+            {t('certifications:providers.gcp')} ({providerCounts.gcp})
           </button>
           <button
             onClick={() => setProviderFilter('ibm')}
@@ -186,7 +186,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 : 'bg-slate-100 dark:bg-[#202533] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#262c3d]'
             }`}
           >
-            IBM watsonx ({providerCounts.ibm})
+            {t('certifications:providers.ibm')} ({providerCounts.ibm})
           </button>
         </div>
 
@@ -197,7 +197,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Filtrer par titre, code (AI-102...), module..."
+              placeholder={t('certifications:searchPlaceholder', 'Filtrer par titre, code (AI-102...), module...')}
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
               className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
@@ -211,10 +211,10 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               onChange={(e) => setLevelFilter(e.target.value as CertificationLevel)}
               className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 focus:outline-none"
             >
-              <option value="all">Tous niveaux</option>
-              <option value="fondamental">Fondamental</option>
-              <option value="associate">Associate</option>
-              <option value="expert">Expert / Pro</option>
+              <option value="all">{t('certifications:filters.allLevels', 'Tous niveaux')}</option>
+              <option value="fondamental">{t('certifications:filters.fundamental', 'Fondamental')}</option>
+              <option value="associate">{t('certifications:filters.associate', 'Associate')}</option>
+              <option value="expert">{t('certifications:filters.expert', 'Expert / Pro')}</option>
             </select>
 
             {/* Domain Select */}
@@ -223,9 +223,9 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               onChange={(e) => setDomainFilter(e.target.value as any)}
               className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 focus:outline-none"
             >
-              <option value="all">Tous domaines</option>
-              <option value="genai">IA Générative & RAG</option>
-              <option value="ml">Machine Learning & MLOps</option>
+              <option value="all">{t('certifications:filters.allDomains', 'Tous domaines')}</option>
+              <option value="genai">{t('certifications:filters.genai', 'IA Générative & RAG')}</option>
+              <option value="ml">{t('certifications:filters.ml', 'Machine Learning & MLOps')}</option>
             </select>
 
             {/* Price Select */}
@@ -234,9 +234,9 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               onChange={(e) => setPriceFilter(e.target.value as any)}
               className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 focus:outline-none"
             >
-              <option value="all">Tous budgets</option>
-              <option value="free_eco">Gratuit / Éco</option>
-              <option value="standard">Standard (~150-200$)</option>
+              <option value="all">{t('certifications:filters.allBudgets', 'Tous budgets')}</option>
+              <option value="free_eco">{t('certifications:filters.freeEco', 'Gratuit / Éco')}</option>
+              <option value="standard">{t('certifications:filters.standardPrice', 'Standard (~150-200$)')}</option>
             </select>
 
             {/* Sort Select */}
@@ -245,9 +245,9 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               onChange={(e) => setSortBy(e.target.value as any)}
               className="px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 focus:outline-none font-mono"
             >
-              <option value="recommended">Tri : Recommandé</option>
-              <option value="progress">Tri : Progression</option>
-              <option value="duration">Tri : Durée d’examen</option>
+              <option value="recommended">{t('certifications:filters.sortRecommended', 'Tri : Recommandé')}</option>
+              <option value="progress">{t('certifications:filters.sortProgress', 'Tri : Progression')}</option>
+              <option value="duration">{t('certifications:filters.sortDuration', 'Tri : Durée d’examen')}</option>
             </select>
           </div>
         </div>
@@ -288,7 +288,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               {/* Progress Bar */}
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
-                  <span className="text-slate-400">Progression</span>
+                  <span className="text-slate-400">{t('certifications:card.progress', 'Progression')}</span>
                   <span className="font-bold text-emerald-500">{cert.userProgress}%</span>
                 </div>
                 <div className="w-full h-1.5 bg-slate-100 dark:bg-[#10141f] rounded-full overflow-hidden">
@@ -302,15 +302,15 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               {/* Key Specs */}
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="p-2 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35]">
-                  <span className="text-[10px] text-slate-400 font-mono block">Durée</span>
+                  <span className="text-[10px] text-slate-400 font-mono block">{t('certifications:card.duration', 'Durée')}</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">{cert.durationMinutes} min</span>
                 </div>
                 <div className="p-2 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35]">
-                  <span className="text-[10px] text-slate-400 font-mono block">Seuil</span>
+                  <span className="text-[10px] text-slate-400 font-mono block">{t('certifications:card.threshold', 'Seuil')}</span>
                   <span className="font-semibold text-emerald-500 font-mono mt-0.5 block">{cert.passScore} pts</span>
                 </div>
                 <div className="p-2 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35]">
-                  <span className="text-[10px] text-slate-400 font-mono block">Réussite</span>
+                  <span className="text-[10px] text-slate-400 font-mono block">{t('certifications:card.successRate', 'Réussite')}</span>
                   <span className="font-semibold text-blue-500 font-mono mt-0.5 block">{cert.avgPassRate}%</span>
                 </div>
               </div>
@@ -340,14 +340,14 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 }}
                 className="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-1.5"
               >
-                <span>S’entraîner</span>
+                <span>{t('certifications:card.train', 'S’entraîner')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
               <button
                 onClick={() => onOpenBlueprint(cert.id)}
                 className="p-2 rounded-xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                title="Consulter la Fiche Détaillée & Blueprint"
+                title={t('certifications:card.blueprintTooltip', 'Consulter la Fiche Détaillée & Blueprint')}
               >
                 <BookOpen className="w-4 h-4" />
               </button>
@@ -356,7 +356,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 <button
                   onClick={() => onOpenAIAssistant(cert.id, cert.code)}
                   className="p-2 rounded-xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                  title="Ouvrir le Tuteur IA sur cette certification"
+                  title={t('certifications:card.aiTutorTooltip', 'Ouvrir le Tuteur IA sur cette certification')}
                 >
                   <Bot className="w-4 h-4 text-blue-500" />
                 </button>

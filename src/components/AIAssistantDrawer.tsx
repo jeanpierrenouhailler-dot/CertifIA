@@ -280,23 +280,32 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               <button
                 onClick={() => {
                   setMessages([]);
+                  const isEn = getCurrentLanguage() === 'en';
                   setTimeout(() => {
                     setMessages([
                       {
                         id: 'reset-1',
                         sender: 'assistant',
-                        content: 'Session réinitialisée. Quel sujet d’intelligence artificielle souhaitez-vous aborder ?',
-                        timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-                        suggestions: [
-                          'Expliquer le RAG vs Fine-Tuning',
-                          'Pièges fréquents en examen',
-                          'Algorithme SRS SM-2',
-                        ],
+                        content: isEn
+                          ? 'Session reset. What AI certification topic would you like to explore?'
+                          : 'Session réinitialisée. Quel sujet d’intelligence artificielle souhaitez-vous aborder ?',
+                        timestamp: formatLocalizedTime(new Date()),
+                        suggestions: isEn
+                          ? [
+                              'Explain RAG vs Fine-Tuning',
+                              'Frequent exam pitfalls',
+                              'SM-2 SRS Algorithm',
+                            ]
+                          : [
+                              'Expliquer le RAG vs Fine-Tuning',
+                              'Pièges fréquents en examen',
+                              'Algorithme SRS SM-2',
+                            ],
                       },
                     ]);
                   }, 100);
                 }}
-                title="Réinitialiser la conversation"
+                title={getCurrentLanguage() === 'en' ? 'Reset conversation' : 'Réinitialiser la conversation'}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#262a35] transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -314,7 +323,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
           {context?.topic && (
             <div className="px-4 py-2 bg-blue-500/10 dark:bg-blue-500/15 border-b border-blue-500/20 flex items-center justify-between text-xs">
               <span className="text-blue-700 dark:text-blue-300 font-medium truncate">
-                📌 Notion en cours : <strong className="font-semibold">{context.topic}</strong>
+                📌 {getCurrentLanguage() === 'en' ? 'Current topic:' : 'Notion en cours :'} <strong className="font-semibold">{context.topic}</strong>
               </span>
               {context.certId && onOpenBlueprint && (
                 <button
@@ -374,7 +383,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
             {isTyping && (
               <div className="flex items-center gap-2 text-xs text-slate-400 font-mono p-3 bg-slate-100 dark:bg-[#1a2030] rounded-2xl rounded-bl-none w-fit border border-slate-200 dark:border-[#2a3045]">
                 <Bot className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
-                <span>Analyse du référentiel officiel...</span>
+                <span>{getCurrentLanguage() === 'en' ? 'Analyzing official blueprint...' : 'Analyse du référentiel officiel...'}</span>
               </div>
             )}
             <div ref={messagesEndRef} />

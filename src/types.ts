@@ -54,7 +54,7 @@ export interface PathwayLevel {
   skills: string[];
   estimatedWeeks: number;
   estimatedHours: number;
-  difficulty: 'Accessible' | 'Intermédiaire' | 'Avancé' | 'Expert';
+  difficulty: 'Accessible' | 'Intermédiaire' | 'Avancé' | 'Expert' | 'Foundational' | 'Intermediate' | 'Advanced';
   status: 'completed' | 'in_progress' | 'next' | 'locked';
   cardsCount: number;
   questionsCount: number;

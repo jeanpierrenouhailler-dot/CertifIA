@@ -22,5 +22,91 @@
   "nextMilestones": "Prochaines étapes recommandées",
   "milestone1": "Finaliser le Domaine 2 : Vision par ordinateur & Document Intelligence",
   "milestone2": "Simuler une épreuve complète de 50 questions chronométrées",
-  "milestone3": "Réviser les 8 pièges récurrents sur les quotas et les VNet Privés"
+  "milestone3": "Réviser les 8 pièges récurrents sur les quotas et les VNet Privés",
+  "phases": {
+    "phase1": "Phase 1 : 🧠 Mémorisation Espacée (SRS)",
+    "phase2": "Phase 2 : ⚠️ Consolidation Notions Fragiles",
+    "phase3": "Phase 3 : ❓ Questions d'Examen Ciblées"
+  },
+  "runner": {
+    "step": "Étape {{current}} sur {{total}}",
+    "flipPrompt": "Cliquer pour révéler le recto/verso",
+    "sessionCompletedTitle": "Session quotidienne accomplie !",
+    "sessionCompletedDesc": "Toutes les cartes SM-2 et questions ciblées du jour ont été validées avec succès.",
+    "backToDashboard": "Retour au cockpit",
+    "continueTraining": "Poursuivre avec un quiz"
+  },
+  "algorithmTag": "Algorithme CertifIA • Session Sur-Mesure",
+  "priorityBadge": "Priorité 4-5/5",
+  "qcmBadge": "QCM",
+  "examPassThreshold": "Seuil de validation examen",
+  "projectedGain": "+3% projeté après cette session",
+  "quickAccess": {
+    "srsTitle": "Mémorisation SRS",
+    "srsSub": "Fiches mémo",
+    "srsDesc": "2 800 cartes avec SM-2",
+    "glossaryTitle": "Encyclopédie IA",
+    "glossarySub": "Glossaire & Fiches",
+    "glossaryDesc": "Concepts, pièges & architectures",
+    "examTitle": "Simulation Réelle",
+    "examSub": "Examen blanc",
+    "examDesc": "90 min • Conditions réelles"
+  },
+  "pathwayBanner": {
+    "badge": "Nouveau • Moteur d'Orientation",
+    "level": "Niveau 1 → 4",
+    "title": "Construire votre parcours IA personnalisé",
+    "desc": "Définissez votre métier, budget et temps disponible pour générer votre feuille de route certifiante officielle.",
+    "action": "Diagnostiquer mon profil"
+  },
+  "sessionDetails": {
+    "title": "Détail de la Session",
+    "totalSteps": "Total {{count}} étapes",
+    "step1Title": "17 Fiches SRS",
+    "step1Desc": "Rappels espacés calculés aujourd'hui ({{overdue}} en retard, {{due}} à échéance).",
+    "step2Title": "8 Notions Fragiles",
+    "step2Desc": "Pièges d'examen à haute pondération identifiés par CertifIA.",
+    "step3Title": "12 Questions QCM",
+    "step3Desc": "Mise en situation d'architecture avec explications officielles Microsoft / AWS / IBM."
+  },
+  "coachTip": {
+    "title": "Conseil du Jour CertifIA",
+    "body": "15 à 20 minutes d'entraînement espacé au seuil d'oubli valent 3 heures de bachotage inefficace. Termine ta session quotidienne pour sécuriser ta série !"
+  },
+  "targetGoal": {
+    "title": "Objectif Examen Cible",
+    "examLabel": "Examen visé :",
+    "dateLabel": "Date cible :",
+    "weeklyLabel": "Objectif hebdo :",
+    "reviewedCount": "{{done}} / {{total}} révisées",
+    "defaultDate": "24 Novembre 2026"
+  },
+  "recentActivities": {
+    "title": "Activités Récentes",
+    "last24h": "Dernières 24h",
+    "item1Title": "Session SRS Matinale",
+    "item1Desc": "14 fiches révisées avec succès",
+    "item2Title": "QCM RAG & Vector Search",
+    "item2Desc": "6/7 bonnes réponses obtenues"
+  },
+  "nextSteps": {
+    "title": "Prochaines Étapes",
+    "guided": "Guidé",
+    "step1Title": "1. Terminer la session du jour",
+    "step1Desc": "17 cartes pour sécuriser le seuil SM-2",
+    "step2Title": "2. Renforcer les pièges RAG",
+    "step2Desc": "Vérifier les filtres Custom Blocklists",
+    "step3Title": "3. Examen blanc complet",
+    "step3Desc": "Valider 700/1000 en 90 minutes"
+  },
+  "tooltips": {
+    "sm2Cards": "Cartes SRS à réviser (SM-2)",
+    "sm2CardsDesc": "Ces 17 cartes ont atteint leur seuil d'oubli critique calculé par l'algorithme SuperMemo-2 / FSRS. Les revoir aujourd'hui maximise votre rétention sans surcharger votre mémoire.",
+    "fragileConcepts": "Notions Fragiles & Pièges",
+    "fragileConceptsDesc": "Concepts à fort coefficient d'examen où vos réponses précédentes ont montré des hésitations, des erreurs répétées ou une difficulté supérieure à 3/5.",
+    "targetedMcq": "QCM d'Architecture Ciblés",
+    "targetedMcqDesc": "12 questions d'examen représentatives sélectionnées pour tester votre capacité à appliquer vos connaissances théoriques dans des cas réels d'entreprise.",
+    "activeCert": "Certification Active",
+    "activeCertDesc": "L'examen officiel ciblé par vos sessions quotidiennes. Vous pouvez changer d'examen cible en un clic via la barre supérieure."
+  }
 }

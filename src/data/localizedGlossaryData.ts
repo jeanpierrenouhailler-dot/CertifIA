@@ -1,6 +1,8 @@
 import { GlossaryEntry, GLOSSARY_ENTRIES, GLOSSARY_CATEGORIES, GlossaryCategory } from './glossaryData';
 import { SupportedLanguage } from '../i18n';
 
+export type LocalizedGlossaryEntry = GlossaryEntry;
+
 export interface LocalizedGlossaryCategory {
   id: GlossaryCategory;
   label: string;

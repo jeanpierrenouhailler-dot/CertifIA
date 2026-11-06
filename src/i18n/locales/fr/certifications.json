@@ -6,6 +6,32 @@
   "filterByLevel": "Niveau de difficulté",
   "filterBySearch": "Recherche par mot-clé, code d'examen...",
   "comparatorTitle": "Comparateur de Certifications",
+  "badgeCount": "18 Certifications 2025",
+  "searchPlaceholder": "Filtrer par titre, code (AI-102...), module...",
+  "filters": {
+    "allLevels": "Tous niveaux",
+    "fundamental": "Fondamental",
+    "associate": "Associate",
+    "expert": "Expert / Pro",
+    "allDomains": "Tous domaines",
+    "genai": "IA Générative & RAG",
+    "ml": "Machine Learning & MLOps",
+    "allBudgets": "Tous budgets",
+    "freeEco": "Gratuit / Éco",
+    "standardPrice": "Standard (~150-200$)",
+    "sortRecommended": "Tri : Recommandé",
+    "sortProgress": "Tri : Progression",
+    "sortDuration": "Tri : Durée d’examen"
+  },
+  "card": {
+    "progress": "Progression",
+    "duration": "Durée",
+    "threshold": "Seuil",
+    "successRate": "Réussite",
+    "train": "S’entraîner",
+    "blueprintTooltip": "Consulter la Fiche Détaillée & Blueprint",
+    "aiTutorTooltip": "Ouvrir le Tuteur IA sur cette certification"
+  },
   "compareButton": "Comparer",
   "addToCompare": "Ajouter au comparateur",
   "removeFromCompare": "Retirer du comparateur",
@@ -39,5 +65,27 @@
     "gcp": "Google Cloud",
     "ibm": "IBM watsonx",
     "nvidia": "NVIDIA DLI"
+  },
+  "blueprint": {
+    "skillsFramework": "Référentiel officiel des compétences et pondération d'examen",
+    "passScore": "Score de Passage",
+    "allocatedDuration": "Durée Allouée",
+    "questionsVolume": "Volume Questions",
+    "averagePassRate": "Taux Réussite Moyen",
+    "officialDomains": "Domaines d'évaluation officiels",
+    "startTraining": "Démarrer l'entraînement",
+    "officialVendorDoc": "Documentation officielle du fournisseur"
+  },
+  "comparator": {
+    "title": "Comparateur de Certifications IA",
+    "subtitle": "Comparez 2 à 3 certifications officielles côte à côte pour choisir la plus adaptée à vos objectifs.",
+    "selectPrompt": "Sélectionnez les certifications à comparer (2 à 3) :",
+    "level": "Niveau",
+    "duration": "Durée",
+    "passScore": "Score de passage",
+    "estimatedPrice": "Prix estimé",
+    "domainWeights": "Pondération des Domaines",
+    "targetAudience": "Public Cible",
+    "startPrep": "Préparer cet examen"
   }
 }

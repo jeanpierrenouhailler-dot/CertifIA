@@ -29,6 +29,7 @@ import { certificationsData } from '../data/certificationsData';
 import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
 import { PageHeader } from './ui/PageHeader';
+import { useTranslation, getCurrentLanguage, formatLocalizedDate } from '../i18n';
 
 interface AnalyticsViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -37,6 +38,8 @@ interface AnalyticsViewProps {
 }
 
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpenBlueprint, onOpenAIAssistant }) => {
+  const { t } = useTranslation(['progress', 'common']);
+  const lang = getCurrentLanguage();
   const { 
     certProgress, 
     examAttempts, 
@@ -94,14 +97,14 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
     }
 
     const report: ExamSessionHistory = {
-      id: `Tentative #${attempt.attemptNumber} (${attempt.examCode})`,
-      date: new Date(attempt.createdAt).toLocaleDateString('fr-FR', {
+      id: `${lang === 'en' ? 'Attempt' : 'Tentative'} #${attempt.attemptNumber} (${attempt.examCode})`,
+      date: formatLocalizedDate(new Date(attempt.createdAt), {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      }),
+      }, lang),
       duration: attempt.duration,
       weakPoint: attempt.weakPoint,
       weakPointSeverity: attempt.passed ? 'medium' : 'high',
@@ -110,8 +113,12 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
       passed: attempt.passed,
       domainScores,
       recommendation: attempt.passed
-        ? 'Examen validé avec succès ! Concentrez vos révisions sur les concepts identifiés comme point faible pour garantir une marge de sécurité maximale.'
-        : 'Score en deçà du seuil d\'admission (700/1000). Révisez les flashcards de la catégorie faible avant de tenter une nouvelle simulation.',
+        ? (lang === 'en'
+            ? 'Exam successfully validated! Concentrate your revisions on the identified weak points to secure a solid buffer.'
+            : 'Examen validé avec succès ! Concentrez vos révisions sur les concepts identifiés comme point faible pour garantir une marge de sécurité maximale.')
+        : (lang === 'en'
+            ? 'Score below the required passing threshold (700/1000). Review flashcards in your weak category before starting another trial.'
+            : 'Score en deçà du seuil d\'admission (700/1000). Révisez les flashcards de la catégorie faible avant de tenter une nouvelle simulation.'),
     };
 
     setSelectedReport(report);
@@ -121,13 +128,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-300">
       {/* Standard Page Header */}
       <PageHeader
-        title="Tableau de Bord & Progression"
-        subtitle="Indicateurs cognitifs, compétences maîtrisées, points faibles identifiés et historique complet de vos examens."
-        badge="Télémétrie Cognitive"
+        title={t('progress:title')}
+        subtitle={t('progress:subtitle')}
+        badge={t('progress:analytics.breadcrumb')}
         breadcrumbs={[
-          { label: 'Accueil', onClick: () => onNavigate('today') },
-          { label: 'Progression', active: true },
-          { label: 'Tableau de bord', active: true },
+          { label: t('navigation:items.today.label'), onClick: () => onNavigate('today') },
+          { label: t('navigation:categories.progression.label'), active: true },
+          { label: t('progress:analytics.breadcrumb'), active: true },
         ]}
         actions={
           <div className="flex items-center gap-2">
@@ -143,13 +150,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
       <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-3">
         <Sparkles className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong className="font-semibold text-blue-600 dark:text-blue-300">Rigueur & Transparence :</strong> Les scores et indices de préparation affichés sont des estimations cognitives basées sur vos sessions d'entraînement et l'algorithme SRS. Ils mesurent votre assiduité et vos réflexes, mais ne constituent en aucun cas une garantie formelle de réussite le jour de l’examen officiel.
+          {t('progress:disclaimer')}
         </p>
       </div>
 
         {/* Target Selector Bar */}
         <div className="flex items-center gap-3 p-2 rounded-2xl bg-[#171b26] border border-[#262a35]">
-          <div className="text-xs text-slate-400 pl-2 font-mono">Cible Active :</div>
+          <div className="text-xs text-slate-400 pl-2 font-mono">{t('progress:analytics.selectCert')}</div>
           <select
             value={selectedTargetExam}
             onChange={(e) => handleTargetChange(e.target.value)}
@@ -166,7 +173,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             onClick={() => onOpenBlueprint && onOpenBlueprint(selectedTargetExam)}
             className="px-3 py-2 rounded-xl bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white text-xs font-semibold transition-colors"
           >
-            Ajuster Cible
+            Blueprint
           </button>
         </div>
 
@@ -177,7 +184,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
               <h2 className="text-base font-bold text-white font-headline">
-                Architecture de Progression & Persistance Utilisateur
+                {lang === 'en' ? 'Progress Architecture & User Persistence' : 'Architecture de Progression & Persistance Utilisateur'}
               </h2>
             </div>
             <p className="text-xs text-slate-400 mt-1">
@@ -195,7 +202,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              1. Certifications
+              {t('progress:analytics.tabCerts')}
             </button>
             <button
               onClick={() => setActiveTabSection('examens')}
@@ -205,7 +212,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              2. Examens ({examAttempts.length})
+              {t('progress:analytics.tabExams')} ({examAttempts.length})
             </button>
             <button
               onClick={() => setActiveTabSection('flashcards')}
@@ -215,7 +222,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              3. Flashcards SRS
+              {t('progress:analytics.tabFlashcards')}
             </button>
             <button
               onClick={() => setActiveTabSection('objectifs')}
@@ -225,7 +232,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              4. Objectifs
+              {t('progress:analytics.tabGoals')}
             </button>
           </div>
         </div>
@@ -234,8 +241,8 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         {activeTabSection === 'certifications' && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="text-xs text-slate-300 font-mono flex items-center justify-between">
-              <span>Progression, domaines et scores par certification :</span>
-              <span className="text-blue-400">Cliquez sur une carte pour basculer la cible active</span>
+              <span>{t('progress:analytics.certMatrixPrompt')}</span>
+              <span className="text-blue-400">{t('progress:analytics.certMatrixSubprompt')}</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -258,7 +265,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                         {c.code}
                       </span>
                       <span className="text-xs font-mono text-emerald-400 font-bold">
-                        {prog.progress}% achevé
+                        {t('progress:analytics.completedPct', { pct: prog.progress })}
                       </span>
                     </div>
 
@@ -742,7 +749,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                 Générateur Diagnostic Sur-Mesure
               </div>
               <p className="text-[11px] text-slate-400 mb-3">
-                Compile un QCM inédit basé uniquement sur vos erreurs passées.
+                {t('progress:analytics.copilotDesc')}
               </p>
               <button
                 onClick={() => {
@@ -755,11 +762,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                 className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
               >
                 {isCopilotTestGenerated ? (
-                  <span>Génération du test en cours...</span>
+                  <span>{t('progress:analytics.generatingTest')}</span>
                 ) : (
                   <>
                     <Zap className="w-3.5 h-3.5" />
-                    <span>Générer le test personnalisé</span>
+                    <span>{t('progress:analytics.generateCustomTest')}</span>
                   </>
                 )}
               </button>
@@ -773,20 +780,20 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#262a35]">
           <div>
             <h3 className="text-base font-bold text-white font-headline">
-              Trajectoire des Examens Blancs & Historique Récent
+              {t('progress:analytics.examTrajectory')}
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Évolution des 4 dernières sessions complètes et franchissement du seuil d'admission (700/1000)
+              {t('progress:analytics.examTrajectoryDesc')}
             </p>
           </div>
           <div className="flex items-center gap-3 text-xs font-mono">
             <span className="flex items-center gap-1.5 text-emerald-400">
               <span className="w-2.5 h-0.5 bg-emerald-400" />
-              Seuil PASS (700 pts)
+              {t('progress:analytics.passThreshold')}
             </span>
             <span className="flex items-center gap-1.5 text-blue-400">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-              Vos Scores Réalisés
+              {t('progress:analytics.yourScores')}
             </span>
           </div>
         </div>
@@ -858,30 +865,30 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-[#262a35] text-slate-400 font-mono text-[10px] uppercase">
-                <th className="pb-3 font-semibold">Identifiant</th>
-                <th className="pb-3 font-semibold">Date & Heure</th>
-                <th className="pb-3 font-semibold">Durée</th>
-                <th className="pb-3 font-semibold">Point Faible Relevé</th>
-                <th className="pb-3 font-semibold text-right">Score</th>
-                <th className="pb-3 font-semibold text-center">Statut</th>
-                <th className="pb-3 font-semibold text-right">Action</th>
+                <th className="pb-3 font-semibold">{t('progress:analytics.colId')}</th>
+                <th className="pb-3 font-semibold">{t('progress:analytics.colDateTime')}</th>
+                <th className="pb-3 font-semibold">{t('progress:analytics.colDuration')}</th>
+                <th className="pb-3 font-semibold">{t('progress:analytics.colWeakPoint')}</th>
+                <th className="pb-3 font-semibold text-right">{t('progress:analytics.colScore')}</th>
+                <th className="pb-3 font-semibold text-center">{t('progress:analytics.colStatus')}</th>
+                <th className="pb-3 font-semibold text-right">{t('progress:analytics.colAction')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#262a35]/60 font-sans">
               {examAttempts.map((item) => (
                 <tr key={item.id} className="hover:bg-[#0f131d]/50 transition-colors">
                   <td className="py-3 font-mono font-bold text-white">
-                    <span className="text-blue-400 font-bold">Tentative #{item.attemptNumber}</span>
+                    <span className="text-blue-400 font-bold">{t('progress:attemptNumber', { number: item.attemptNumber })}</span>
                     <span className="ml-2 text-[10px] text-slate-400 font-mono">({item.examCode})</span>
                   </td>
                   <td className="py-3 text-slate-300 font-mono text-[11px]">
-                    {new Date(item.createdAt).toLocaleDateString('fr-FR', {
+                    {formatLocalizedDate(item.createdAt, {
                       day: '2-digit',
                       month: 'short',
                       year: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    })}
+                    }, lang)}
                   </td>
                   <td className="py-3 font-mono text-slate-400">
                     {item.duration}
@@ -903,7 +910,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                           : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
                       }`}
                     >
-                      {item.passed ? 'ADMIS ✓' : 'ÉCHEC'}
+                      {item.passed ? t('progress:analytics.passedStatus') : t('progress:analytics.failedStatus')}
                     </span>
                   </td>
                   <td className="py-3 text-right">
@@ -911,7 +918,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                       onClick={() => handleOpenAttemptReport(item)}
                       className="text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
                     >
-                      Rapport détaillé
+                      {t('progress:analytics.detailedReport')}
                     </button>
                   </td>
                 </tr>
@@ -935,10 +942,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white font-headline">
-                    Rapport de Session {selectedReport.id}
+                    {t('progress:analytics.sessionReportTitle', { id: selectedReport.id })}
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Passé le {selectedReport.date} • Durée : {selectedReport.duration}
+                    {t('progress:analytics.sessionReportSub', { date: selectedReport.date, duration: selectedReport.duration })}
                   </p>
                 </div>
               </div>
@@ -953,7 +960,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             {/* Score pill */}
             <div className="p-4 rounded-2xl bg-[#0f131d] border border-[#262a35] flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-mono uppercase text-slate-400">Score Obtenu</span>
+                <span className="text-[10px] font-mono uppercase text-slate-400">{t('progress:analytics.scoreObtained')}</span>
                 <div className="text-2xl font-bold font-mono text-blue-400 mt-0.5">
                   {selectedReport.score} / {selectedReport.maxScore} pts
                 </div>
@@ -965,14 +972,14 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                     : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                 }`}
               >
-                {selectedReport.passed ? 'Certification Validée ✓' : 'Sous le seuil d\'admission'}
+                {selectedReport.passed ? t('progress:analytics.certValidated') : t('progress:analytics.belowThreshold')}
               </span>
             </div>
 
             {/* Domain breakdown */}
             <div>
               <div className="text-xs font-mono font-semibold uppercase text-slate-400 mb-3">
-                Détail par section
+                {t('progress:analytics.sectionBreakdown')}
               </div>
               <div className="space-y-2">
                 {selectedReport.domainScores.map((d, i) => (
@@ -987,7 +994,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             {/* Pedagogical recommendation */}
             <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 space-y-1">
               <div className="text-xs font-semibold text-blue-300">
-                Avis du Diagnostic Télémétrique :
+                {t('progress:analytics.telemetryAdvice')}
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
                 {selectedReport.recommendation}
@@ -998,7 +1005,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
               onClick={() => setSelectedReport(null)}
               className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all shadow-md shadow-blue-600/20"
             >
-              Fermer le rapport
+              {t('progress:analytics.closeReport')}
             </button>
           </div>
         </div>

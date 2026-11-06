@@ -1,31 +1,73 @@
 {
-  "title": "Mock Examination in Real Conditions",
+  "title": "Real Condition Mock Examination",
   "subtitle": "90-minute timed test • 50 questions • 70% passing threshold.",
   "instructions": {
     "title": "Mock Examination Instructions",
-    "rule1": "You have 90 minutes to complete 50 questions covering all official blueprint domains.",
-    "rule2": "You can flag questions for review and navigate back to them at any time before submitting.",
-    "rule3": "Once submitted, an in-depth analytical breakdown by domain and weakness will be generated.",
-    "start": "Start Timed Exam"
+    "rule1": "You have 90 minutes to answer 50 questions distributed across all official exam domains.",
+    "rule2": "You can flag questions for review and return to them anytime before time expires.",
+    "rule3": "Once the exam is submitted, a detailed analysis report highlighting strengths and gaps is generated.",
+    "start": "Start timed examination"
+  },
+  "surveillance": {
+    "active": "Official Timer Active",
+    "simulatedConditions": "Proctored exam conditions",
+    "exitWarning": "Any screen departure will be recorded.",
+    "activeMode": "Active Surveillance Mode",
+    "officialSim": "AWS Certified AI Practitioner — Official Simulation"
+  },
+  "controls": {
+    "pause": "Pause exam",
+    "resume": "Resume exam",
+    "submit": "Finish exam",
+    "questionProgress": "Question {{current}} of {{total}}",
+    "progressPct": "Progress: {{pct}}%",
+    "flagReview": "Review later",
+    "flagged": "Flagged",
+    "answered": "{{count}} answered",
+    "marked": "{{count}} flagged",
+    "unvisited": "{{count}} unanswered",
+    "flagForReview": "Flag for review",
+    "flaggedForReview": "Flagged for review",
+    "pauseTitle": "Exam on Pause",
+    "pauseDesc": "The official timer is stopped. Your answers are saved.",
+    "resumeExam": "Resume exam",
+    "returnToExam": "Return to exam",
+    "submitAndResults": "Submit and view results",
+    "confirmModalTitle": "Confirm Submission",
+    "confirmModalSubtitle": "AWS Certified AI Practitioner Exam (AIF-C01)",
+    "questionsAnswered": "Questions answered",
+    "questionsFlagged": "Questions flagged for review",
+    "questionsUnanswered": "Unanswered questions",
+    "unansweredWarning": "Warning: {{count}} questions have not been answered. The exam has no negative marking, answering every question is strongly advised."
   },
   "inProgress": {
-    "timeRemaining": "Time Remaining",
+    "timeRemaining": "Time remaining",
     "question": "Question {{current}} / {{total}}",
-    "flagForReview": "Flag for Review",
-    "unflag": "Remove Flag",
-    "finishExam": "Submit Exam",
-    "confirmFinish": "Are you sure you want to submit your exam? Unanswered questions will be marked incorrect."
+    "flagForReview": "Flag for review",
+    "unflag": "Remove flag",
+    "finishExam": "Finish exam",
+    "confirmFinish": "Are you sure you want to submit your test? Unanswered questions will be counted as incorrect."
   },
   "results": {
     "title": "Mock Examination Performance Report",
     "passed": "Congratulations! Exam Passed",
-    "failed": "Exam Not Passed - Targeted Practice Recommended",
-    "score": "Final Score: {{score}} / 1000",
-    "passScoreRequired": "Passing score required: 700 / 1000 (70%)",
-    "duration": "Time elapsed: {{duration}}",
+    "failed": "Exam Not Passed - Additional Training Recommended",
+    "score": "Final score: {{score}} / 1000",
+    "passScoreRequired": "Minimum passing score: 700 / 1000 (70%)",
+    "duration": "Elapsed time: {{duration}}",
     "weakDomain": "Priority domain to strengthen:",
-    "recommendations": "Targeted pedagogical recommendations:",
-    "reviewAnswers": "Review detailed answers and explanations",
-    "retakeExam": "Start a new practice attempt"
+    "recommendations": "Targeted educational recommendations:",
+    "reviewAnswers": "Review detailed answers",
+    "retakeExam": "Retake a new test"
+  },
+  "runner": {
+    "scoringNote": "Official AWS Scoring: Required score 700 / 1000 pts. No negative penalty (answer all questions).",
+    "prevButton": "Previous (Q{{num}})",
+    "nextButton": "Next (Q{{num}})",
+    "questionIndicator": "Question {{current}} / {{total}}",
+    "examGrid": "Exam Grid",
+    "totalQuestions": "{{count}} Questions",
+    "jumpToFlagged": "Jump to 1st flagged (Q{{num}})",
+    "jumpToUnanswered": "1st unanswered (Q{{num}})"
   }
 }

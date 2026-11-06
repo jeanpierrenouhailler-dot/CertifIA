@@ -68,8 +68,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { isInstalled, promptInstall } = usePwa();
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { versionInfo } = useSystemUpdate();
-  const { certProgress } = useProgress();
+  const { certProgress, activeCertId } = useProgress();
   const { t } = useTranslation(['navigation', 'common', 'settings']);
+
+  const activeProgressPct = (activeCertId && certProgress[activeCertId]?.progress) 
+    ?? certProgress['ai102']?.progress 
+    ?? 74;
 
   const [localCollapsed, setLocalCollapsed] = useState(false);
   const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : localCollapsed;
@@ -405,7 +409,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="flex items-center justify-between w-full truncate">
                   <span className="truncate">{t('navigation:items.analytics.shortLabel', 'Tableau de bord')}</span>
                   <span className="text-[10px] font-mono text-emerald-500 font-bold">
-                    {certProgress ? `${certProgress.overallScore}%` : '74%'}
+                    {`${activeProgressPct}%`}
                   </span>
                 </div>
               )}
@@ -538,10 +542,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex flex-col text-left truncate">
                 <span className="truncate font-semibold text-slate-900 dark:text-white">
-                  {user?.displayName || userProfile?.displayName || t('common:learnerName', 'Apprenant IA')}
+                  {user?.displayName || userProfile?.displayName || t('common:user.learnerName', 'Apprenant IA')}
                 </span>
                 <span className="text-[10px] text-slate-400 truncate">
-                  {user ? t('common:syncedAccount', 'Compte synchronisé') : t('common:guestMode', 'Mode invité')}
+                  {user ? t('common:user.syncedAccount', 'Compte synchronisé') : t('common:user.guestMode', 'Mode invité')}
                 </span>
               </div>
             )}

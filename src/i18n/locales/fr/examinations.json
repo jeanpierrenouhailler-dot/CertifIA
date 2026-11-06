@@ -8,6 +8,38 @@
     "rule3": "Une fois l'examen validé, le rapport d'analyse détaillé des domaines et des lacunes sera généré.",
     "start": "Démarrer l'examen chronométré"
   },
+  "surveillance": {
+    "active": "Chronomètre Officiel Actif",
+    "simulatedConditions": "Conditions d'examen surveillé",
+    "exitWarning": "Toute sortie d'écran sera comptabilisée.",
+    "activeMode": "Mode Surveillance Active",
+    "officialSim": "AWS Certified AI Practitioner — Simulation Officielle"
+  },
+  "controls": {
+    "pause": "Mettre en pause",
+    "resume": "Reprendre l'examen",
+    "submit": "Terminer l'examen",
+    "questionProgress": "Question {{current}} sur {{total}}",
+    "progressPct": "Progression : {{pct}}%",
+    "flagReview": "À revoir",
+    "flagged": "Marquée",
+    "answered": "{{count}} répondues",
+    "marked": "{{count}} marquées",
+    "unvisited": "{{count}} sans réponse",
+    "flagForReview": "Marquer pour révision",
+    "flaggedForReview": "Marquée pour révision",
+    "pauseTitle": "Épreuve en Pause",
+    "pauseDesc": "Le chronomètre officiel est arrêté. Vos réponses sont sauvegardées.",
+    "resumeExam": "Reprendre l'épreuve",
+    "returnToExam": "Revenir à l'examen",
+    "submitAndResults": "Soumettre et voir les résultats",
+    "confirmModalTitle": "Confirmer la Soumission",
+    "confirmModalSubtitle": "Examen AWS Certified AI Practitioner (AIF-C01)",
+    "questionsAnswered": "Questions traitées",
+    "questionsFlagged": "Questions marquées pour révision",
+    "questionsUnanswered": "Questions sans réponse",
+    "unansweredWarning": "Attention : {{count}} questions n'ont reçu aucune réponse. L'examen ne comporte aucun point négatif, il est fortement conseillé de répondre à toutes les questions."
+  },
   "inProgress": {
     "timeRemaining": "Temps restant",
     "question": "Question {{current}} / {{total}}",
@@ -27,5 +59,15 @@
     "recommendations": "Recommandations pédagogiques ciblées :",
     "reviewAnswers": "Passer en revue les réponses détaillées",
     "retakeExam": "Recommencer une nouvelle épreuve"
+  },
+  "runner": {
+    "scoringNote": "Barème officiel AWS : Score requis 700 / 1000 pts. Aucune pénalité pour réponse incorrecte (répondez à toutes les questions).",
+    "prevButton": "Précédente (Q{{num}})",
+    "nextButton": "Suivante (Q{{num}})",
+    "questionIndicator": "Question {{current}} / {{total}}",
+    "examGrid": "Grille d'Examen",
+    "totalQuestions": "{{count}} Questions",
+    "jumpToFlagged": "Sauter vers 1ère marquée (Q{{num}})",
+    "jumpToUnanswered": "1ère sans réponse (Q{{num}})"
   }
 }

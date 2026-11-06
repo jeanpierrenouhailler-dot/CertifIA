@@ -138,11 +138,11 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
               </span>
               <span className="text-xs text-emerald-400 font-mono flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                Mode Surveillance Active
+                {t('examinations:surveillance.activeMode')}
               </span>
             </div>
             <h1 className="text-lg sm:text-xl font-bold text-white font-headline mt-1">
-              AWS Certified AI Practitioner — Simulation Officielle
+              {t('examinations:surveillance.officialSim')}
             </h1>
           </div>
         </div>
@@ -163,7 +163,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#171b26] text-slate-300 hover:text-white border border-[#262a35] text-xs font-semibold transition-colors"
           >
             <Pause className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">Pause</span>
+            <span className="hidden sm:inline">{t('examinations:controls.pause')}</span>
           </button>
 
           {/* Terminer l'Examen */}
@@ -172,7 +172,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/20 transition-all"
           >
             <FileCheck className="w-3.5 h-3.5" />
-            <span>Terminer l'examen</span>
+            <span>{t('examinations:controls.submit')}</span>
           </button>
         </div>
       </div>
@@ -181,14 +181,14 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
       <div className="p-4 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
           <div className="flex items-center gap-3 font-semibold text-white">
-            <span>Question {currentQNum} sur 65</span>
+            <span>{t('examinations:controls.questionProgress', { current: currentQNum, total: 65 })}</span>
             <span className="text-slate-400 font-normal">|</span>
-            <span className="text-emerald-400 font-mono">{answeredCount} répondues</span>
-            <span className="text-purple-400 font-mono">{flaggedCount} marquées</span>
-            <span className="text-slate-400 font-mono">{unvisitedCount} sans réponse</span>
+            <span className="text-emerald-400 font-mono">{t('examinations:controls.answered', { count: answeredCount })}</span>
+            <span className="text-purple-400 font-mono">{t('examinations:controls.marked', { count: flaggedCount })}</span>
+            <span className="text-slate-400 font-mono">{t('examinations:controls.unvisited', { count: unvisitedCount })}</span>
           </div>
           <span className="text-blue-400 font-mono font-bold text-xs">
-            Progression : {progressPercent}%
+            {t('examinations:controls.progressPct', { pct: progressPercent })}
           </span>
         </div>
         <div className="w-full h-2 bg-[#0a0e18] rounded-full overflow-hidden">
@@ -220,7 +220,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 }`}
               >
                 <Flag className={`w-3.5 h-3.5 ${currentItem.status === 'flagged' ? 'fill-purple-400 text-purple-400' : ''}`} />
-                <span>{currentItem.status === 'flagged' ? 'Marquée pour révision' : 'Marquer pour révision'}</span>
+                <span>{currentItem.status === 'flagged' ? t('examinations:controls.flaggedForReview') : t('examinations:controls.flagForReview')}</span>
               </button>
             </div>
 
@@ -269,7 +269,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
             <div className="p-3 rounded-xl bg-[#0f131d]/80 border border-[#262a35] flex items-center gap-2 text-xs text-slate-400">
               <Info className="w-4 h-4 text-blue-400 shrink-0" />
               <span>
-                Barème officiel AWS : Score requis 700 / 1000 pts. Aucune pénalité pour réponse incorrecte (répondez à toutes les questions).
+                {t('examinations:runner.scoringNote')}
               </span>
             </div>
 
@@ -281,11 +281,11 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#0f131d] border border-[#262a35] disabled:opacity-30 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Précédente (Q{currentQNum - 1})</span>
+                <span>{t('examinations:runner.prevButton', { num: currentQNum - 1 })}</span>
               </button>
 
               <span className="text-xs font-mono text-slate-400">
-                Question {currentQNum} / 65
+                {t('examinations:runner.questionIndicator', { current: currentQNum, total: 65 })}
               </span>
 
               <button
@@ -293,7 +293,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 disabled={currentQNum >= 65}
                 className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-30 transition-colors shadow-md shadow-blue-600/20"
               >
-                <span>Suivante (Q{currentQNum + 1})</span>
+                <span>{t('examinations:runner.nextButton', { num: currentQNum + 1 })}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -306,9 +306,9 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-mono font-semibold uppercase tracking-wider text-slate-300">
-                Grille d'Examen
+                {t('examinations:runner.examGrid')}
               </span>
-              <span className="text-slate-400 font-mono text-[11px]">65 Questions</span>
+              <span className="text-slate-400 font-mono text-[11px]">{t('examinations:runner.totalQuestions', { count: 65 })}</span>
             </div>
 
             {/* Quick jump filter buttons */}
@@ -317,13 +317,13 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 onClick={handleJumpToFirstFlagged}
                 className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 border border-purple-500/20 transition-colors"
               >
-                Sauter vers 1ère marquée (Q7)
+                {t('examinations:runner.jumpToFlagged', { num: 7 })}
               </button>
               <button
                 onClick={handleJumpToFirstUnvisited}
                 className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-[#0f131d] text-slate-300 hover:text-white border border-[#262a35] transition-colors"
               >
-                1ère sans réponse (Q28)
+                {t('examinations:runner.jumpToUnanswered', { num: 28 })}
               </button>
             </div>
 
@@ -417,7 +417,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/25 transition-all"
             >
               <Play className="w-4 h-4 fill-white" />
-              <span>Reprendre l'épreuve</span>
+              <span>{t('examinations:controls.resumeExam')}</span>
             </button>
           </div>
         </div>
@@ -434,16 +434,17 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white font-headline">
-                    Confirmer la Soumission
+                    {t('examinations:controls.confirmModalTitle')}
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Examen AWS Certified AI Practitioner (AIF-C01)
+                    {t('examinations:controls.confirmModalSubtitle')}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsSubmitModalOpen(false)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white"
+                aria-label={t('common:actions.close')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -452,15 +453,15 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
             {/* Breakdown summary */}
             <div className="space-y-3">
               <div className="flex justify-between p-3 rounded-xl bg-[#0f131d] text-xs">
-                <span className="text-slate-300">Questions traitées</span>
+                <span className="text-slate-300">{t('examinations:controls.questionsAnswered')}</span>
                 <span className="font-mono font-bold text-emerald-400">{answeredCount} / 65</span>
               </div>
               <div className="flex justify-between p-3 rounded-xl bg-[#0f131d] text-xs">
-                <span className="text-slate-300">Questions marquées pour révision</span>
+                <span className="text-slate-300">{t('examinations:controls.questionsFlagged')}</span>
                 <span className="font-mono font-bold text-purple-400">{flaggedCount}</span>
               </div>
               <div className="flex justify-between p-3 rounded-xl bg-[#0f131d] text-xs">
-                <span className="text-slate-300">Questions sans réponse</span>
+                <span className="text-slate-300">{t('examinations:controls.questionsUnanswered')}</span>
                 <span className="font-mono font-bold text-rose-400">{unvisitedCount}</span>
               </div>
             </div>
@@ -469,7 +470,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
               <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>
-                  Attention : {unvisitedCount} questions n'ont reçu aucune réponse. L'examen ne comporte aucun point négatif, il est fortement conseillé de répondre à toutes les questions.
+                  {t('examinations:controls.unansweredWarning', { count: unvisitedCount })}
                 </span>
               </div>
             )}
@@ -480,7 +481,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 onClick={() => setIsSubmitModalOpen(false)}
                 className="flex-1 py-2.5 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-300 text-xs font-semibold border border-[#262a35] transition-colors"
               >
-                Revenir à l'examen
+                {t('examinations:controls.returnToExam')}
               </button>
               <button
                 onClick={async () => {
@@ -515,7 +516,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 }}
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/25 transition-all"
               >
-                Soumettre et voir les résultats
+                {t('examinations:controls.submitAndResults')}
               </button>
             </div>
           </div>

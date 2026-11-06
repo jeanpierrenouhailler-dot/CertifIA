@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Command, Keyboard } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 interface ShortcutsModalProps {
   isOpen: boolean;
@@ -7,16 +8,19 @@ interface ShortcutsModalProps {
 }
 
 export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose }) => {
+  const { t, i18n } = useTranslation(['settings', 'common']);
+  const isEn = i18n.language === 'en';
+
   if (!isOpen) return null;
 
   const shortcuts = [
-    { key: 'Espace', desc: "Retourner la fiche mémoire (SRS) / Valider l'étape" },
-    { key: '1, 2, 3, 4', desc: "Sélectionner les options A, B, C, D en QCM ou voter la difficulté SM-2" },
-    { key: 'F', desc: "Marquer / Démarquer la question active pour révision" },
-    { key: '← / →', desc: "Passer à la question ou carte précédente / suivante" },
-    { key: 'P', desc: "Mettre en pause l'examen blanc officiel" },
-    { key: 'Ctrl + K', desc: "Ouvrir la recherche globale et les blueprints" },
-    { key: 'Échap', desc: "Fermer les fenêtres modales ou le drawer latéral" },
+    { key: isEn ? 'Space' : 'Espace', desc: t('settings:shortcuts.space', "Retourner la fiche mémoire (SRS) / Valider l'étape") },
+    { key: '1, 2, 3, 4', desc: t('settings:shortcuts.numbers', "Sélectionner les options A, B, C, D en QCM ou noter la difficulté SM-2") },
+    { key: 'F', desc: t('settings:shortcuts.flag', "Marquer / Démarquer la question active pour révision") },
+    { key: '← / →', desc: t('settings:shortcuts.arrows', "Passer à la question ou carte précédente / suivante") },
+    { key: 'P', desc: t('settings:shortcuts.pause', "Mettre en pause l'examen blanc officiel") },
+    { key: 'Ctrl + K', desc: t('settings:shortcuts.search', "Ouvrir la recherche globale et les blueprints") },
+    { key: isEn ? 'Esc' : 'Échap', desc: t('settings:shortcuts.escape', "Fermer les fenêtres modales ou le drawer latéral") },
   ];
 
   return (
@@ -32,16 +36,17 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
             </div>
             <div>
               <h3 className="font-semibold text-white font-headline text-base">
-                Raccourcis Clavier CertifAI
+                {t('settings:shortcuts.title', 'Raccourcis Clavier CertifIA')}
               </h3>
               <p className="text-xs text-slate-400">
-                Accélérez vos sessions d'entraînement et de simulation
+                {t('settings:shortcuts.subtitle', 'Accélérez vos sessions d\'entraînement et de simulation')}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#262a35] transition-colors"
+            aria-label={t('common:actions.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -64,13 +69,13 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
         <div className="mt-6 pt-4 border-t border-[#262a35] flex items-center justify-between">
           <span className="text-[11px] text-slate-300 font-mono flex items-center gap-1.5">
             <Command className="w-3.5 h-3.5" />
-            Optimisé pour révisions intensives
+            CertifIA Speed Review
           </span>
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md shadow-blue-600/20"
           >
-            Compris
+            {t('common:actions.confirm', 'Compris')}
           </button>
         </div>
       </div>

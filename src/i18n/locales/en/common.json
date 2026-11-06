@@ -1,11 +1,24 @@
 {
   "appName": "CertifIA",
-  "appTagline": "Elite Cloud AI Certification Preparation Platform",
+  "appTagline": "Elite Preparation Platform for Cloud AI Certifications",
   "language": {
     "fr": "Français",
     "en": "English",
-    "selectLanguage": "Select language",
+    "selectLanguage": "Select Language",
     "switchSuccess": "Language changed successfully"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "toggle": "Toggle light/dark theme"
+  },
+  "guide": {
+    "enable": "Enable guided tooltips",
+    "disable": "Disable guided tooltips",
+    "badgeActive": "ACTIVE",
+    "badgeInactive": "INACTIVE"
   },
   "actions": {
     "confirm": "Confirm",
@@ -27,12 +40,16 @@
     "filter": "Filter",
     "export": "Export",
     "share": "Share",
-    "install": "Install app",
-    "checkUpdates": "Check for updates",
-    "learnMore": "Learn more",
-    "resumeLearning": "Resume my learning",
-    "viewDetails": "View details",
-    "openBlueprint": "View blueprint"
+    "install": "Install Application",
+    "installPwa": "Install PWA",
+    "checkUpdates": "Check for Updates",
+    "learnMore": "Learn More",
+    "resumeLearning": "Resume Learning",
+    "viewDetails": "View Details",
+    "openBlueprint": "View Blueprint",
+    "open": "Open",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "status": {
     "loading": "Loading...",
@@ -46,7 +63,11 @@
     "inProgress": "In progress",
     "completed": "Completed",
     "locked": "Locked",
-    "recommended": "Recommended"
+    "recommended": "Recommended",
+    "active": "Active",
+    "inactive": "Inactive",
+    "synchronized": "Synchronized",
+    "syncing": "Syncing..."
   },
   "units": {
     "days": "days",
@@ -60,7 +81,17 @@
   },
   "feedback": {
     "emptyState": "No data available at this time.",
-    "noResults": "No results found for your search.",
-    "retry": "Try again"
-  }
+    "noResults": "No results found for your query.",
+    "retry": "Retry"
+  },
+  "user": {
+    "learnerName": "AI Learner",
+    "guestMode": "Guest Mode",
+    "syncedAccount": "Synced Account"
+  },
+  "aiTutorBadge": "Tutor",
+  "pauseAndExit": "Pause and Exit",
+  "resetSearch": "Reset Search",
+  "bookmark": "Save",
+  "bookmarked": "Saved"
 }

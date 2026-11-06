@@ -7,11 +7,52 @@
     "assistant": "AI Assistant",
     "plus": "More"
   },
+  "unifiedArchitecture": "Unified Navigation Architecture",
+  "hamburger": {
+    "aria": "Categorized Main Menu",
+    "close": "Close Menu"
+  },
+  "mobileNav": {
+    "aria": "Mobile Primary Navigation",
+    "home": "Home",
+    "certs": "Certs",
+    "learn": "Learn",
+    "progress": "Progress",
+    "more": "More",
+    "homeAria": "CertifIA Home",
+    "certsAria": "Official Certifications",
+    "learnAria": "Learning & Training",
+    "progressAria": "Dashboard & Progress",
+    "moreAria": "More options and utilities",
+    "sheetAria": "CertifIA Supplementary Menu",
+    "sheetTitle": "Sections & Utilities",
+    "sheetSubtitle": "AI Assistant, Profile, Settings & Tools",
+    "advancedLearning": "Advanced Learning",
+    "certsAndPaths": "Certifications & Pathways",
+    "systemAndAccount": "System & Account",
+    "assistantDesc": "Explanations, tips & mnemonics",
+    "flashcardsDesc": "2,800 SRS cards",
+    "distributionDesc": "Cards inventory",
+    "examDesc": "Timed",
+    "glossaryDesc": "Concepts & acronyms",
+    "recommendationDesc": "From Level 1 to Level 4",
+    "comparatorDesc": "Exams side by side",
+    "profileDesc": "Profile & Learning Goals",
+    "guideLabel": "Guide Mode & Tooltips",
+    "legalLabel": "Legal Notices & Disclaimer",
+    "installLabel": "Install App on Home Screen",
+    "languageLabel": "Language / Langue"
+  },
   "items": {
     "today": {
       "label": "Today",
       "shortLabel": "Today",
       "description": "Daily cockpit: 17 SM-2 cards, 8 weak topics, 12 targeted exam questions"
+    },
+    "quickResume": {
+      "label": "Resume Learning",
+      "shortLabel": "Resume",
+      "description": "Instantly resume your active session in 1 click"
     },
     "catalogue": {
       "label": "Certification Catalog",
@@ -58,6 +99,21 @@
       "shortLabel": "Dashboard",
       "description": "Mastery metrics, skills radar chart, and learning attempt history"
     },
+    "analyticsDashboard": {
+      "label": "Dashboard",
+      "shortLabel": "Dashboard",
+      "description": "Global readiness score, success rate, and weekly study pace"
+    },
+    "analyticsDetail": {
+      "label": "Analytics & Skills",
+      "shortLabel": "Analytics",
+      "description": "Breakdown by certification domain and skill gap identification"
+    },
+    "history": {
+      "label": "Exam History",
+      "shortLabel": "History",
+      "description": "Detailed reports of all mock exam and quiz sessions taken"
+    },
     "assistant": {
       "label": "Pedagogical Assistant",
       "shortLabel": "AI Tutor",
@@ -91,6 +147,7 @@
   },
   "search": {
     "placeholder": "Search certification, MCQ question, AI tutor, or concept...",
+    "placeholderFilter": "Filter a section, exam, tool...",
     "commandKey": "Ctrl+K",
     "noResults": "No results found for “{{query}}”",
     "instructions": "↑↓ Navigate • ↵ Open • ESC Close"

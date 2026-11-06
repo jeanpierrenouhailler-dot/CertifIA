@@ -11,6 +11,7 @@ import {
   Globe 
 } from 'lucide-react';
 import { usePwa } from '../context/PwaContext';
+import { useTranslation } from '../i18n';
 
 interface InstallAppModalProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ interface InstallAppModalProps {
 
 export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClose }) => {
   const { isInstalled } = usePwa();
+  const { t, i18n } = useTranslation(['settings', 'common']);
+  const isEn = i18n.language === 'en';
 
   if (!isOpen) return null;
 
@@ -34,10 +37,10 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             </div>
             <div>
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Installation Progressive Web App
+                {t('settings:pwa.subtitle', 'Installation Progressive Web App')}
               </span>
               <h2 className="text-lg sm:text-xl font-bold font-headline text-slate-900 dark:text-white mt-0.5">
-                Installer CertifIA sur votre Écran
+                {t('settings:pwa.title', 'Installer CertifIA sur votre Écran')}
               </h2>
             </div>
           </div>
@@ -45,6 +48,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#262a35] transition-colors"
+            aria-label={t('common:actions.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -57,15 +61,18 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-200 flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <div>
-                <div className="font-bold text-sm">Application déjà installée !</div>
+                <div className="font-bold text-sm">{t('settings:pwa.alreadyInstalled', 'Application déjà installée !')}</div>
                 <div className="text-[11px] opacity-80">
-                  CertifIA est configuré en mode standalone sur votre appareil. Vous pouvez la lancer directement depuis votre écran d'accueil.
+                  {t('settings:pwa.alreadyInstalledDesc', 'CertifIA est configuré en mode standalone sur votre appareil. Vous pouvez la lancer directement depuis votre écran d\'accueil.')}
                 </div>
               </div>
             </div>
           ) : (
             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-              Ajoutez CertifIA directement sur l'écran d'accueil de votre smartphone, tablette ou bureau PC/Mac pour une expérience plein écran ultra-rapide et accessible hors-ligne.
+              {isEn 
+                ? 'Add CertifIA directly to your smartphone, tablet, or desktop home screen for a lightning-fast full-screen experience available offline.'
+                : 'Ajoutez CertifIA directement sur l\'écran d\'accueil de votre smartphone, tablette ou bureau PC/Mac pour une expérience plein écran ultra-rapide et accessible hors-ligne.'
+              }
             </p>
           )}
 
@@ -75,17 +82,29 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#0f131d] border border-slate-200 dark:border-[#262a35] space-y-2">
               <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-xs">
                 <Smartphone className="w-4 h-4 text-blue-500" />
-                <span>Sur iPhone &amp; iPad (Safari)</span>
+                <span>{isEn ? 'On iPhone & iPad (Safari)' : 'Sur iPhone & iPad (Safari)'}</span>
               </div>
               <ol className="list-decimal list-inside space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
                 <li>
-                  Appuyez sur l'icône de <strong className="text-blue-600 dark:text-blue-400">Partage</strong> (le carré avec une flèche vers le haut <Share className="w-3 h-3 inline text-blue-500" /> en bas de l'écran).
+                  {isEn ? (
+                    <>Tap the <strong className="text-blue-600 dark:text-blue-400">Share</strong> icon (<Share className="w-3 h-3 inline text-blue-500" /> at bottom of screen).</>
+                  ) : (
+                    <>Appuyez sur l'icône de <strong className="text-blue-600 dark:text-blue-400">Partage</strong> (<Share className="w-3 h-3 inline text-blue-500" /> en bas de l'écran).</>
+                  )}
                 </li>
                 <li>
-                  Faites défiler vers le bas et touchez <strong className="text-slate-900 dark:text-white">« Sur l'écran d'accueil »</strong> (<PlusSquare className="w-3 h-3 inline text-slate-500" />).
+                  {isEn ? (
+                    <>Scroll down and tap <strong className="text-slate-900 dark:text-white">“Add to Home Screen”</strong> (<PlusSquare className="w-3 h-3 inline text-slate-500" />).</>
+                  ) : (
+                    <>Faites défiler vers le bas et touchez <strong className="text-slate-900 dark:text-white">« Sur l'écran d'accueil »</strong> (<PlusSquare className="w-3 h-3 inline text-slate-500" />).</>
+                  )}
                 </li>
                 <li>
-                  Confirmez en appuyant sur <strong className="text-blue-600 dark:text-blue-400">Ajouter</strong> en haut à droite. L'icône CertifIA apparaîtra sur votre écran.
+                  {isEn ? (
+                    <>Confirm by tapping <strong className="text-blue-600 dark:text-blue-400">Add</strong> at top right. The CertifIA icon will appear on your screen.</>
+                  ) : (
+                    <>Confirmez en appuyant sur <strong className="text-blue-600 dark:text-blue-400">Ajouter</strong> en haut à droite. L'icône CertifIA apparaîtra sur votre écran.</>
+                  )}
                 </li>
               </ol>
             </div>
@@ -94,17 +113,29 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#0f131d] border border-slate-200 dark:border-[#262a35] space-y-2">
               <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-xs">
                 <Smartphone className="w-4 h-4 text-emerald-500" />
-                <span>Sur Android (Chrome &amp; Edge)</span>
+                <span>{isEn ? 'On Android (Chrome & Edge)' : 'Sur Android (Chrome & Edge)'}</span>
               </div>
               <ol className="list-decimal list-inside space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
                 <li>
-                  Appuyez sur les <strong className="text-emerald-600 dark:text-emerald-400">3 points verticaux</strong> en haut à droite du navigateur.
+                  {isEn ? (
+                    <>Tap the <strong className="text-emerald-600 dark:text-emerald-400">3 vertical dots</strong> in top right corner of browser.</>
+                  ) : (
+                    <>Appuyez sur les <strong className="text-emerald-600 dark:text-emerald-400">3 points verticaux</strong> en haut à droite du navigateur.</>
+                  )}
                 </li>
                 <li>
-                  Sélectionnez <strong className="text-slate-900 dark:text-white">« Installer l'application »</strong> ou <strong className="text-slate-900 dark:text-white">« Ajouter à l'écran d'accueil »</strong>.
+                  {isEn ? (
+                    <>Select <strong className="text-slate-900 dark:text-white">“Install app”</strong> or <strong className="text-slate-900 dark:text-white">“Add to Home screen”</strong>.</>
+                  ) : (
+                    <>Sélectionnez <strong className="text-slate-900 dark:text-white">« Installer l'application »</strong> ou <strong className="text-slate-900 dark:text-white">« Ajouter à l'écran d'accueil »</strong>.</>
+                  )}
                 </li>
                 <li>
-                  Validez : CertifIA s'installe comme une véritable application native.
+                  {isEn ? (
+                    <>Confirm: CertifIA will install as a native standalone app.</>
+                  ) : (
+                    <>Validez : CertifIA s'installe comme une véritable application native.</>
+                  )}
                 </li>
               </ol>
             </div>
@@ -113,17 +144,26 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#0f131d] border border-slate-200 dark:border-[#262a35] space-y-2">
               <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2 text-xs">
                 <Monitor className="w-4 h-4 text-indigo-500" />
-                <span>Sur Ordinateur (Chrome, Edge, Brave)</span>
+                <span>{isEn ? 'On Computer (Chrome, Edge, Brave)' : 'Sur Ordinateur (Chrome, Edge, Brave)'}</span>
               </div>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                Repérez la petite icône d'<strong className="text-indigo-600 dark:text-indigo-400">écran avec flèche</strong> dans la barre d'adresse de votre navigateur (à droite de l'URL), puis cliquez sur <em>« Installer »</em>. L'application s'ouvrira dans sa propre fenêtre autonome dédiée sans barre d'outils.
+                {isEn ? (
+                  <>Look for the install icon in your address bar (right of URL) and click <em>“Install”</em>. The app will launch in its own dedicated window without toolbar distraction.</>
+                ) : (
+                  <>Repérez la petite icône d'<strong className="text-indigo-600 dark:text-indigo-400">écran avec flèche</strong> dans la barre d'adresse de votre navigateur (à droite de l'URL), puis cliquez sur <em>« Installer »</em>. L'application s'ouvrira dans sa propre fenêtre autonome dédiée sans barre d'outils.</>
+                )}
               </p>
             </div>
           </div>
 
           <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-700 dark:text-blue-300 flex items-center gap-2 font-mono">
             <Sparkles className="w-4 h-4 shrink-0" />
-            <span>Aucun passage par l'App Store ou le Play Store requis. Zéro compte supplémentaire !</span>
+            <span>
+              {isEn 
+                ? 'No App Store or Play Store account required. Zero friction!'
+                : 'Aucun passage par l\'App Store ou le Play Store requis. Zéro compte supplémentaire !'
+              }
+            </span>
           </div>
         </div>
 
@@ -133,7 +173,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             onClick={onClose}
             className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold transition-all shadow-md"
           >
-            Compris, merci !
+            {t('common:actions.confirm', 'Compris')}
           </button>
         </div>
 

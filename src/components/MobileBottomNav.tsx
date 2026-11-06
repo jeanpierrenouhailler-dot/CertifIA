@@ -27,6 +27,7 @@ import { useGuide } from '../context/GuideContext';
 import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { LanguageSelector } from './LanguageSelector';
+import { useTranslation } from '../i18n';
 
 interface MobileBottomNavProps {
   currentScreen: AppScreen;
@@ -48,6 +49,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onOpenMenu,
 }) => {
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
+  const { t } = useTranslation(['navigation', 'common']);
   const { user } = useAuth();
   const { isGuideModeActive, toggleGuideMode, openLegalModal } = useGuide();
   const { isInstalled, promptInstall } = usePwa();
@@ -70,7 +72,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       {/* Mobile Bottom Navigation Bar: Exactly 5 main accessible touch targets (min 48px height) */}
       <nav 
         id="mobile-bottom-nav"
-        aria-label="Navigation principale mobile"
+        aria-label={t('navigation:mobileNav.aria', 'Navigation principale mobile')}
         className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0f131d]/95 backdrop-blur-xl border-t border-slate-200 dark:border-[#1c1f2a] px-2 pt-1 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-2xl flex items-center justify-around transition-colors duration-200"
       >
         {/* 1. ACCUEIL */}
@@ -82,10 +84,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
           aria-current={isAccueilActive ? 'page' : undefined}
-          aria-label="Accueil CertifIA"
+          aria-label={t('navigation:mobileNav.homeAria', 'Accueil CertifIA')}
         >
           <Home className={`w-5 h-5 mb-0.5 transition-transform ${isAccueilActive ? 'scale-110 text-blue-600 dark:text-blue-400' : ''}`} />
-          <span className="text-[11px] tracking-tight">Accueil</span>
+          <span className="text-[11px] tracking-tight">{t('navigation:mobileNav.home', 'Accueil')}</span>
           {isAccueilActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-0.5" />}
         </button>
 
@@ -98,10 +100,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
           aria-current={isCertificationsActive ? 'page' : undefined}
-          aria-label="Certifications officielles"
+          aria-label={t('navigation:mobileNav.certsAria', 'Certifications officielles')}
         >
           <Compass className={`w-5 h-5 mb-0.5 transition-transform ${isCertificationsActive ? 'scale-110 text-blue-600 dark:text-blue-400' : ''}`} />
-          <span className="text-[11px] tracking-tight">Certifs</span>
+          <span className="text-[11px] tracking-tight">{t('navigation:mobileNav.certs', 'Certifs')}</span>
           {isCertificationsActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-0.5" />}
         </button>
 
@@ -114,10 +116,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
           aria-current={isApprentissageActive ? 'page' : undefined}
-          aria-label="Apprentissage et entraînement"
+          aria-label={t('navigation:mobileNav.learnAria', 'Apprentissage et entraînement')}
         >
           <GraduationCap className={`w-5 h-5 mb-0.5 transition-transform ${isApprentissageActive ? 'scale-110 text-blue-600 dark:text-blue-400' : ''}`} />
-          <span className="text-[11px] tracking-tight">Apprendre</span>
+          <span className="text-[11px] tracking-tight">{t('navigation:mobileNav.learn', 'Apprendre')}</span>
           {isApprentissageActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-0.5" />}
         </button>
 
@@ -130,10 +132,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
           aria-current={isProgressionActive ? 'page' : undefined}
-          aria-label="Tableau de bord et progression"
+          aria-label={t('navigation:mobileNav.progressAria', 'Tableau de bord et progression')}
         >
           <BarChart3 className={`w-5 h-5 mb-0.5 transition-transform ${isProgressionActive ? 'scale-110 text-blue-600 dark:text-blue-400' : ''}`} />
-          <span className="text-[11px] tracking-tight">Progrès</span>
+          <span className="text-[11px] tracking-tight">{t('navigation:mobileNav.progress', 'Progrès')}</span>
           {isProgressionActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-0.5" />}
         </button>
 
@@ -145,14 +147,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               ? 'text-blue-600 dark:text-blue-400 font-bold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
-          aria-label="Plus d’options et rubriques secondaires"
+          aria-label={t('navigation:mobileNav.moreAria', 'Plus d’options et rubriques secondaires')}
           aria-expanded={isMoreSheetOpen}
         >
           <div className="relative">
             <MoreHorizontal className="w-5 h-5 mb-0.5" />
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-500" />
           </div>
-          <span className="text-[11px] tracking-tight">Plus</span>
+          <span className="text-[11px] tracking-tight">{t('navigation:mobileNav.more', 'Plus')}</span>
           {isMoreActive && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 mt-0.5" />}
         </button>
       </nav>
@@ -164,7 +166,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           onClick={() => setIsMoreSheetOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Menu complémentaire CertifIA"
+          aria-label={t('navigation:mobileNav.sheetAria', 'Menu complémentaire CertifIA')}
         >
           <div 
             className="w-full bg-white dark:bg-[#121622] border-t border-slate-200 dark:border-[#22283a] rounded-t-3xl max-h-[85vh] overflow-y-auto p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl animate-in slide-in-from-bottom duration-200"
@@ -177,14 +179,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   +
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">Rubriques & Utilitaires</h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Assistant IA, Profil, Paramètres et Outils</p>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">{t('navigation:mobileNav.sheetTitle', 'Rubriques & Utilitaires')}</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">{t('navigation:mobileNav.sheetSubtitle', 'Assistant IA, Profil, Paramètres et Outils')}</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsMoreSheetOpen(false)}
                 className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2030]"
-                aria-label="Fermer le menu"
+                aria-label={t('common:actions.close', 'Fermer')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -198,10 +200,12 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 </div>
                 <div>
                   <div className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
-                    Assistant Pédagogique IA
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-blue-500/20 text-blue-600 dark:text-blue-300">Tuteur</span>
+                    {t('navigation:items.assistant.label', 'Assistant Pédagogique IA')}
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-blue-500/20 text-blue-600 dark:text-blue-300">
+                      {t('navigation:items.assistant.shortLabel', 'Tuteur')}
+                    </span>
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">Explications, astuces & mnémotechniques</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400">{t('navigation:mobileNav.assistantDesc', 'Explications, astuces & mnémotechniques')}</div>
                 </div>
               </div>
               <button
@@ -211,14 +215,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 }}
                 className="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-xs font-semibold shadow hover:bg-blue-500"
               >
-                Ouvrir
+                {t('common:actions.open', 'Ouvrir')}
               </button>
             </div>
 
             {/* Grid of Secondary & Deep-Learning Links */}
             <div className="mt-4 space-y-4">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Apprentissage avancé</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">{t('navigation:mobileNav.advancedLearning', 'Apprentissage avancé')}</span>
                 <div className="grid grid-cols-2 gap-2 mt-1.5">
                   <button
                     onClick={() => handleSelectNav('flashcards')}
@@ -226,8 +230,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <Layers className="w-4 h-4 text-purple-500 shrink-0" />
                     <div>
-                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">Fiches Mémo</div>
-                      <div className="text-[10px] text-slate-400">2 800 cartes SRS</div>
+                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.flashcards.shortLabel', 'Fiches Mémo')}</div>
+                      <div className="text-[10px] text-slate-400">{t('navigation:mobileNav.flashcardsDesc', '2 800 cartes SRS')}</div>
                     </div>
                   </button>
 
@@ -240,8 +244,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <PieChart className="w-4 h-4 text-emerald-500 shrink-0" />
                     <div>
-                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">Répartition</div>
-                      <div className="text-[10px] text-slate-400">Inventaire fiches</div>
+                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.distribution.shortLabel', 'Répartition')}</div>
+                      <div className="text-[10px] text-slate-400">{t('navigation:mobileNav.distributionDesc', 'Inventaire fiches')}</div>
                     </div>
                   </button>
 
@@ -251,8 +255,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <Clock className="w-4 h-4 text-amber-500 shrink-0" />
                     <div>
-                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">Examens blancs</div>
-                      <div className="text-[10px] text-slate-400">Chronométré</div>
+                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.exam.shortLabel', 'Examens blancs')}</div>
+                      <div className="text-[10px] text-slate-400">{t('navigation:mobileNav.examDesc', 'Chronométré')}</div>
                     </div>
                   </button>
 
@@ -262,15 +266,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <BookOpen className="w-4 h-4 text-blue-500 shrink-0" />
                     <div>
-                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">Glossaire IA</div>
-                      <div className="text-[10px] text-slate-400">Concepts & acronymes</div>
+                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.glossary.shortLabel', 'Glossaire IA')}</div>
+                      <div className="text-[10px] text-slate-400">{t('navigation:mobileNav.glossaryDesc', 'Concepts & acronymes')}</div>
                     </div>
                   </button>
                 </div>
               </div>
 
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Certifications & Parcours</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">{t('navigation:mobileNav.certsAndPaths', 'Certifications & Parcours')}</span>
                 <div className="grid grid-cols-2 gap-2 mt-1.5">
                   <button
                     onClick={() => handleSelectNav('recommendation')}
@@ -278,8 +282,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <Sparkles className="w-4 h-4 text-indigo-500 shrink-0" />
                     <div>
-                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">Parcours IA</div>
-                      <div className="text-[10px] text-slate-400">Du Niv. 1 au Niv. 4</div>
+                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.recommendation.shortLabel', 'Parcours IA')}</div>
+                      <div className="text-[10px] text-slate-400">{t('navigation:mobileNav.recommendationDesc', 'Du Niv. 1 au Niv. 4')}</div>
                     </div>
                   </button>
 
@@ -292,15 +296,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <Scale className="w-4 h-4 text-cyan-500 shrink-0" />
                     <div>
-                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">Comparateur</div>
-                      <div className="text-[10px] text-slate-400">Examens face à face</div>
+                      <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.comparator.shortLabel', 'Comparateur')}</div>
+                      <div className="text-[10px] text-slate-400">{t('navigation:mobileNav.comparatorDesc', 'Examens face à face')}</div>
                     </div>
                   </button>
                 </div>
               </div>
 
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Système & Compte</span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold">{t('navigation:mobileNav.systemAndAccount', 'Système & Compte')}</span>
                 <div className="space-y-1.5 mt-1.5">
                   <button
                     onClick={() => handleSelectNav('profile')}
@@ -308,7 +312,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <div className="flex items-center gap-2.5">
                       <User className="w-4 h-4 text-slate-500" />
-                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Profil & Objectifs d'apprentissage</span>
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.profile.label', 'Profil & Objectifs d\'apprentissage')}</span>
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </button>
@@ -323,7 +327,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     <div className="flex items-center gap-2.5">
                       <Settings className="w-4 h-4 text-slate-500" />
                       <div>
-                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Paramètres système</span>
+                        <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.settings.label', 'Paramètres système')}</span>
                         <span className="ml-2 text-[10px] font-mono text-slate-400">{versionInfo.version}</span>
                       </div>
                     </div>
@@ -333,7 +337,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   <div className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-[#171c2b] border border-slate-200/80 dark:border-[#22283a] flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <Globe className="w-4 h-4 text-blue-500" />
-                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Langue / Language</span>
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:mobileNav.languageLabel', 'Langue / Language')}</span>
                     </div>
                     <LanguageSelector variant="compact" />
                   </div>
@@ -347,10 +351,10 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <div className="flex items-center gap-2.5">
                       <HelpCircle className="w-4 h-4 text-slate-500" />
-                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Mode Guide & Infobulles</span>
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:mobileNav.guideLabel', 'Mode Guide & Infobulles')}</span>
                     </div>
                     <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${isGuideModeActive ? 'bg-emerald-500/20 text-emerald-600' : 'bg-slate-200 text-slate-500'}`}>
-                      {isGuideModeActive ? 'ACTIF' : 'INACTIF'}
+                      {isGuideModeActive ? t('common:guide.badgeActive', 'ACTIF') : t('common:guide.badgeInactive', 'INACTIF')}
                     </span>
                   </button>
 
@@ -363,7 +367,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   >
                     <div className="flex items-center gap-2.5">
                       <FileText className="w-4 h-4 text-slate-500" />
-                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Mentions légales & Avertissement</span>
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.legal.label', 'Mentions légales & Avertissement')}</span>
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </button>
@@ -378,7 +382,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     >
                       <div className="flex items-center gap-2.5">
                         <Download className="w-4 h-4 text-white" />
-                        <span className="text-xs font-bold">Installer l’application sur l’écran d’accueil</span>
+                        <span className="text-xs font-bold">{t('navigation:mobileNav.installLabel', 'Installer l’application sur l’écran d’accueil')}</span>
                       </div>
                       <ChevronRight className="w-4 h-4 text-white/80" />
                     </button>

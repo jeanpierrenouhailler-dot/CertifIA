@@ -396,31 +396,31 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
-                Algorithme SM-2 / FSRS • Ordonnancement Intelligent
+                {t('flashcards:algorithmHeader')}
               </span>
               <button
                 onClick={() => setIsAlgorithmModalOpen(true)}
                 className="text-[11px] font-mono text-slate-400 hover:text-white flex items-center gap-1 underline underline-offset-2 ml-2 transition-colors"
               >
                 <Info className="w-3.5 h-3.5" />
-                Comment ça marche ?
+                {t('flashcards:howItWorks')}
               </button>
             </div>
             <p className="text-sm sm:text-base font-bold text-white font-headline mt-1">
-              « Aujourd'hui, voici les {dailyQueue.totalDue} cartes que tu dois absolument revoir. »
+              {t('flashcards:todayQueuePrompt', { count: dailyQueue.totalDue })}
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] font-mono text-slate-300">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20 font-semibold">
                 <AlertCircle className="w-3 h-3 text-rose-400" />
-                {dailyQueue.overdueCards.length} en retard
+                {t('flashcards:overdueBadge', { count: dailyQueue.overdueCards.length })}
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-semibold">
                 <Clock className="w-3 h-3 text-amber-400" />
-                {dailyQueue.dueTodayCards.length} à échéance aujourd'hui
+                {t('flashcards:dueTodayBadgeCount', { count: dailyQueue.dueTodayCards.length })}
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/20 font-semibold">
                 <Layers className="w-3 h-3 text-blue-400" />
-                {dailyQueue.newCards.length} consolidations prioritaires
+                {t('flashcards:priorityConsolidations', { count: dailyQueue.newCards.length })}
               </span>
             </div>
           </div>
@@ -562,11 +562,12 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
       </div>
 
       {/* Retention Mastery Filter Bar (Maîtrisées / À revoir / Difficiles) */}
+      {/* Retention Mastery Filter Bar (Maîtrisées / À revoir / Difficiles) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#131722] border border-[#262a35]">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-emerald-400 shrink-0" />
           <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
-            État de Rétention SRS :
+            {t('flashcards:retention.title')}
           </span>
         </div>
 
@@ -584,7 +585,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             }`}
           >
             <Zap className="w-3 h-3 fill-amber-400 text-amber-400" />
-            <span>À revoir aujourd'hui</span>
+            <span>{t('flashcards:retention.dueToday')}</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-950/80 text-blue-200 border border-blue-500/30">
               {dailyQueue.totalDue}
             </span>
@@ -602,7 +603,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 : 'bg-[#171b26] text-slate-400 hover:text-white border border-[#262a35]'
             }`}
           >
-            Toutes ({activeDataset.length})
+            {t('flashcards:retention.all', { count: activeDataset.length })}
           </button>
 
           <button
@@ -618,7 +619,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>Maîtrisées</span>
+            <span>{t('flashcards:retention.mastered')}</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-200">
               {certStats.maitriseCount}
             </span>
@@ -637,7 +638,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-rose-400" />
-            <span>À revoir</span>
+            <span>{t('flashcards:retention.toReview')}</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-950/80 text-rose-200">
               {certStats.revoirCount}
             </span>
@@ -656,7 +657,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-amber-400" />
-            <span>Difficiles (≥ 4/5)</span>
+            <span>{t('flashcards:retention.hard')}</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-950/80 text-amber-200">
               {certStats.moyenCount}
             </span>
@@ -674,7 +675,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 : 'bg-[#171b26] text-slate-400 hover:text-white border border-[#262a35]'
             }`}
           >
-            Non évaluées ({Math.max(0, activeDataset.length - certStats.totalReviewed)})
+            {t('flashcards:retention.unreviewed', { count: Math.max(0, activeDataset.length - certStats.totalReviewed) })}
           </button>
         </div>
       </div>
@@ -684,10 +685,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         <div className="flex items-center justify-between text-xs text-slate-300 px-1">
           <span className="font-semibold uppercase tracking-wider font-mono flex items-center gap-1.5">
             <FolderOpen className="w-3.5 h-3.5 text-blue-400" />
-            Domaines Officiels {selectedCert.toUpperCase()} (100 fiches chacun) :
+            {t('flashcards:domains.officialTitle', { cert: selectedCert.toUpperCase() })}
           </span>
           <span className="text-[11px] font-mono text-slate-400">
-            Total : {activeDataset.length} cartes actives
+            {t('flashcards:domains.activeCards', { count: activeDataset.length })}
           </span>
         </div>
 
@@ -720,11 +721,11 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 </div>
                 <div className="text-xs font-bold line-clamp-2 leading-snug">
                   {dm.id === 'all' 
-                    ? `Tous (${activeDataset.length})` 
+                    ? t('flashcards:domains.all', { count: activeDataset.length })
                     : dm.name.split('.')[1]?.trim() || dm.name}
                 </div>
                 <div className="text-[11px] font-mono text-blue-400 font-semibold mt-1">
-                  {dm.count} fiches
+                  {t('flashcards:domains.cardsCount', { count: dm.count })}
                 </div>
               </button>
             );
@@ -743,16 +744,16 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
               selectedCert === 'c1000177'
-                ? "Rechercher IBM watsonx (ex: Granite, Prompt Lab, Iceberg, Presto, Factsheets, Disparate Impact, OpenShift)..."
+                ? t('flashcards:stage.searchIbm')
                 : selectedCert === 'gcpmle'
-                ? "Rechercher GCP-PMLE (ex: TPU, Vizier, tf.Transform, Feature Store, BigQuery ML, LoRA, Kubeflow, Wasserstein)..."
+                ? t('flashcards:stage.searchGcp')
                 : selectedCert === 'aifc01'
-                ? "Rechercher AIF-C01 (ex: Bedrock, Claude, RAG, Guardrails, Clarify, KMS, Hallucination, Few-shot)..."
+                ? t('flashcards:stage.searchAwsAif')
                 : selectedCert === 'mlsc01'
-                ? "Rechercher un concept AWS MLS-C01 (ex: XGBoost, DeepAR, Glue, Pipe Mode, Model Monitor)..."
+                ? t('flashcards:stage.searchAwsMls')
                 : selectedCert === 'ai900' 
-                ? "Rechercher un concept AI-900 (ex: Régression, K-Means, Fairness, OCR, DALL-E, PII)..."
-                : "Rechercher par concept AI-102 (ex: BM25, IoU, SSML, Jailbreak, PTU)..."
+                ? t('flashcards:stage.searchAzure900')
+                : t('flashcards:stage.searchAzure102')
             }
             className="w-full pl-9 pr-4 py-1.5 rounded-xl bg-[#0f131d] border border-[#262a35] text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
           />
@@ -770,17 +771,17 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             }`}
           >
             <Bookmark className={`w-3.5 h-3.5 ${bookmarkedOnly ? 'fill-amber-400 text-amber-400' : ''}`} />
-            <span>Favoris ({bookmarkedCardIds.size})</span>
+            <span>{t('flashcards:stage.bookmarkOnly')} ({bookmarkedCardIds.size})</span>
           </button>
 
           {/* Shuffle Button */}
           <button
             onClick={handleShuffle}
-            title="Mélanger aléatoirement le paquet"
+            title={t('flashcards:stage.shuffle')}
             className="px-3 py-1.5 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-400 hover:text-white border border-[#262a35] text-xs font-mono transition-colors flex items-center gap-1"
           >
             <Shuffle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Mélanger</span>
+            <span className="hidden sm:inline">{t('flashcards:stage.shuffle')}</span>
           </button>
 
           {/* Jump To Form */}
@@ -798,7 +799,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               type="submit"
               className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono transition-colors"
             >
-              Aller
+              {t('flashcards:stage.go')}
             </button>
           </form>
         </div>
@@ -813,13 +814,13 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             <div className="flex items-center justify-between text-xs">
               <span className="font-mono font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-blue-400" />
-                Domaine Sélectionné
+                {t('flashcards:telemetry.domainSelected')}
               </span>
               <span 
                 className="text-[11px] font-mono px-2 py-0.5 rounded-full font-bold text-white"
                 style={{ backgroundColor: currentDomainMeta.color }}
               >
-                Poids {currentDomainMeta.weight}
+                {t('flashcards:telemetry.weight')} {currentDomainMeta.weight}
               </span>
             </div>
 
@@ -833,11 +834,11 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
             <div className="pt-2 border-t border-[#262a35] space-y-2 text-xs">
               <div className="flex items-center justify-between font-mono text-[11px]">
-                <span className="text-slate-400">Cartes du domaine :</span>
-                <span className="text-blue-400 font-bold">{filteredCards.length} fiches</span>
+                <span className="text-slate-400">{t('flashcards:telemetry.cardsInDomain')} :</span>
+                <span className="text-blue-400 font-bold">{t('flashcards:domains.cardsCount', { count: filteredCards.length })}</span>
               </div>
               <div className="flex items-center justify-between font-mono text-[11px]">
-                <span className="text-slate-400">Objectif de rétention :</span>
+                <span className="text-slate-400">{t('flashcards:telemetry.retentionTarget')} :</span>
                 <span className="text-emerald-400 font-bold">SM-2 ≥ 85%</span>
               </div>
             </div>
@@ -1108,9 +1109,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           {filteredCards.length === 0 ? (
             <div className="min-h-[400px] rounded-3xl bg-[#171b26] border border-[#262a35] p-8 flex flex-col items-center justify-center text-center space-y-3">
               <Bookmark className="w-10 h-10 text-slate-600" />
-              <h3 className="text-lg font-bold text-white">Aucune fiche correspondante</h3>
+              <h3 className="text-lg font-bold text-white">{t('flashcards:stage.noMatchTitle')}</h3>
               <p className="text-xs text-slate-400 max-w-sm">
-                Aucune fiche ne correspond à votre filtre de recherche ou à vos favoris pour ce domaine.
+                {t('flashcards:stage.noMatchDesc')}
               </p>
               <button
                 onClick={() => {
@@ -1120,7 +1121,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 }}
                 className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold"
               >
-                Réinitialiser les filtres
+                {t('flashcards:stage.resetFilters')}
               </button>
             </div>
           ) : (
@@ -1145,12 +1146,12 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                     {srsDisplay.isDueToday ? (
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
                         <Clock className="w-3 h-3 text-amber-400" />
-                        À revoir aujourd'hui
+                        {t('flashcards:stage.dueTodayBadge')}
                       </span>
                     ) : (
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                        Planifié
+                        {t('flashcards:stage.planned')}
                       </span>
                     )}
                   </div>
@@ -1162,10 +1163,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                         setIsAlgorithmModalOpen(true);
                       }}
                       className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-300 hover:text-white border border-blue-500/20 text-[11px] font-mono transition-colors"
-                      title="Explications mathématiques de l'algorithme SM-2 / FSRS"
+                      title={t('flashcards:stage.mathExplanationTooltip')}
                     >
                       <Brain className="w-3.5 h-3.5 text-blue-400" />
-                      <span className="hidden sm:inline">SM-2 / FSRS</span>
+                      <span className="hidden sm:inline">{t('flashcards:stage.sm2FSRS')}</span>
                     </button>
                     <button
                       onClick={(e) => {
@@ -1173,7 +1174,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                         toggleBookmark(card.id);
                       }}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 transition-colors"
-                      title={isCurrentBookmarked ? "Retirer des favoris" : "Ajouter aux favoris"}
+                      title={isCurrentBookmarked ? t('flashcards:stage.bookmarkRemove') : t('flashcards:stage.bookmarkAdd')}
                     >
                       <Bookmark className={`w-4 h-4 ${isCurrentBookmarked ? 'fill-amber-400 text-amber-400' : ''}`} />
                     </button>
@@ -1185,7 +1186,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                       className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#262a35] text-slate-300 hover:text-white text-xs font-mono font-medium transition-colors"
                     >
                       <RotateCw className="w-3.5 h-3.5 text-blue-400 group-hover:rotate-180 transition-transform duration-500" />
-                      <span>{isFlipped ? 'Voir Question' : 'Retourner [Espace]'}</span>
+                      <span>{isFlipped ? t('flashcards:stage.viewQuestion') : t('flashcards:stage.flipSpace')}</span>
                     </button>
                   </div>
                 </div>
@@ -1195,10 +1196,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   {/* Carte # */}
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <span>Identifiant</span>
+                      <span>{t('flashcards:telemetry.cardId')}</span>
                       <InfoTooltip
-                        title="Identifiant de la Fiche"
-                        content="Numérotation unique de la fiche mémo permettant un repérage précis dans le référentiel d'examen (ex: Carte #127)."
+                        title={t('flashcards:tooltips.cardIdTitle')}
+                        content={t('flashcards:tooltips.cardIdDesc')}
                       />
                     </div>
                     <div className="text-sm font-bold text-blue-400 mt-0.5">{srsDisplay.cardNumber}</div>
@@ -1206,10 +1207,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   {/* Dernière révision */}
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <span>Dernière révision</span>
+                      <span>{t('flashcards:telemetry.lastReview')}</span>
                       <InfoTooltip
-                        title="Historique de révision"
-                        content="Date à laquelle vous avez interagi pour la dernière fois avec cette notion (aujourd'hui, hier, il y a 3 jours...)."
+                        title={t('flashcards:tooltips.lastReviewTitle')}
+                        content={t('flashcards:tooltips.lastReviewDesc')}
                       />
                     </div>
                     <div className="text-sm font-bold text-slate-100 mt-0.5 capitalize">{srsDisplay.lastReviewLabel}</div>
@@ -1217,10 +1218,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   {/* Difficulté 3/5 */}
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <span>Difficulté</span>
+                      <span>{t('flashcards:telemetry.difficulty')}</span>
                       <InfoTooltip
-                        title="Indice de Difficulté (1 à 5)"
-                        content="Calculé dynamiquement par l'algorithme SM-2 selon vos réussites et échecs. 1/5 = Très facile, 5/5 = Piège critique."
+                        title={t('flashcards:tooltips.diffTitle')}
+                        content={t('flashcards:tooltips.diffDesc')}
                       />
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -1251,10 +1252,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   {/* Prochaine révision */}
                   <div>
                     <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <span>Prochaine révision</span>
+                      <span>{t('flashcards:telemetry.nextReview')}</span>
                       <InfoTooltip
-                        title="Prochaine échéance SM-2"
-                        content="Intervalle calculé pour présenter la carte juste avant que votre mémoire ne commence à effacer le souvenir (seuil d'oubli Ebbinghaus)."
+                        title={t('flashcards:tooltips.nextReviewTitle')}
+                        content={t('flashcards:tooltips.nextReviewDesc')}
                       />
                     </div>
                     <div className={`text-sm font-bold mt-0.5 ${
@@ -1266,10 +1267,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   {/* Nombre de répétitions & Taux de réussite */}
                   <div className="col-span-2 sm:col-span-1">
                     <div className="text-[10px] text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                      <span>Répétitions / Taux</span>
+                      <span>{t('flashcards:telemetry.repetitionsAndRate')}</span>
                       <InfoTooltip
-                        title="Taux de réussite cumulé"
-                        content="Nombre total d'évaluations réussies sur cette carte et pourcentage de victoires mémo."
+                        title={t('flashcards:tooltips.repetitionsTitle')}
+                        content={t('flashcards:tooltips.repetitionsDesc')}
                       />
                     </div>
                     <div className="text-sm font-bold text-purple-400 mt-0.5">
@@ -1295,7 +1296,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                     </p>
                     <div className="pt-4 flex items-center gap-2 text-xs text-blue-400 font-mono">
                       <Zap className="w-4 h-4 text-blue-400 animate-pulse" />
-                      <span>Cliquez ou appuyez sur [Espace] pour révéler la solution et les standards officiels IBM</span>
+                      <span>{t('flashcards:stage.revealSolution')}</span>
                     </div>
                   </div>
                 ) : (
@@ -1492,10 +1493,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white font-headline">
-                  Moteur SRS CertifAI : SuperMemo SM-2 &amp; FSRS
+                  {t('flashcards:algorithmModal.title')}
                 </h3>
                 <p className="text-xs text-slate-400 font-mono">
-                  Pourquoi réviser 17 cartes ciblées bat le défilement aveugle de 500 fiches
+                  {t('flashcards:algorithmModal.subtitle')}
                 </p>
               </div>
             </div>
@@ -1505,54 +1506,63 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               <div className="p-4 rounded-2xl bg-[#0f131d] border border-[#262a35] space-y-2">
                 <div className="font-bold text-blue-300 font-mono text-sm flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-blue-400" />
-                  La Courbe de l'Oubli d'Ebbinghaus inversée
+                  {t('flashcards:algorithmModal.ebbinghausTitle')}
                 </div>
                 <p>
-                  Sans révision espacée, le cerveau humain oublie 70% des notions techniques complexes en 48 heures.
-                  Le moteur SRS de CertifAI calcule la date exacte où la probabilité de rappel descend sous 85%, pour te faire réviser la carte au moment le plus efficace mathématiquement.
+                  {t('flashcards:algorithmModal.ebbinghausDesc')}
                 </p>
               </div>
 
               {/* The 5 Key Indicators */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
-                  <div className="font-bold font-mono text-white text-[11px] text-blue-400">1. Identifiant unique</div>
+                  <div className="font-bold font-mono text-white text-[11px] text-blue-400">
+                    {t('flashcards:algorithmModal.idTitle')}
+                  </div>
                   <p className="text-[11px] text-slate-400">
-                    Chaque fiche (ex: Carte #127) possède son propre modèle d'historique indépendant.
+                    {t('flashcards:algorithmModal.idDesc')}
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
-                  <div className="font-bold font-mono text-white text-[11px] text-emerald-400">2. Difficulté adaptative (1/5 à 5/5)</div>
+                  <div className="font-bold font-mono text-white text-[11px] text-emerald-400">
+                    {t('flashcards:algorithmModal.diffTitle')}
+                  </div>
                   <p className="text-[11px] text-slate-400">
-                    S'adapte dynamiquement selon tes réponses. Une carte hésitante monte à 4 ou 5/5.
+                    {t('flashcards:algorithmModal.diffDesc')}
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
-                  <div className="font-bold font-mono text-white text-[11px] text-amber-400">3. Prochaine révision au jour près</div>
+                  <div className="font-bold font-mono text-white text-[11px] text-amber-400">
+                    {t('flashcards:algorithmModal.nextReviewTitle')}
+                  </div>
                   <p className="text-[11px] text-slate-400">
-                    Calculée via l'Ease Factor (EF) : 1j → 3j → 7j → 14j → 30j+.
+                    {t('flashcards:algorithmModal.nextReviewDesc')}
                   </p>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-[#131722] border border-[#262a35] space-y-1">
-                  <div className="font-bold font-mono text-white text-[11px] text-purple-400">4. Répétitions &amp; Taux de réussite</div>
+                  <div className="font-bold font-mono text-white text-[11px] text-purple-400">
+                    {t('flashcards:algorithmModal.repTitle')}
+                  </div>
                   <p className="text-[11px] text-slate-400">
-                    Suivi statistique des succès (ex: 4 répétitions consécutives, 75% de réussite).
+                    {t('flashcards:algorithmModal.repDesc')}
                   </p>
                 </div>
               </div>
 
               {/* SM-2 Formula Card */}
               <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 font-mono text-[11px] space-y-2">
-                <div className="font-bold text-blue-300">Formule Mathématique SM-2 Implémentée :</div>
+                <div className="font-bold text-blue-300">
+                  {t('flashcards:algorithmModal.sm2FormulaTitle')}
+                </div>
                 <div className="bg-[#0a0e18] p-3 rounded-xl border border-blue-500/20 text-slate-200">
                   EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))<br />
                   Intervalle(n) = Intervalle(n-1) * EF
                 </div>
                 <div className="text-slate-400 text-[10px]">
-                  Où q est votre note de rappel (1 = Revoir, 3 = Difficile, 4 = Bien, 5 = Facile).
+                  {t('flashcards:algorithmModal.sm2FormulaNote')}
                 </div>
               </div>
             </div>
@@ -1562,7 +1572,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 onClick={() => setIsAlgorithmModalOpen(false)}
                 className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold transition-colors"
               >
-                Compris, continuer mes révisions
+                {t('flashcards:algorithmModal.dismissBtn')}
               </button>
             </div>
           </div>

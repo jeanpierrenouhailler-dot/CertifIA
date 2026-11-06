@@ -238,7 +238,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
             }`}
           >
             <BookOpen className="w-4 h-4" />
-            <span>Glossaire Rapide (A-Z)</span>
+            <span>{t('learning:glossary.quickGlossaryTab', 'Glossaire Rapide (A-Z)')}</span>
             <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-black/20 text-white">
               {filteredEntries.length}
             </span>
@@ -253,9 +253,9 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>Encyclopédie Approfondie</span>
+            <span>{t('learning:glossary.encyclopediaTab', 'Encyclopédie Approfondie')}</span>
             <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-              Fiches Détaillées
+              {t('learning:glossary.detailedArticlesBadge', 'Fiches Détaillées')}
             </span>
           </button>
 
@@ -266,10 +266,10 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                 ? 'bg-amber-500/20 text-amber-500 dark:text-amber-300 border-amber-500/40 ring-1 ring-amber-500/30'
                 : 'bg-white/10 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:text-slate-900 dark:hover:text-white'
             }`}
-            title="Afficher uniquement mes termes enregistrés"
+            title={t('learning:glossary.bookmarksOnlyTitle', 'Afficher uniquement mes termes enregistrés')}
           >
             {onlyBookmarks ? <BookmarkCheck className="w-4 h-4 text-amber-500" /> : <Bookmark className="w-4 h-4" />}
-            <span className="hidden sm:inline">Termes Favoris</span>
+            <span className="hidden sm:inline">{t('learning:glossary.yourBookmarks', 'Vos Favoris')}</span>
             {bookmarkedIds.length > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-500">
                 {bookmarkedIds.length}
@@ -489,14 +489,14 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                       <button
                         onClick={(e) => handleCopy(entry, e)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                        title="Copier la définition"
+                        title={t('learning:glossary.copyDefinitionTooltip', 'Copier la définition')}
                       >
                         {copiedId === entry.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
                       </button>
                       <button
                         onClick={(e) => toggleBookmark(entry.id, e)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                        title={isBookmarked ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                        title={isBookmarked ? t('learning:glossary.removeFromBookmarks', 'Retirer des favoris') : t('learning:glossary.addToBookmarks', 'Ajouter aux favoris')}
                       >
                         {isBookmarked ? (
                           <BookmarkCheck className="w-4 h-4 text-amber-500" />
@@ -593,7 +593,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                           className="w-full py-2 px-4 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center gap-2 shadow-sm transition-all"
                         >
                           <BookOpen className="w-4 h-4" />
-                          <span>Ouvrir l'article complet dans l'Encyclopédie</span>
+                          <span>{t('learning:glossary.openFullArticle', "Ouvrir l'article complet dans l'Encyclopédie")}</span>
                         </button>
                       </div>
                     </div>
@@ -609,8 +609,8 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
           {/* Left Column: Quick Article Directory (4 cols on lg) */}
           <div className="lg:col-span-4 space-y-2 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pr-1">
             <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider px-2 pb-1">
-              <span>Articles Encyclopédiques</span>
-              <span>{filteredEntries.length} dispo</span>
+              <span>{t('learning:glossary.encyclopedicArticles', 'Articles Encyclopédiques')}</span>
+              <span>{t('learning:glossary.availableCount', '{{count}} dispo', { count: filteredEntries.length })}</span>
             </div>
 
             <div className="space-y-1.5">
@@ -696,7 +696,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                   ) : (
                     <>
                       <Share2 className="w-4 h-4" />
-                      <span>Partager</span>
+                      <span>{t('learning:glossary.shareAction', 'Partager')}</span>
                     </>
                   )}
                 </button>
@@ -709,7 +709,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                   }`}
                 >
                   <BookmarkCheck className="w-4 h-4" />
-                  <span>{bookmarkedIds.includes(currentEncyclopediaEntry.id) ? 'Favori' : 'Enregistrer'}</span>
+                  <span>{bookmarkedIds.includes(currentEncyclopediaEntry.id) ? t('learning:glossary.savedAction', 'Favori') : t('learning:glossary.saveAction', 'Enregistrer')}</span>
                 </button>
               </div>
             </div>
@@ -720,7 +720,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-500/20">
                 <h4 className="text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4" />
-                  Résumé Exécutif
+                  {t('learning:glossary.executiveSummary', 'Résumé Exécutif')}
                 </h4>
                 <p className="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
                   {currentEncyclopediaEntry.shortDefinition}
@@ -731,7 +731,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               <div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-indigo-500" />
-                  Fonctionnement & Principes Architecturaux
+                  {t('learning:glossary.architecturePrinciples', 'Fonctionnement & Principes Architecturaux')}
                 </h3>
                 <div className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed space-y-3 whitespace-pre-line">
                   {currentEncyclopediaEntry.fullExplanation}
@@ -743,7 +743,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                     <Cpu className="w-5 h-5 text-blue-500" />
-                    Flux de Données & Architecture
+                    {t('learning:glossary.dataFlowArchitecture', 'Flux de Données & Architecture')}
                   </h3>
                   <div className="p-4 rounded-xl bg-slate-950 font-mono text-xs sm:text-sm text-emerald-400 border border-slate-800 overflow-x-auto shadow-inner leading-relaxed">
                     <pre>{currentEncyclopediaEntry.architectureDetails}</pre>
@@ -755,7 +755,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               {currentEncyclopediaEntry.formulaOrMetric && (
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                   <h4 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">
-                    📐 Formule Mathématique / Définition Formelle
+                    {t('learning:glossary.formalDefinition', '📐 Formule Mathématique / Définition Formelle')}
                   </h4>
                   <div className="font-mono text-sm sm:text-base font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
                     {currentEncyclopediaEntry.formulaOrMetric}
@@ -769,7 +769,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                   <AlertTriangle className="w-6 h-6 text-amber-500 shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <h4 className="text-sm font-black text-amber-800 dark:text-amber-300 uppercase tracking-wide">
-                      ⚠️ Le Piège d'Examen Incontournable
+                      {t('learning:glossary.criticalExamTrap', "⚠️ Le Piège d'Examen Incontournable")}
                     </h4>
                     <p className="text-sm text-slate-800 dark:text-amber-100/90 leading-relaxed font-medium">
                       {currentEncyclopediaEntry.examTrap}
@@ -783,7 +783,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                     <Cloud className="w-5 h-5 text-cyan-500" />
-                    Correspondance des Services par Cloud Provider
+                    {t('learning:glossary.cloudMapping', 'Correspondance des Services par Cloud Provider')}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {currentEncyclopediaEntry.cloudEquivalents.azure && (
@@ -849,7 +849,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               <div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  À Retenir Absolument pour Réussir
+                  {t('learning:glossary.keyTakeaways', 'À Retenir Absolument pour Réussir')}
                 </h3>
                 <div className="space-y-2">
                   {currentEncyclopediaEntry.keyTakeaways.map((point, idx) => (
@@ -867,7 +867,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               {currentEncyclopediaEntry.relatedTermIds && currentEncyclopediaEntry.relatedTermIds.length > 0 && (
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">
-                    🔗 Concepts Liés & Connexions
+                    {t('learning:glossary.relatedConcepts', '🔗 Concepts Liés & Connexions')}
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {currentEncyclopediaEntry.relatedTermIds.map(relId => {

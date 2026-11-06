@@ -10,6 +10,7 @@
  */
 
 import { Flashcard, FlashcardReviewRecord } from '../types';
+import { getCurrentLanguage } from '../i18n';
 
 export type SRSGrade = 'revoir' | 'difficile' | 'moyen' | 'facile';
 
@@ -268,11 +269,13 @@ export function calculateNextSRSState(
  * Nombre de répétitions : 4
  * Taux de réussite : 75 %
  */
-export function formatSRSDisplay(metrics: CardSRSMetrics, promptNumberFallback: string) {
+export function formatSRSDisplay(metrics: CardSRSMetrics, promptNumberFallback: string, langOverride?: 'fr' | 'en') {
+  const lang = langOverride || getCurrentLanguage();
+  const isEn = lang === 'en';
   const cardNum = promptNumberFallback.replace(/[^0-9]/g, '') || '1';
 
   // Dernière révision
-  let lastReviewLabel = 'Jamais révisée';
+  let lastReviewLabel = isEn ? 'Never reviewed' : 'Jamais révisée';
   if (metrics.lastReviewedAt) {
     const revTime = new Date(metrics.lastReviewedAt).getTime();
     const nowTime = Date.now();
@@ -280,11 +283,11 @@ export function formatSRSDisplay(metrics: CardSRSMetrics, promptNumberFallback: 
     const diffDays = Math.round((nowTime - revTime) / (1000 * 60 * 60 * 24));
 
     if (diffHours < 24) {
-      lastReviewLabel = "aujourd'hui";
+      lastReviewLabel = isEn ? 'today' : "aujourd'hui";
     } else if (diffDays === 1) {
-      lastReviewLabel = 'hier';
+      lastReviewLabel = isEn ? 'yesterday' : 'hier';
     } else {
-      lastReviewLabel = `il y a ${diffDays} jours`;
+      lastReviewLabel = isEn ? `${diffDays} days ago` : `il y a ${diffDays} jours`;
     }
   }
 
@@ -293,27 +296,31 @@ export function formatSRSDisplay(metrics: CardSRSMetrics, promptNumberFallback: 
   const diffLabel = `${diffScore}/5`;
 
   // Prochaine révision
-  let nextReviewLabel = "aujourd'hui";
+  let nextReviewLabel = isEn ? 'today' : "aujourd'hui";
   if (metrics.daysUntilDue <= 0) {
     if (metrics.daysUntilDue < 0) {
-      nextReviewLabel = `aujourd'hui (retard ${Math.abs(metrics.daysUntilDue)}j)`;
+      nextReviewLabel = isEn 
+        ? `today (${Math.abs(metrics.daysUntilDue)}d overdue)`
+        : `aujourd'hui (retard ${Math.abs(metrics.daysUntilDue)}j)`;
     } else {
-      nextReviewLabel = "aujourd'hui";
+      nextReviewLabel = isEn ? 'today' : "aujourd'hui";
     }
   } else if (metrics.daysUntilDue === 1) {
-    nextReviewLabel = 'dans 1 jour';
+    nextReviewLabel = isEn ? 'in 1 day' : 'dans 1 jour';
   } else {
-    nextReviewLabel = `dans ${metrics.daysUntilDue} jours`;
+    nextReviewLabel = isEn ? `in ${metrics.daysUntilDue} days` : `dans ${metrics.daysUntilDue} jours`;
   }
 
   // Nombre de répétitions
-  const repLabel = metrics.repetitions === 1 ? '1 répétition' : `${metrics.repetitions} répétitions`;
+  const repLabel = isEn
+    ? (metrics.repetitions === 1 ? '1 repetition' : `${metrics.repetitions} repetitions`)
+    : (metrics.repetitions === 1 ? '1 répétition' : `${metrics.repetitions} répétitions`);
 
   // Taux de réussite
   const successLabel = metrics.totalReviews > 0 ? `${metrics.successRate} %` : '—';
 
   return {
-    cardNumber: `Carte #${cardNum}`,
+    cardNumber: isEn ? `Card #${cardNum}` : `Carte #${cardNum}`,
     lastReviewLabel,
     diffScore,
     diffLabel,

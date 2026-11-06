@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import type { UserProfile } from '../types';
 import type { User } from 'firebase/auth';
+import { useTranslation } from '../i18n';
 
 interface GdprHelpModalProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
   user,
   userProfile
 }) => {
+  const { t } = useTranslation(['settings', 'common']);
   const [activeTab, setActiveTab] = useState<TabType>('sent');
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
@@ -99,14 +101,14 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-white tracking-tight">
-                  Confidentialité & Respect du RGPD
+                  {t('settings:gdpr.title', 'Confidentialité & Respect du RGPD')}
                 </h2>
                 <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                   Règlement UE 2016/679
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Transparence totale sur vos données dans Firebase Firestore & vos droits d'accès
+                {t('settings:gdpr.subtitle', 'Transparence totale sur vos données dans Firebase Firestore & vos droits d\'accès')}
               </p>
             </div>
           </div>
@@ -115,7 +117,8 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
             id="gdpr-modal-close-btn"
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors"
-            title="Fermer le menu d'aide"
+            title={t('common:actions.close')}
+            aria-label={t('common:actions.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -133,8 +136,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
             }`}
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            Ce qui est envoyé à Firebase
-            <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-[10px]">5 éléments</span>
+            {t('settings:gdpr.tabSent', 'Données Collectées')}
           </button>
 
           <button
@@ -147,8 +149,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
             }`}
           >
             <XCircle className="w-3.5 h-3.5 text-rose-400" />
-            Ce qui n'est JAMAIS envoyé
-            <span className="px-1.5 py-0.2 rounded bg-rose-500/20 text-[10px]">6 protections</span>
+            {t('settings:gdpr.tabNotSent', 'Ce qui N\'EST PAS Collecté')}
           </button>
 
           <button
@@ -161,7 +162,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
             }`}
           >
             <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
-            Vos Droits RGPD
+            {t('settings:gdpr.tabRights', 'Vos Droits RGPD')}
           </button>
 
           <button
@@ -174,7 +175,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
             }`}
           >
             <FileCode className="w-3.5 h-3.5 text-violet-400" />
-            Données Brutes (JSON)
+            {t('settings:gdpr.tabRawData', 'Données Brutes & Export')}
           </button>
         </div>
 

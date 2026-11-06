@@ -140,8 +140,8 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={toggleTheme}
           className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors"
-          title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
-          aria-label="Toggle theme"
+          title={theme === 'dark' ? t('common:theme.lightMode') : t('common:theme.darkMode')}
+          aria-label={t('common:theme.toggle')}
         >
           {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
         </button>
@@ -154,8 +154,8 @@ export const Header: React.FC<HeaderProps> = ({
               ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/40'
               : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2030]'
           }`}
-          title={isGuideModeActive ? 'Désactiver les infobulles guidées' : 'Activer les infobulles guidées'}
-          aria-label="Mode infobulles contextuelles"
+          title={isGuideModeActive ? t('common:guide.disable') : t('common:guide.enable')}
+          aria-label={t('common:guide.enable')}
         >
           <HelpCircle className="w-4 h-4" />
         </button>
@@ -164,8 +164,8 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onOpenSystemSettings}
           className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors relative"
-          title="Paramètres et mises à jour système"
-          aria-label="Paramètres système"
+          title={t('navigation:items.settings.label')}
+          aria-label={t('navigation:items.settings.label')}
         >
           <Settings className="w-4 h-4" />
           {isChecking && (
@@ -177,8 +177,8 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={() => onNavigate('profile')}
           className="p-1.5 rounded-xl border border-slate-200 dark:border-[#262a35] hover:border-blue-500 transition-all flex items-center gap-1.5 text-xs"
-          title="Accéder à mon profil"
-          aria-label="Mon profil"
+          title={t('navigation:items.profile.label')}
+          aria-label={t('navigation:items.profile.label')}
         >
           <div className="w-7 h-7 rounded-lg bg-blue-600/15 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
             {user?.displayName ? user.displayName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}

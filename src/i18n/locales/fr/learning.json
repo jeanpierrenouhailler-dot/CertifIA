@@ -80,6 +80,25 @@
     "addToBookmarks": "Enregistrer dans mes favoris",
     "removeFromBookmarks": "Retirer des favoris",
     "shareTerm": "Copier la fiche",
-    "copied": "Copié !"
+    "copied": "Copié !",
+    "quickGlossaryTab": "Glossaire Rapide (A-Z)",
+    "encyclopediaTab": "Encyclopédie Approfondie",
+    "detailedArticlesBadge": "Fiches Détaillées",
+    "bookmarksOnlyTitle": "Afficher uniquement mes termes enregistrés",
+    "openFullArticle": "Ouvrir l'article complet dans l'Encyclopédie",
+    "encyclopedicArticles": "Articles Encyclopédiques",
+    "availableCount": "{{count}} dispo",
+    "executiveSummary": "Résumé Exécutif",
+    "architecturePrinciples": "Fonctionnement & Principes Architecturaux",
+    "dataFlowArchitecture": "Flux de Données & Architecture",
+    "formalDefinition": "📐 Formule Mathématique / Définition Formelle",
+    "criticalExamTrap": "⚠️ Le Piège d'Examen Incontournable",
+    "cloudMapping": "Correspondance des Services par Cloud Provider",
+    "keyTakeaways": "À Retenir Absolument pour Réussir",
+    "relatedConcepts": "🔗 Concepts Liés & Connexions",
+    "shareAction": "Partager",
+    "saveAction": "Enregistrer",
+    "savedAction": "Favori",
+    "copyDefinitionTooltip": "Copier la définition"
   }
 }

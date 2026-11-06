@@ -15,7 +15,8 @@ import {
   Target
 } from 'lucide-react';
 import { Certification, AppScreen } from '../types';
-import { certificationsData } from '../data/certificationsData';
+import { getLocalizedCertifications } from '../data/localizedCertifications';
+import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface CertificationsComparatorModalProps {
   isOpen: boolean;
@@ -31,6 +32,9 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
   onOpenBlueprint,
 }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>(['ai102', 'aifc01']);
+  const { t, i18n } = useTranslation(['certifications', 'common', 'navigation']);
+  const lang = (i18n.language === 'en' ? 'en' : 'fr');
+  const allCerts = getLocalizedCertifications(lang);
 
   if (!isOpen) return null;
 
@@ -50,7 +54,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
   };
 
   const comparedCerts = selectedIds
-    .map((id) => certificationsData.find((c) => c.id === id))
+    .map((id) => allCerts.find((c) => c.id === id))
     .filter(Boolean) as Certification[];
 
   return (
@@ -67,10 +71,10 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-headline">
-                Comparateur de Certifications IA
+                {t('certifications:comparator.title', 'Comparateur de Certifications IA')}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Comparez 2 à 3 certifications officielles côte à côte pour choisir la plus adaptée à vos objectifs.
+                {t('certifications:comparator.subtitle', 'Comparez 2 à 3 certifications officielles côte à côte pour choisir la plus adaptée à vos objectifs.')}
               </p>
             </div>
           </div>
@@ -78,6 +82,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#262a35] transition-colors"
+            aria-label={t('common:actions.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -86,9 +91,9 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
         {/* Cert Picker Strip */}
         <div className="p-4 bg-slate-100 dark:bg-[#10141f] border-b border-slate-200 dark:border-[#262a35] flex items-center gap-2 overflow-x-auto text-xs">
           <span className="font-mono text-slate-500 dark:text-slate-400 uppercase text-[10px] shrink-0 font-semibold mr-1">
-            Sélectionner (max 3) :
+            {t('certifications:comparator.selectPrompt', 'Sélectionner (max 3) :')}
           </span>
-          {certificationsData.slice(0, 10).map((c) => {
+          {allCerts.slice(0, 10).map((c) => {
             const isSelected = selectedIds.includes(c.id);
             return (
               <button
@@ -111,7 +116,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           <div className={`grid grid-cols-1 ${comparedCerts.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4 sm:gap-6`}>
             {comparedCerts.map((cert) => {
-              const estPrice = cert.provider === 'azure' ? '165 $ USD' : cert.provider === 'aws' ? (cert.level === 'fondamental' ? '100 $ USD' : '150 $ USD') : cert.provider === 'gcp' ? '200 $ USD' : cert.provider === 'ibm' ? '200 $ USD' : 'Gratuit (Cours) / 135 $ (Badge)';
+              const estPrice = cert.provider === 'azure' ? '$165 USD' : cert.provider === 'aws' ? (cert.level === 'fondamental' ? '$100 USD' : '$150 USD') : cert.provider === 'gcp' ? '$200 USD' : cert.provider === 'ibm' ? '$200 USD' : (lang === 'en' ? 'Free (Course) / $135 (Badge)' : 'Gratuit (Cours) / 135 $ (Badge)');
 
               return (
                 <div
@@ -141,25 +146,25 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
                     {/* Quick Badges Matrix */}
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35]">
-                        <span className="text-[10px] text-slate-400 font-mono uppercase block">Niveau</span>
+                        <span className="text-[10px] text-slate-400 font-mono uppercase block">{t('certifications:comparator.level', 'Niveau')}</span>
                         <span className="font-semibold text-slate-800 dark:text-slate-200 capitalize mt-0.5 block">
                           {cert.levelLabel}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35]">
-                        <span className="text-[10px] text-slate-400 font-mono uppercase block">Durée</span>
+                        <span className="text-[10px] text-slate-400 font-mono uppercase block">{t('certifications:comparator.duration', 'Durée')}</span>
                         <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">
-                          {cert.durationMinutes} min
+                          {cert.durationMinutes} {t('common:units.minutes')}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35]">
-                        <span className="text-[10px] text-slate-400 font-mono uppercase block">Score de passage</span>
+                        <span className="text-[10px] text-slate-400 font-mono uppercase block">{t('certifications:comparator.passScore', 'Score de passage')}</span>
                         <span className="font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 block font-mono">
                           {cert.passScore} / {cert.maxScore}
                         </span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#10141f] border border-slate-200 dark:border-[#262a35]">
-                        <span className="text-[10px] text-slate-400 font-mono uppercase block">Prix estimé</span>
+                        <span className="text-[10px] text-slate-400 font-mono uppercase block">{t('certifications:comparator.estimatedPrice', 'Prix estimé')}</span>
                         <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block font-mono">
                           {estPrice}
                         </span>
@@ -169,7 +174,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
                     {/* Domains breakdown */}
                     <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-[#202533]">
                       <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        Pondération des Domaines
+                        {t('certifications:comparator.domainWeights', 'Pondération des Domaines')}
                       </div>
                       <div className="space-y-1.5">
                         {cert.domains.map((dom, idx) => (
@@ -202,7 +207,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
                       className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-1.5"
                     >
                       <BookOpen className="w-3.5 h-3.5" />
-                      <span>Consulter la Fiche Détaillée</span>
+                      <span>{t('certifications:actions.viewBlueprint', 'Consulter le blueprint')}</span>
                     </button>
                     <div className="grid grid-cols-2 gap-2">
                       <button
@@ -213,7 +218,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
                         className="py-1.5 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#202533] dark:hover:bg-[#262c3d] text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-[#262a35] transition-all flex items-center justify-center gap-1"
                       >
                         <Target className="w-3 h-3 text-blue-500" />
-                        <span>QCM</span>
+                        <span>{t('navigation:items.quiz.shortLabel', 'QCM')}</span>
                       </button>
                       <button
                         onClick={() => {
@@ -223,7 +228,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
                         className="py-1.5 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#202533] dark:hover:bg-[#262c3d] text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-[#262a35] transition-all flex items-center justify-center gap-1"
                       >
                         <Layers className="w-3 h-3 text-emerald-500" />
-                        <span>Flashcards</span>
+                        <span>{t('navigation:items.flashcards.shortLabel', 'Flashcards')}</span>
                       </button>
                     </div>
                   </div>

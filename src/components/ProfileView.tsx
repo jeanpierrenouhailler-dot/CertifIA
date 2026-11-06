@@ -30,6 +30,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { GdprHelpModal } from './GdprHelpModal';
 import type { AppScreen } from '../types';
+import { useTranslation } from '../i18n';
 
 interface ProfileViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -37,6 +38,7 @@ interface ProfileViewProps {
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
+  const { t } = useTranslation(['settings', 'common']);
   const { 
     user, 
     userProfile, 
@@ -155,14 +157,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                 ) : (
                   <>
                     <h1 id="profile-display-name" className="text-2xl font-bold text-white tracking-tight">
-                      {userProfile?.displayName || user?.displayName || 'Architecte Cloud'}
+                      {userProfile?.displayName || user?.displayName || t('settings:profile.defaultRole')}
                     </h1>
                     {user && (
                       <button 
                         id="profile-edit-name-trigger"
                         onClick={handleStartEditName}
                         className="text-slate-400 hover:text-indigo-300 transition-colors p-1"
-                        title="Modifier le nom"
+                        title={t('settings:profile.editName')}
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
@@ -174,12 +176,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
               <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
                 <span className="flex items-center gap-1.5">
                   <Mail className="w-4 h-4 text-slate-400" />
-                  {user?.email || 'Non connecté'}
+                  {user?.email || t('settings:profile.notConnected')}
                 </span>
                 <span className="text-slate-600">•</span>
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  Compte Vérifié Google
+                  {t('settings:profile.googleVerified')}
                 </span>
               </div>
             </div>
@@ -191,10 +193,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
               id="profile-open-gdpr-btn"
               onClick={() => setIsGdprModalOpen(true)}
               className="px-3.5 py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 hover:text-white border border-indigo-500/30 text-sm font-medium transition-all flex items-center gap-2 shadow-sm"
-              title="Menu d'aide et transparence RGPD"
+              title={t('settings:profile.helpGdprTitle')}
             >
               <HelpCircle className="w-4 h-4 text-indigo-400" />
-              <span>Aide & RGPD</span>
+              <span>{t('settings:profile.helpGdpr')}</span>
             </button>
 
             {user ? (
@@ -205,7 +207,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                   className="px-4 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/60 text-sm font-medium transition-all flex items-center gap-2"
                 >
                   <RefreshCw className={`w-4 h-4 ${syncSuccess ? 'text-emerald-400 rotate-180 transition-transform' : ''}`} />
-                  {syncSuccess ? 'Synchronisé' : 'Synchroniser'}
+                  {syncSuccess ? t('settings:profile.synced') : t('settings:profile.syncNow')}
                 </button>
                 <button
                   id="profile-signout-btn"
@@ -213,7 +215,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                   className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-sm font-medium transition-all flex items-center gap-2"
                 >
                   <LogOut className="w-4 h-4" />
-                  Déconnexion
+                  {t('settings:profile.logout')}
                 </button>
               </div>
             ) : (
@@ -224,7 +226,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2.5"
               >
                 <LogIn className="w-4 h-4" />
-                Se connecter avec Google
+                {t('settings:profile.loginWithGoogle')}
               </button>
             )}
           </div>
@@ -235,7 +237,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Base Firestore Live : ai-studio-certifaiaicloude
+              {t('settings:profile.liveFirestore')} : ai-studio-certifaiaicloude
             </span>
             <span className="text-slate-600">|</span>
             <span className="flex items-center gap-1 text-slate-400">
@@ -249,10 +251,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
               id="profile-gdpr-meta-link"
               onClick={() => setIsGdprModalOpen(true)}
               className="flex items-center gap-1.5 text-indigo-300 hover:text-indigo-200 transition-colors"
-              title="Consulter le registre de confidentialité RGPD"
+              title={t('settings:profile.viewGdprDetails')}
             >
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Conforme RGPD (UE 2016/679)</span>
+              <span>{t('settings:profile.gdprCompliant')}</span>
             </button>
 
             {user && (
@@ -262,7 +264,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                 className="flex items-center gap-1.5 hover:text-slate-200 transition-colors"
               >
                 {copiedUid ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedUid ? 'UID copié' : 'Copier UID Auth'}</span>
+                <span>{copiedUid ? t('settings:profile.uidCopied') : t('settings:profile.copyAuthUid')}</span>
               </button>
             )}
           </div>
@@ -277,8 +279,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Objectif de Certification Actif</h2>
-              <p className="text-xs text-slate-400">Défini et synchronisé en continu sur votre profil Firestore</p>
+              <h2 className="text-lg font-semibold text-white">{t('settings:profile.targetExamTitle')}</h2>
+              <p className="text-xs text-slate-400">{t('settings:profile.targetExamSubtitle')}</p>
             </div>
           </div>
           <button 
@@ -286,7 +288,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
             onClick={() => onNavigate('catalogue')}
             className="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors"
           >
-            Explorer tout le catalogue <ExternalLink className="w-3.5 h-3.5" />
+            {t('settings:profile.exploreCatalogue')} <ExternalLink className="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -390,16 +392,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
             <span className="text-3xl font-bold text-white tracking-tight">
               {userProfile?.readinessIndex ?? 78}%
             </span>
-            <span className="text-xs text-violet-400 font-medium">Niveau Confirmé</span>
+            <span className="text-xs text-violet-400 font-medium">{t('settings:profile.confirmedLevel')}</span>
           </div>
-          <p className="text-xs text-violet-400/80">Prêt pour l'examen officiel</p>
+          <p className="text-xs text-violet-400/80">{t('settings:profile.readyForExam')}</p>
         </div>
       </div>
 
       {/* Quick Launchpad to modules */}
       <div className="rounded-2xl bg-slate-900/60 border border-slate-800/80 p-6 space-y-4">
         <h3 className="text-sm font-semibold text-white uppercase tracking-wider text-slate-400">
-          Reprendre l'entraînement pour {userProfile?.targetExamTitle || 'AI-102'}
+          {t('settings:profile.resumeTraining', { exam: userProfile?.targetExamTitle || 'AI-102' })}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <button
@@ -408,11 +410,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
             className="p-4 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 hover:border-indigo-500/40 text-left transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-indigo-400">Mode Examen Rapide</span>
+              <span className="text-xs font-medium text-indigo-400">{t('settings:profile.quickExamMode')}</span>
               <Sparkles className="w-4 h-4 text-indigo-400 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <div className="text-sm font-semibold text-white">Quiz Scénario & Cas Pratique</div>
-            <p className="text-xs text-slate-400 mt-1">Questions d'architecture complexes avec explications officielles</p>
+            <div className="text-sm font-semibold text-white">{t('settings:profile.scenarioQuiz')}</div>
+            <p className="text-xs text-slate-400 mt-1">{t('settings:profile.scenarioQuizDesc')}</p>
           </button>
 
           <button
@@ -421,11 +423,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
             className="p-4 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 hover:border-violet-500/40 text-left transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-violet-400">Mémorisation SM-2</span>
+              <span className="text-xs font-medium text-violet-400">{t('settings:profile.sm2Memorization')}</span>
               <Clock className="w-4 h-4 text-violet-400 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <div className="text-sm font-semibold text-white">Flashcards Spaced Repetition</div>
-            <p className="text-xs text-slate-400 mt-1">Règles d'or, quotas, SLA et métriques clés d'examen</p>
+            <div className="text-sm font-semibold text-white">{t('settings:profile.spacedRepetitionFlashcards')}</div>
+            <p className="text-xs text-slate-400 mt-1">{t('settings:profile.flashcardsDesc')}</p>
           </button>
 
           <button
@@ -434,11 +436,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
             className="p-4 rounded-xl bg-slate-950/60 hover:bg-slate-800/60 border border-slate-800 hover:border-emerald-500/40 text-left transition-all group"
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-emerald-400">Simulation Réelle</span>
+              <span className="text-xs font-medium text-emerald-400">{t('settings:profile.realSimulation')}</span>
               <Award className="w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <div className="text-sm font-semibold text-white">Examen Blanc Chronométré</div>
-            <p className="text-xs text-slate-400 mt-1">120 minutes, conditions Pearson VUE réelles</p>
+            <div className="text-sm font-semibold text-white">{t('settings:profile.timedMockExam')}</div>
+            <p className="text-xs text-slate-400 mt-1">{t('settings:profile.timedMockExamDesc')}</p>
           </button>
         </div>
       </div>
@@ -452,13 +454,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">Transparence Données & Respect du RGPD</h3>
+                <h3 className="text-base font-bold text-white">{t('settings:profile.gdprTransparencyTitle')}</h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  Règlement UE 2016/679
+                  {t('settings:profile.gdprEuRegulation')}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Isolation stricte par compte, chiffrement AES-256 et minimisation des données dans Google Cloud Firestore
+                {t('settings:profile.gdprFirestoreDesc')}
               </p>
             </div>
           </div>
@@ -470,7 +472,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
               className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 shadow-md shadow-indigo-600/20 transition-colors"
             >
               <HelpCircle className="w-3.5 h-3.5" />
-              Guide & Vos Droits RGPD
+              {t('settings:profile.gdprRightsGuide')}
             </button>
           </div>
         </div>
@@ -481,10 +483,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
           <div className="p-4 rounded-xl bg-slate-950/40 border border-emerald-500/20 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" /> Ce qui est envoyé à Firebase
+                <CheckCircle2 className="w-4 h-4" /> {t('settings:profile.whatIsSent')}
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono">
-                Minimisation stricte
+                {t('settings:profile.strictMinimization')}
               </span>
             </div>
             <ul className="text-xs text-slate-300 space-y-2">
@@ -511,10 +513,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
           <div className="p-4 rounded-xl bg-slate-950/40 border border-rose-500/20 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-                <XCircle className="w-4 h-4" /> Ce qui n'est JAMAIS envoyé
+                <XCircle className="w-4 h-4" /> {t('settings:profile.whatIsNeverSent')}
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 font-mono">
-                100% Hors-portée
+                {t('settings:profile.outOfScope')}
               </span>
             </div>
             <ul className="text-xs text-slate-300 space-y-2">
@@ -541,7 +543,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs text-slate-400">
           <div className="flex items-center gap-2">
             <Lock className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Droits d'accès (Art. 15), de rectification (Art. 16) et d'effacement (Art. 17) garantis.</span>
+            <span>{t('settings:profile.gdprRightsSummary')}</span>
           </div>
 
           <button
@@ -549,7 +551,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
             onClick={() => setIsGdprModalOpen(true)}
             className="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline flex items-center gap-1 transition-colors"
           >
-            Afficher les détails de sécurité et exporter mes données
+            {t('settings:profile.viewSecurityDetails')}
           </button>
         </div>
       </div>

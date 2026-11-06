@@ -1,26 +1,112 @@
 {
   "greeting": "Hello, {{name}}!",
-  "subtitle": "Here is your daily training session calibrated with the SM-2 retention curve.",
-  "dailySessionTitle": "Your Daily Session",
+  "subtitle": "Here is your daily session calibrated against the SM-2 forgetting curve.",
+  "dailySessionTitle": "Your daily session",
   "cardsToReview": "cards to review",
   "cardsToReviewDesc": "Scheduled spaced repetition",
-  "fragileConcepts": "weak topics",
-  "fragileConceptsDesc": "Priority topics to consolidate",
+  "fragileConcepts": "weak concepts",
+  "fragileConceptsDesc": "Priority to consolidate",
   "unmasteredQuestions": "unmastered questions",
-  "unmasteredQuestionsDesc": "Practice in scenario mode",
+  "unmasteredQuestionsDesc": "To replay in scenario mode",
   "targetCert": "Target Certification",
   "progress": "Progress",
   "startSession": "Start my session",
-  "resumeLearning": "Resume my learning",
+  "resumeLearning": "Resume learning",
   "quickActions": "Direct shortcuts",
-  "browseCatalogue": "Explore catalog (18 certifications)",
-  "openTutor": "Consult AI tutor",
-  "takeMockExam": "Start mock exam (90 min)",
-  "readGlossary": "Explore AI glossary",
+  "browseCatalogue": "Explore catalog (18 certs)",
+  "openTutor": "Ask AI Tutor",
+  "takeMockExam": "Take mock exam (90 min)",
+  "readGlossary": "Read AI Glossary",
   "recentActivity": "Recent Activity",
-  "noRecentActivity": "No study session recorded today. Start practicing now!",
-  "nextMilestones": "Recommended Next Steps",
-  "milestone1": "Complete Domain 2: Computer Vision & Document Intelligence",
-  "milestone2": "Simulate a complete 50-question timed practice exam",
-  "milestone3": "Review 8 recurring exam pitfalls regarding quotas and Private VNets"
+  "noRecentActivity": "No session recorded today yet. Start now!",
+  "nextMilestones": "Recommended next milestones",
+  "milestone1": "Finish Domain 2: Computer Vision & Document Intelligence",
+  "milestone2": "Simulate a complete 50-question timed exam",
+  "milestone3": "Review the 8 common pitfalls on quotas and Private VNets",
+  "phases": {
+    "phase1": "Phase 1: 🧠 Spaced Repetition (SRS)",
+    "phase2": "Phase 2: ⚠️ Fragile Concepts Consolidation",
+    "phase3": "Phase 3: ❓ Targeted Exam Questions"
+  },
+  "runner": {
+    "step": "Step {{current}} of {{total}}",
+    "flipPrompt": "Click to flip front / back",
+    "sessionCompletedTitle": "Daily session completed!",
+    "sessionCompletedDesc": "All SM-2 cards and targeted questions for today have been reviewed successfully.",
+    "backToDashboard": "Back to Dashboard",
+    "continueTraining": "Continue with a quiz"
+  },
+  "algorithmTag": "CertifIA Algorithm • Tailored Session",
+  "priorityBadge": "Priority 4-5/5",
+  "qcmBadge": "MCQ",
+  "examPassThreshold": "Exam passing score",
+  "projectedGain": "+3% projected after this session",
+  "quickAccess": {
+    "srsTitle": "SRS Memorization",
+    "srsSub": "Flashcards",
+    "srsDesc": "2,800 cards with SM-2",
+    "glossaryTitle": "AI Encyclopedia",
+    "glossarySub": "Glossary & Cards",
+    "glossaryDesc": "Concepts, traps & architectures",
+    "examTitle": "Real Simulation",
+    "examSub": "Mock Exam",
+    "examDesc": "90 min • Real conditions"
+  },
+  "pathwayBanner": {
+    "badge": "New • Orientation Engine",
+    "level": "Level 1 → 4",
+    "title": "Build your personalized AI pathway",
+    "desc": "Define your role, budget and available time to generate your official certification roadmap.",
+    "action": "Assess my profile"
+  },
+  "sessionDetails": {
+    "title": "Session Details",
+    "totalSteps": "Total {{count}} steps",
+    "step1Title": "17 SRS Cards",
+    "step1Desc": "Spaced repetition scheduled today ({{overdue}} overdue, {{due}} due).",
+    "step2Title": "8 Fragile Concepts",
+    "step2Desc": "High-weight exam traps identified by CertifIA.",
+    "step3Title": "12 MCQ Questions",
+    "step3Desc": "Architecture scenarios with official Microsoft / AWS / IBM explanations."
+  },
+  "coachTip": {
+    "title": "CertifIA Daily Tip",
+    "body": "15 to 20 minutes of spaced practice at the forgetting curve is worth 3 hours of ineffective cramming. Finish your daily session to keep your streak!"
+  },
+  "targetGoal": {
+    "title": "Target Exam Goal",
+    "examLabel": "Target exam:",
+    "dateLabel": "Target date:",
+    "weeklyLabel": "Weekly goal:",
+    "reviewedCount": "{{done}} / {{total}} reviewed",
+    "defaultDate": "November 24, 2026"
+  },
+  "recentActivities": {
+    "title": "Recent Activities",
+    "last24h": "Last 24h",
+    "item1Title": "Morning SRS Session",
+    "item1Desc": "14 cards successfully reviewed",
+    "item2Title": "MCQ RAG & Vector Search",
+    "item2Desc": "6/7 correct answers obtained"
+  },
+  "nextSteps": {
+    "title": "Next Steps",
+    "guided": "Guided",
+    "step1Title": "1. Complete daily session",
+    "step1Desc": "17 cards to secure SM-2 threshold",
+    "step2Title": "2. Reinforce RAG traps",
+    "step2Desc": "Verify Custom Blocklist filters",
+    "step3Title": "3. Full Mock Exam",
+    "step3Desc": "Pass 700/1000 in 90 minutes"
+  },
+  "tooltips": {
+    "sm2Cards": "SRS Cards to Review (SM-2)",
+    "sm2CardsDesc": "These 17 cards have reached their critical forgetting threshold computed by SuperMemo-2 / FSRS. Reviewing them today maximizes memory consolidation without cognitive overload.",
+    "fragileConcepts": "Weak Concepts & Pitfalls",
+    "fragileConceptsDesc": "High-coefficient exam topics where your past answers showed hesitation, repeat errors, or high difficulty ratings.",
+    "targetedMcq": "Targeted Architecture MCQs",
+    "targetedMcqDesc": "12 representative exam scenario questions selected to validate your ability to apply theoretical concepts to enterprise cloud workloads.",
+    "activeCert": "Active Target Exam",
+    "activeCertDesc": "Official exam targeted by your daily curriculum. You can switch your active exam anytime via the top bar."
+  }
 }

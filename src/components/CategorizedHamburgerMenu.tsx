@@ -63,6 +63,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
   onSelectCertFlashcards,
 }) => {
   const [filterQuery, setFilterQuery] = useState('');
+  const { t } = useTranslation(['navigation', 'common']);
   const { theme, toggleTheme } = useTheme();
   const { isGuideModeActive, toggleGuideMode, openLegalModal } = useGuide();
   const { isInstalled, promptInstall } = usePwa();
@@ -108,7 +109,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Menu principal catégorisé"
+      aria-label={t('navigation:hamburger.aria', 'Menu principal catégorisé')}
     >
       <div 
         className="w-full max-w-md bg-white dark:bg-[#111520] h-full shadow-2xl flex flex-col border-r border-slate-200 dark:border-[#22283a] overflow-hidden animate-in slide-in-from-left duration-200"
@@ -123,14 +124,14 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                 Certif<span className="text-blue-600 dark:text-blue-400">IA</span>
               </div>
               <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-                Architecture de navigation unifiée
+                {t('navigation:unifiedArchitecture', 'Architecture de navigation unifiée')}
               </div>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-[#20273c] transition-all"
-            aria-label="Fermer le menu"
+            aria-label={t('common:actions.close', 'Fermer')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -144,13 +145,14 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
               type="text"
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              placeholder="Filtrer une rubrique, examen, outil..."
+              placeholder={t('navigation:search.placeholderFilter', 'Filtrer une rubrique, examen, outil...')}
               className="w-full pl-9 pr-8 py-2 text-xs rounded-xl bg-white dark:bg-[#171c2b] border border-slate-200 dark:border-[#2a3044] text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {filterQuery && (
               <button
                 onClick={() => setFilterQuery('')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white p-0.5"
+                aria-label={t('common:actions.reset')}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -160,15 +162,19 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
 
         {/* Navigation Categories and Items List */}
         <div className="flex-1 overflow-y-auto p-3 space-y-5">
-          {categoriesOrder.map((catId) => {
+          {categoriesOrder.map((catId, catIdx) => {
             const cat = NAV_CATEGORIES[catId];
+            const localizedCatName = t(`navigation:categories.${catId}`, cat.label);
             const items = NAV_ITEMS.filter((item) => {
               if (item.category !== catId) return false;
               if (!q) return true;
+              const itemKey = item.id.replace('nav-', '');
+              const itemLabel = t(`navigation:items.${itemKey}.label`, item.label).toLowerCase();
+              const itemDesc = t(`navigation:items.${itemKey}.description`, item.description).toLowerCase();
               return (
-                item.label.toLowerCase().includes(q) ||
-                item.description.toLowerCase().includes(q) ||
-                cat.label.toLowerCase().includes(q)
+                itemLabel.includes(q) ||
+                itemDesc.includes(q) ||
+                localizedCatName.toLowerCase().includes(q)
               );
             });
 
@@ -180,7 +186,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                 <div className="flex items-center justify-between px-2 pt-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      {cat.title}
+                      {catIdx + 1}. {localizedCatName}
                     </span>
                     {cat.badge && (
                       <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
@@ -188,9 +194,6 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] text-slate-400 truncate max-w-[150px]">
-                    {cat.description}
-                  </span>
                 </div>
 
                 {/* Items in Category */}
@@ -198,6 +201,9 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                   {items.map((item) => {
                     const IconComponent = item.icon;
                     const isActive = currentScreen === item.screen && !item.actionKey;
+                    const itemKey = item.id.replace('nav-', '');
+                    const localizedLabel = t(`navigation:items.${itemKey}.label`, item.label);
+                    const localizedDesc = t(`navigation:items.${itemKey}.description`, item.description);
 
                     return (
                       <button
@@ -220,7 +226,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                           </div>
                           <div className="truncate">
                             <div className="text-xs truncate flex items-center gap-2">
-                              <span>{item.label}</span>
+                              <span>{localizedLabel}</span>
                               {item.badge && (
                                 <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono font-bold ${
                                   isActive
@@ -234,7 +240,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                             <div className={`text-[10px] truncate ${
                               isActive ? 'text-blue-100' : 'text-slate-400 dark:text-slate-400'
                             }`}>
-                              {item.description}
+                              {localizedDesc}
                             </div>
                           </div>
                         </div>
@@ -257,10 +263,10 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
             <button
               onClick={toggleTheme}
               className="p-2 rounded-xl bg-white dark:bg-[#1a2030] border border-slate-200 dark:border-[#2a3146] text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center gap-1.5 font-medium"
-              aria-label="Basculer thème clair/sombre"
+              aria-label={t('common:theme.toggle')}
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-blue-500" />}
-              <span className="text-[11px]">{theme === 'dark' ? 'Clair' : 'Sombre'}</span>
+              <span className="text-[11px]">{theme === 'dark' ? t('common:theme.light') : t('common:theme.dark')}</span>
             </button>
 
             <button
@@ -269,6 +275,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
                 onOpenSystemSettings();
               }}
               className="p-2 rounded-xl bg-white dark:bg-[#1a2030] border border-slate-200 dark:border-[#2a3146] text-slate-600 dark:text-slate-300 hover:text-blue-600 flex items-center gap-1.5 font-medium"
+              title={t('navigation:items.settings.label')}
             >
               <Settings className="w-4 h-4 text-slate-400" />
               <span className="text-[11px] font-mono">{versionInfo.version}</span>
@@ -286,7 +293,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
               className="px-2.5 py-1.5 rounded-xl bg-blue-600 text-white font-semibold text-[11px] flex items-center gap-1 shadow hover:bg-blue-500"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Installer PWA</span>
+              <span>{t('common:actions.installPwa')}</span>
             </button>
           )}
         </div>

@@ -7,11 +7,52 @@
     "assistant": "Assistant IA",
     "plus": "Plus"
   },
+  "unifiedArchitecture": "Architecture de navigation unifiée",
+  "hamburger": {
+    "aria": "Menu principal catégorisé",
+    "close": "Fermer le menu"
+  },
+  "mobileNav": {
+    "aria": "Navigation principale mobile",
+    "home": "Accueil",
+    "certs": "Certifs",
+    "learn": "Apprendre",
+    "progress": "Progrès",
+    "more": "Plus",
+    "homeAria": "Accueil CertifIA",
+    "certsAria": "Certifications officielles",
+    "learnAria": "Apprentissage et entraînement",
+    "progressAria": "Tableau de bord et progression",
+    "moreAria": "Plus d’options et rubriques secondaires",
+    "sheetAria": "Menu complémentaire CertifIA",
+    "sheetTitle": "Rubriques & Utilitaires",
+    "sheetSubtitle": "Assistant IA, Profil, Paramètres et Outils",
+    "advancedLearning": "Apprentissage avancé",
+    "certsAndPaths": "Certifications & Parcours",
+    "systemAndAccount": "Système & Compte",
+    "assistantDesc": "Explications, astuces & mnémotechniques",
+    "flashcardsDesc": "2 800 cartes SRS",
+    "distributionDesc": "Inventaire fiches",
+    "examDesc": "Chronométré",
+    "glossaryDesc": "Concepts & acronymes",
+    "recommendationDesc": "Du Niv. 1 au Niv. 4",
+    "comparatorDesc": "Examens face à face",
+    "profileDesc": "Profil & Objectifs d'apprentissage",
+    "guideLabel": "Mode Guide & Infobulles",
+    "legalLabel": "Mentions légales & Avertissement",
+    "installLabel": "Installer l’application sur l’écran d’accueil",
+    "languageLabel": "Langue / Language"
+  },
   "items": {
     "today": {
       "label": "Aujourd’hui",
       "shortLabel": "Aujourd’hui",
       "description": "Cockpit du jour : 17 cartes SM-2, 8 notions fragiles, 12 QCM ciblés"
+    },
+    "quickResume": {
+      "label": "Reprendre mon apprentissage",
+      "shortLabel": "Reprendre",
+      "description": "Reprendre immédiatement votre session en cours en 1 clic"
     },
     "catalogue": {
       "label": "Catalogue des certifications",
@@ -58,6 +99,21 @@
       "shortLabel": "Tableau de bord",
       "description": "Indicateurs d'assimilation, radar de compétences et historique"
     },
+    "analyticsDashboard": {
+      "label": "Tableau de bord",
+      "shortLabel": "Tableau de bord",
+      "description": "Score de préparation global, taux de réussite et cadence hebdomadaire"
+    },
+    "analyticsDetail": {
+      "label": "Analytics & Compétences",
+      "shortLabel": "Analytics",
+      "description": "Décomposition par domaine de certification et identification des lacunes"
+    },
+    "history": {
+      "label": "Historique des examens",
+      "shortLabel": "Historique",
+      "description": "Rapports détaillés de toutes les sessions d’examen et quiz passés"
+    },
     "assistant": {
       "label": "Assistant pédagogique",
       "shortLabel": "Tuteur IA",
@@ -91,6 +147,7 @@
   },
   "search": {
     "placeholder": "Rechercher une certification, un QCM, le tuteur IA, ou un concept...",
+    "placeholderFilter": "Filtrer une rubrique, examen, outil...",
     "commandKey": "Ctrl+K",
     "noResults": "Aucun résultat trouvé pour « {{query}} »",
     "instructions": "↑↓ Naviguer • ↵ Ouvrir • ESC Quitter"

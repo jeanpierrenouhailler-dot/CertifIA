@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
 import { Certification } from '../types';
+import { useTranslation } from '../i18n';
 
 interface BlueprintDrawerProps {
   certification: Certification | null;
@@ -15,6 +16,8 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
   onClose,
   onStartTraining,
 }) => {
+  const { t } = useTranslation(['certifications', 'common']);
+
   if (!isOpen || !certification) return null;
 
   // Colors for donut segments
@@ -55,6 +58,7 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
               <button
                 onClick={onClose}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#262a35] transition-colors"
+                aria-label={t('common:actions.close')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -64,7 +68,7 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
               {certification.title}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              Référentiel officiel des compétences et pondération d'examen
+              {t('certifications:blueprint.skillsFramework', 'Référentiel officiel des compétences et pondération d\'examen')}
             </p>
           </div>
 
@@ -108,7 +112,7 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
                     {certification.domains.length}
                   </span>
                   <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
-                    Domaines
+                    {t('certifications:domains', 'Domaines')}
                   </span>
                 </div>
               </div>
@@ -116,25 +120,25 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
               {/* Exam specs */}
               <div className="flex-1 grid grid-cols-2 gap-3 w-full">
                 <div className="p-2.5 rounded-xl bg-[#171b26] border border-[#262a35]/60">
-                  <div className="text-[10px] text-slate-400 font-mono">Score de Passage</div>
+                  <div className="text-[10px] text-slate-400 font-mono">{t('certifications:blueprint.passScore', 'Score de Passage')}</div>
                   <div className="text-sm font-bold font-mono text-blue-400 mt-0.5">
                     {certification.passScore} / {certification.maxScore} pts
                   </div>
                 </div>
                 <div className="p-2.5 rounded-xl bg-[#171b26] border border-[#262a35]/60">
-                  <div className="text-[10px] text-slate-400 font-mono">Durée Allouée</div>
+                  <div className="text-[10px] text-slate-400 font-mono">{t('certifications:blueprint.allocatedDuration', 'Durée Allouée')}</div>
                   <div className="text-sm font-bold font-mono text-slate-200 mt-0.5">
-                    {certification.durationMinutes} minutes
+                    {certification.durationMinutes} {t('common:units.minutes')}
                   </div>
                 </div>
                 <div className="p-2.5 rounded-xl bg-[#171b26] border border-[#262a35]/60">
-                  <div className="text-[10px] text-slate-400 font-mono">Volume Questions</div>
+                  <div className="text-[10px] text-slate-400 font-mono">{t('certifications:blueprint.questionsVolume', 'Volume Questions')}</div>
                   <div className="text-sm font-bold font-mono text-slate-200 mt-0.5">
-                    {certification.itemsCount} QCM & Cas
+                    {certification.itemsCount} {t('common:units.questions')}
                   </div>
                 </div>
                 <div className="p-2.5 rounded-xl bg-[#171b26] border border-[#262a35]/60">
-                  <div className="text-[10px] text-slate-400 font-mono">Taux Réussite Moyen</div>
+                  <div className="text-[10px] text-slate-400 font-mono">{t('certifications:blueprint.averagePassRate', 'Taux Réussite Moyen')}</div>
                   <div className="text-sm font-bold font-mono text-emerald-400 mt-0.5">
                     {certification.avgPassRate}%
                   </div>
@@ -146,10 +150,10 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-300">
-                  Pondération Détaillée des Domaines
+                  {t('certifications:comparator.domainWeights', 'Pondération Détaillée des Domaines')}
                 </h3>
                 <span className="text-xs text-slate-300 font-mono">
-                  Maîtrise : {certification.userProgress}%
+                  {t('dashboard:progress')} : {certification.userProgress}%
                 </span>
               </div>
 
@@ -209,10 +213,10 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
                 <BookOpen className="w-5 h-5 text-blue-400 shrink-0" />
                 <div>
                   <div className="text-xs font-semibold text-white">
-                    Documentation Officielle de l'Examen
+                    {t('certifications:blueprint.officialVendorDoc', 'Documentation Officielle du Fournisseur')}
                   </div>
                   <div className="text-[11px] text-slate-400">
-                    Guide d'évaluation et compétences mesurées
+                    {t('certifications:blueprint.skillsFramework')}
                   </div>
                 </div>
               </div>
@@ -221,7 +225,7 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 rounded-lg bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white transition-colors"
-                aria-label="Ouvrir le guide officiel"
+                aria-label={t('common:actions.open')}
               >
                 <ExternalLink className="w-4 h-4" />
               </a>
@@ -234,7 +238,7 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
               onClick={onClose}
               className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#0f131d] border border-[#262a35] hover:bg-[#262a35] transition-all"
             >
-              Fermer
+              {t('common:actions.close', 'Fermer')}
             </button>
             <button
               onClick={() => {
@@ -243,7 +247,7 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
               }}
               className="flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/25 active:scale-[0.99]"
             >
-              <span>S'entraîner sur ce blueprint</span>
+              <span>{t('certifications:blueprint.startTraining', 'Démarrer l\'entraînement')}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

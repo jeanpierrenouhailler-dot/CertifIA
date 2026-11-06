@@ -37,16 +37,17 @@ import {
   PathwayPlan,
   PathwayLevel
 } from '../types';
+import { useTranslation } from 'react-i18next';
 import { 
-  LEVEL_OPTIONS, 
-  ROLE_OPTIONS, 
-  PRIMARY_GOAL_OPTIONS, 
-  BUDGET_OPTIONS, 
-  WEEKLY_TIME_OPTIONS, 
-  LANGUAGE_OPTIONS, 
-  CAREER_GOAL_OPTIONS, 
   DEFAULT_USER_PROFILE,
-  generatePathways 
+  generatePathways,
+  getLocalizedLevelOptions,
+  getLocalizedRoleOptions,
+  getLocalizedPrimaryGoalOptions,
+  getLocalizedBudgetOptions,
+  getLocalizedWeeklyTimeOptions,
+  getLocalizedLanguageOptions,
+  getLocalizedCareerGoalOptions
 } from '../lib/recommendationEngine';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
@@ -62,8 +63,18 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
   onNavigate, 
   onOpenBlueprint 
 }) => {
+  const { t, i18n } = useTranslation(['learning', 'certifications', 'common']);
+  const lang = (i18n.language?.startsWith('en') ? 'en' : 'fr') as 'fr' | 'en';
   const { userProfile } = useAuth();
   const { activeCertId, setActiveCertId, updateGoalTarget } = useProgress();
+
+  const levelOptions = useMemo(() => getLocalizedLevelOptions(lang), [lang]);
+  const roleOptions = useMemo(() => getLocalizedRoleOptions(lang), [lang]);
+  const primaryGoalOptions = useMemo(() => getLocalizedPrimaryGoalOptions(lang), [lang]);
+  const budgetOptions = useMemo(() => getLocalizedBudgetOptions(lang), [lang]);
+  const weeklyTimeOptions = useMemo(() => getLocalizedWeeklyTimeOptions(lang), [lang]);
+  const languageOptions = useMemo(() => getLocalizedLanguageOptions(lang), [lang]);
+  const careerGoalOptions = useMemo(() => getLocalizedCareerGoalOptions(lang), [lang]);
 
   // Load saved profile or defaults
   const [profile, setProfile] = useState<UserRecommendationProfile>(() => {
@@ -85,8 +96,8 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
 
   // Compute generated pathways
   const pathways = useMemo(() => {
-    return generatePathways(profile, activeCertId, ['ai900']);
-  }, [profile, activeCertId]);
+    return generatePathways(profile, activeCertId, ['ai900'], lang);
+  }, [profile, activeCertId, lang]);
 
   // Active pathway
   const activePathway = useMemo(() => {
@@ -142,15 +153,19 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
           <div className="flex items-center gap-2 text-xs font-mono text-blue-400 font-semibold uppercase tracking-wider mb-2">
             <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Moteur d'Orientation &amp; Diagnostic CertifIA</span>
+            <span>{lang === 'en' ? 'CertifIA AI Pathway & Orientation Engine' : 'Moteur d\'Orientation & Diagnostic CertifIA'}</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-headline tracking-tight">
-            Le Moteur de Recommandation
+            {t('learning:title', 'Le Moteur de Recommandation')}
           </h1>
 
           <p className="text-sm text-slate-300 mt-2 max-w-3xl leading-relaxed">
-            CertifIA évalue votre niveau, votre métier et vos contraintes pour structurer votre feuille de route certifiante officielle du <strong>Niveau 1 (Fondations)</strong> jusqu'au <strong>Niveau 4 (Spécialisation)</strong>.
+            {lang === 'en' ? (
+              <>CertifIA assesses your level, role, and constraints to build your official certification roadmap from <strong>Level 1 (Foundations)</strong> up to <strong>Level 4 (Specialization)</strong>.</>
+            ) : (
+              <>CertifIA évalue votre niveau, votre métier et vos contraintes pour structurer votre feuille de route certifiante officielle du <strong>Niveau 1 (Fondations)</strong> jusqu'au <strong>Niveau 4 (Spécialisation)</strong>.</>
+            )}
           </p>
         </div>
 
@@ -165,7 +180,9 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
             }`}
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>{isDiagnosticMode ? 'Masquer le questionnaire' : 'Ajuster mon profil & critères'}</span>
+            <span>{isDiagnosticMode 
+              ? (lang === 'en' ? 'Hide questionnaire' : 'Masquer le questionnaire') 
+              : (lang === 'en' ? 'Adjust my profile & criteria' : 'Ajuster mon profil & critères')}</span>
           </button>
 
           <button
@@ -173,7 +190,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
             className="px-4 py-2.5 rounded-xl bg-[#0f131d] hover:bg-[#1c2233] text-slate-300 hover:text-white border border-[#262a35] font-mono text-xs transition-colors flex items-center gap-2"
           >
             <Target className="w-3.5 h-3.5 text-blue-400" />
-            <span>Session du jour</span>
+            <span>{lang === 'en' ? 'Daily session' : 'Session du jour'}</span>
           </button>
         </div>
       </div>
@@ -189,7 +206,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
             onClick={() => onNavigate('flashcards')}
             className="text-xs text-white underline underline-offset-2 hover:text-emerald-300"
           >
-            Commencer à réviser →
+            {lang === 'en' ? 'Start studying →' : 'Commencer à réviser →'}
           </button>
         </div>
       )}
@@ -209,7 +226,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                     : 'bg-[#0f131d] text-slate-400 hover:text-white'
                 }`}
               >
-                <span>1. Votre profil</span>
+                <span>{lang === 'en' ? '1. Your profile' : '1. Votre profil'}</span>
                 <span className="w-5 h-5 rounded-full bg-white/20 text-[10px] flex items-center justify-center">1</span>
               </button>
 
@@ -221,13 +238,13 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                     : 'bg-[#0f131d] text-slate-400 hover:text-white'
                 }`}
               >
-                <span>2. Vos contraintes &amp; objectifs</span>
+                <span>{lang === 'en' ? '2. Constraints & goals' : '2. Vos contraintes & objectifs'}</span>
                 <span className="w-5 h-5 rounded-full bg-white/20 text-[10px] flex items-center justify-center">2</span>
               </button>
             </div>
 
             <span className="text-xs font-mono text-blue-300">
-              Étape {activeStep} sur 2
+              {lang === 'en' ? `Step ${activeStep} of 2` : `Étape ${activeStep} sur 2`}
             </span>
           </div>
 
@@ -241,16 +258,18 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                     A
                   </span>
                   <label className="text-sm font-bold text-white font-headline flex items-center gap-2">
-                    <span>Quel est votre niveau ?</span>
+                    <span>{t('learning:survey.levelQuestion', 'Quel est votre niveau ?')}</span>
                     <InfoTooltip
-                      title="Niveau d'expérience"
-                      content="Définit le point d'entrée recommandé. Les débutants démarrent par les fondamentaux (ex: AI-900), évitant le taux d'abandon précoce."
+                      title={lang === 'en' ? 'Experience Level' : "Niveau d'expérience"}
+                      content={lang === 'en' 
+                        ? 'Defines recommended starting milestone. Beginners start with fundamentals (e.g. AI-900) to prevent early drop-off.' 
+                        : "Définit le point d'entrée recommandé. Les débutants démarrent par les fondamentaux (ex: AI-900), évitant le taux d'abandon précoce."}
                     />
                   </label>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {LEVEL_OPTIONS.map((opt) => {
+                  {levelOptions.map((opt) => {
                     const isSelected = profile.level === opt.id;
                     return (
                       <button
@@ -288,16 +307,18 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                     B
                   </span>
                   <label className="text-sm font-bold text-white font-headline flex items-center gap-2">
-                    <span>Votre métier ?</span>
+                    <span>{t('learning:survey.roleQuestion', 'Votre métier ?')}</span>
                     <InfoTooltip
-                      title="Métier cible"
-                      content="Oriente les certifications vers vos cas d'usage réels : SDK et code pour développeurs, modélisation pour data scientists, gouvernance pour chefs de projet."
+                      title={lang === 'en' ? 'Target Role' : 'Métier cible'}
+                      content={lang === 'en' 
+                        ? 'Aligns credentials to real-world workflows: SDKs and code for developers, modeling for data scientists, governance for project leads.'
+                        : "Oriente les certifications vers vos cas d'usage réels : SDK et code pour développeurs, modélisation pour data scientists, gouvernance pour chefs de projet."}
                     />
                   </label>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-                  {ROLE_OPTIONS.map((opt) => {
+                  {roleOptions.map((opt) => {
                     const isSelected = profile.role === opt.id;
                     return (
                       <button
@@ -328,16 +349,18 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                     C
                   </span>
                   <label className="text-sm font-bold text-white font-headline flex items-center gap-2">
-                    <span>Votre objectif ?</span>
+                    <span>{t('learning:survey.goalQuestion', 'Votre objectif ?')}</span>
                     <InfoTooltip
-                      title="Objectif technologique"
-                      content="Choix de la spécialité majeure : IA Générative (LLM, RAG), Cloud AI managé, Machine Learning pur ou pipelines MLOps."
+                      title={lang === 'en' ? 'Technological Objective' : 'Objectif technologique'}
+                      content={lang === 'en' 
+                        ? 'Select primary specialty: Generative AI (LLMs, RAG), managed Cloud AI, core Machine Learning or MLOps pipelines.'
+                        : "Choix de la spécialité majeure : IA Générative (LLM, RAG), Cloud AI managé, Machine Learning pur ou pipelines MLOps."}
                     />
                   </label>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                  {PRIMARY_GOAL_OPTIONS.map((opt) => {
+                  {primaryGoalOptions.map((opt) => {
                     const isSelected = profile.primaryGoal === opt.id;
                     return (
                       <button
@@ -375,7 +398,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                   onClick={() => setActiveStep(2)}
                   className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-blue-600/30"
                 >
-                  <span>Continuer : Budget, Temps &amp; Objectif pro</span>
+                  <span>{lang === 'en' ? 'Continue: Budget, Time & Career Goal' : 'Continuer : Budget, Temps & Objectif pro'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -392,12 +415,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                     D
                   </span>
                   <label className="text-sm font-bold text-white font-headline">
-                    Quel est votre budget certifications ?
+                    {t('learning:survey.budgetQuestion', 'Quel est votre budget certifications ?')}
                   </label>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {BUDGET_OPTIONS.map((opt) => {
+                  {budgetOptions.map((opt) => {
                     const isSelected = profile.budget === opt.id;
                     return (
                       <button
@@ -437,12 +460,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                     E
                   </span>
                   <label className="text-sm font-bold text-white font-headline">
-                    Temps disponible / semaine
+                    {t('learning:survey.timeQuestion', 'Temps disponible / semaine')}
                   </label>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {WEEKLY_TIME_OPTIONS.map((opt) => {
+                  {weeklyTimeOptions.map((opt) => {
                     const isSelected = profile.weeklyTime === opt.id;
                     return (
                       <button
@@ -485,12 +508,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                       F
                     </span>
                     <label className="text-sm font-bold text-white font-headline">
-                      Langue préférée
+                      {lang === 'en' ? 'Preferred language' : 'Langue préférée'}
                     </label>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2.5">
-                    {LANGUAGE_OPTIONS.map((opt) => {
+                    {languageOptions.map((opt) => {
                       const isSelected = profile.language === opt.id;
                       return (
                         <button
@@ -518,12 +541,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                       G
                     </span>
                     <label className="text-sm font-bold text-white font-headline">
-                      Objectif professionnel
+                      {t('learning:survey.careerQuestion', 'Objectif professionnel')}
                     </label>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {CAREER_GOAL_OPTIONS.map((opt) => {
+                    {careerGoalOptions.map((opt) => {
                       const isSelected = profile.careerGoal === opt.id;
                       return (
                         <button
@@ -555,7 +578,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                   onClick={() => setActiveStep(1)}
                   className="px-4 py-2.5 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-300 font-mono text-xs font-medium transition-colors"
                 >
-                  ← Revenir à l'étape 1
+                  {lang === 'en' ? '← Back to step 1' : '← Revenir à l\'étape 1'}
                 </button>
 
                 <button
@@ -567,7 +590,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-headline font-bold text-sm shadow-xl shadow-blue-600/30 flex items-center gap-2.5 transition-all"
                 >
                   <Sparkles className="w-4 h-4 fill-white" />
-                  <span>Construire mon Parcours IA CertifIA</span>
+                  <span>{lang === 'en' ? 'Build my CertifIA Pathway' : 'Construire mon Parcours IA CertifIA'}</span>
                 </button>
               </div>
             </div>
@@ -578,15 +601,15 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
       {/* 3. Output Section: « 🎯 Votre parcours IA » */}
       <div className="space-y-6">
         
-        {/* Pathway Selection Tabs (Plusieurs parcours possibles selon le profil) */}
+        {/* Pathway Selection Tabs */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-3xl bg-[#171b26] border border-[#262a35]">
           <div>
             <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
               <Brain className="w-3.5 h-3.5 text-blue-400" />
-              Moteur CertifIA • Parcours disponibles
+              {lang === 'en' ? 'CertifIA Engine • Available Pathways' : 'Moteur CertifIA • Parcours disponibles'}
             </span>
             <h2 className="text-xl sm:text-2xl font-bold text-white font-headline mt-0.5 flex items-center gap-2">
-              <span>🎯 Votre parcours IA</span>
+              <span>{t('learning:pathway.title', '🎯 Votre parcours IA')}</span>
             </h2>
           </div>
 
@@ -634,15 +657,15 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
             {/* Quick Metrics */}
             <div className="flex flex-wrap items-center gap-3">
               <div className="px-3 py-1.5 rounded-xl bg-[#0a0e18] border border-[#262a35] text-xs font-mono text-center">
-                <div className="text-[10px] text-slate-400">Durée estimée</div>
-                <div className="font-bold text-emerald-400">~{activePathway.totalWeeks} semaines</div>
+                <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Estimated duration' : 'Durée estimée'}</div>
+                <div className="font-bold text-emerald-400">~{activePathway.totalWeeks} {lang === 'en' ? 'weeks' : 'semaines'}</div>
               </div>
               <div className="px-3 py-1.5 rounded-xl bg-[#0a0e18] border border-[#262a35] text-xs font-mono text-center">
-                <div className="text-[10px] text-slate-400">Heures de travail</div>
-                <div className="font-bold text-blue-400">~{activePathway.totalHours} heures</div>
+                <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Study hours' : 'Heures de travail'}</div>
+                <div className="font-bold text-blue-400">~{activePathway.totalHours} {lang === 'en' ? 'hours' : 'heures'}</div>
               </div>
               <div className="px-3 py-1.5 rounded-xl bg-[#0a0e18] border border-[#262a35] text-xs font-mono text-center">
-                <div className="text-[10px] text-slate-400">Coût estimé</div>
+                <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Estimated cost' : 'Coût estimé'}</div>
                 <div className="font-bold text-amber-400">{activePathway.estimatedCost}</div>
               </div>
             </div>
@@ -660,15 +683,6 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
         </div>
 
         {/* 4. THE CORE 4-LEVEL CONNECTED FLOWCHART */}
-        {/* 
-            Niveau 1 : AI Fundamentals
-                  ↓
-            Niveau 2 : Generative AI
-                  ↓
-            Niveau 3 : Cloud AI
-                  ↓
-            Niveau 4 : Machine Learning / MLOps
-        */}
         <div className="space-y-4 pt-2">
           {activePathway.levels.map((level, index) => {
             const isLast = index === activePathway.levels.length - 1;
@@ -709,12 +723,12 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                           {isCurrentActiveTarget && (
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center gap-1">
                               <Sparkles className="w-2.5 h-2.5" />
-                              Cible Actuelle
+                              {lang === 'en' ? 'Current Target' : 'Cible Actuelle'}
                             </span>
                           )}
                           {isCompleted && (
                             <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                              Validé ✓
+                              {lang === 'en' ? 'Completed ✓' : 'Validé ✓'}
                             </span>
                           )}
                         </div>
@@ -732,7 +746,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                       </span>
                       <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-medium bg-[#0f131d] text-slate-300 border border-[#262a35] flex items-center gap-1">
                         <Clock className="w-3 h-3 text-slate-400" />
-                        {level.estimatedWeeks} sem. (~{level.estimatedHours}h)
+                        {level.estimatedWeeks} {lang === 'en' ? 'wks' : 'sem.'} (~{level.estimatedHours}h)
                       </span>
                       <span className="px-2.5 py-1 rounded-xl text-xs font-mono font-medium bg-[#0f131d] text-amber-300 border border-[#262a35]">
                         {level.difficulty}
@@ -751,7 +765,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                       <div className="p-3 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] text-xs space-y-1">
                         <span className="font-mono text-[10px] uppercase font-bold text-blue-300 flex items-center gap-1">
                           <Zap className="w-3 h-3 text-blue-400" />
-                          Pourquoi ce niveau pour vous ?
+                          {lang === 'en' ? 'Why this level for you?' : 'Pourquoi ce niveau pour vous ?'}
                         </span>
                         <p className="text-[11px] text-slate-300 leading-relaxed">
                           {level.rationale}
@@ -761,7 +775,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                       {/* Acquired Skills Pills */}
                       <div className="space-y-1.5">
                         <span className="text-[10px] font-mono uppercase font-bold text-slate-400">
-                          Compétences clés validées :
+                          {lang === 'en' ? 'Key skills validated:' : 'Compétences clés validées :'}
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {level.skills.map((skill, si) => (
@@ -781,29 +795,29 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                       <div className="text-[11px] font-mono font-bold text-slate-300 flex items-center justify-between">
                         <span className="flex items-center gap-1.5">
                           <Layers className="w-3.5 h-3.5 text-blue-400" />
-                          Contenu disponible CertifIA
+                          {lang === 'en' ? 'CertifIA Available Content' : 'Contenu disponible CertifIA'}
                         </span>
-                        <span className="text-emerald-400">Prêt à l'emploi</span>
+                        <span className="text-emerald-400">{lang === 'en' ? 'Ready to study' : 'Prêt à l\'emploi'}</span>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
                         <div className="p-2 rounded-xl bg-[#171b26] border border-[#262a35]">
-                          <div className="text-[10px] text-slate-400">Fiches SRS</div>
+                          <div className="text-[10px] text-slate-400">{lang === 'en' ? 'SRS Cards' : 'Fiches SRS'}</div>
                           <div className="font-bold text-white mt-0.5">{level.cardsCount}</div>
                         </div>
                         <div className="p-2 rounded-xl bg-[#171b26] border border-[#262a35]">
-                          <div className="text-[10px] text-slate-400">QCM Examen</div>
+                          <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Exam MCQs' : 'QCM Examen'}</div>
                           <div className="font-bold text-white mt-0.5">{level.questionsCount}</div>
                         </div>
                         <div className="p-2 rounded-xl bg-[#171b26] border border-[#262a35]">
-                          <div className="text-[10px] text-slate-400">Seuil de réussite</div>
+                          <div className="text-[10px] text-slate-400">{lang === 'en' ? 'Pass threshold' : 'Seuil de réussite'}</div>
                           <div className="font-bold text-emerald-400 mt-0.5">70%</div>
                         </div>
                       </div>
 
                       <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between pt-1">
-                        <span>Score passage : {level.examPassScore}</span>
-                        {certData && <span className="text-blue-300">Taux réussite moy. {certData.avgPassRate}%</span>}
+                        <span>{lang === 'en' ? 'Passing score' : 'Score passage'} : {level.examPassScore}</span>
+                        {certData && <span className="text-blue-300">{lang === 'en' ? 'Avg pass rate' : 'Taux réussite moy.'} {certData.avgPassRate}%</span>}
                       </div>
                     </div>
                   </div>
@@ -817,7 +831,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                           className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold transition-all shadow-md shadow-blue-600/20 flex items-center gap-1.5"
                         >
                           <Target className="w-3.5 h-3.5" />
-                          <span>Définir comme cible active</span>
+                          <span>{t('certifications:actions.setAsTarget', 'Définir comme cible active')}</span>
                         </button>
                       )}
 
@@ -829,7 +843,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                         className="px-3.5 py-2 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-300 hover:text-white border border-[#262a35] font-mono text-xs transition-colors flex items-center gap-1.5"
                       >
                         <Layers className="w-3.5 h-3.5 text-blue-400" />
-                        <span>Réviser les fiches</span>
+                        <span>{lang === 'en' ? 'Review flashcards' : 'Réviser les fiches'}</span>
                       </button>
 
                       <button
@@ -840,7 +854,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                         className="px-3.5 py-2 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-300 hover:text-white border border-[#262a35] font-mono text-xs transition-colors flex items-center gap-1.5"
                       >
                         <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Entraînement QCM</span>
+                        <span>{lang === 'en' ? 'Practice MCQs' : 'Entraînement QCM'}</span>
                       </button>
                     </div>
 
@@ -849,14 +863,14 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
                         onClick={() => onOpenBlueprint(level.certId)}
                         className="text-xs font-mono text-slate-400 hover:text-blue-300 transition-colors flex items-center gap-1"
                       >
-                        <span>Consulter le Blueprint officiel</span>
+                        <span>{t('certifications:actions.viewBlueprint', 'Consulter le Blueprint officiel')}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
                 </div>
 
-                {/* Vertical Connector Arrow (Niveau 1 ↓ Niveau 2 ↓ Niveau 3 ↓ Niveau 4) */}
+                {/* Vertical Connector Arrow */}
                 {!isLast && (
                   <div className="flex flex-col items-center justify-center my-1 select-none py-1">
                     <div className="w-0.5 h-4 bg-gradient-to-b from-blue-500/60 to-indigo-500/60" />
@@ -877,13 +891,17 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
         <div className="space-y-1 md:col-span-2">
           <div className="flex items-center gap-2 text-xs font-mono text-blue-400 font-bold uppercase">
             <GraduationCap className="w-4 h-4" />
-            <span>Conseil Pédagogique CertifIA</span>
+            <span>{lang === 'en' ? 'CertifIA Pedagogical Tip' : 'Conseil Pédagogique CertifIA'}</span>
           </div>
           <h4 className="text-base font-bold text-white font-headline">
-            Pourquoi structurer sa progression en 4 niveaux ?
+            {lang === 'en' ? 'Why structure your progression in 4 levels?' : 'Pourquoi structurer sa progression en 4 niveaux ?'}
           </h4>
           <p className="text-xs text-slate-300 leading-relaxed">
-            Aborder directement une certification Specialist comme <strong>Azure AI-102</strong> ou <strong>GCP-PMLE</strong> sans validation préalable des fondations génère un taux d'échec de 42%. Franchir les 4 paliers garantit une rétention durable et maximise votre valeur sur le marché de l'emploi tech.
+            {lang === 'en' ? (
+              <>Attempting a Specialist certification like <strong>Azure AI-102</strong> or <strong>GCP-PMLE</strong> without prior validation of foundations leads to a 42% failure rate. Conquering all 4 stages guarantees long-term retention and maximizes your market value.</>
+            ) : (
+              <>Aborder directement une certification Specialist comme <strong>Azure AI-102</strong> ou <strong>GCP-PMLE</strong> sans validation préalable des fondations génère un taux d'échec de 42%. Franchir les 4 paliers garantit une rétention durable et maximise votre valeur sur le marché de l'emploi tech.</>
+            )}
           </p>
         </div>
 
@@ -893,7 +911,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
             className="w-full py-2.5 px-4 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-200 border border-[#262a35] text-xs font-mono font-medium transition-colors flex items-center justify-center gap-2"
           >
             <Compass className="w-3.5 h-3.5 text-blue-400" />
-            <span>Explorer tout le catalogue (18)</span>
+            <span>{lang === 'en' ? 'Explore full catalog (18)' : 'Explorer tout le catalogue (18)'}</span>
           </button>
 
           <button
@@ -901,7 +919,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
             className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold transition-all shadow-md shadow-blue-600/20 flex items-center justify-center gap-2"
           >
             <Target className="w-3.5 h-3.5" />
-            <span>Lancer ma session du jour</span>
+            <span>{lang === 'en' ? 'Launch my daily session' : 'Lancer ma session du jour'}</span>
           </button>
         </div>
       </div>

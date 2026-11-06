@@ -7,6 +7,19 @@
     "selectLanguage": "Choisir la langue",
     "switchSuccess": "Langue modifiée avec succès"
   },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "lightMode": "Mode clair",
+    "darkMode": "Mode sombre",
+    "toggle": "Basculer thème clair/sombre"
+  },
+  "guide": {
+    "enable": "Activer les infobulles guidées",
+    "disable": "Désactiver les infobulles guidées",
+    "badgeActive": "ACTIF",
+    "badgeInactive": "INACTIF"
+  },
   "actions": {
     "confirm": "Confirmer",
     "cancel": "Annuler",
@@ -28,11 +41,15 @@
     "export": "Exporter",
     "share": "Partager",
     "install": "Installer l'application",
+    "installPwa": "Installer PWA",
     "checkUpdates": "Vérifier les mises à jour",
     "learnMore": "En savoir plus",
     "resumeLearning": "Reprendre mon apprentissage",
     "viewDetails": "Voir les détails",
-    "openBlueprint": "Consulter le blueprint"
+    "openBlueprint": "Consulter le blueprint",
+    "open": "Ouvrir",
+    "collapseSidebar": "Réduire la barre latérale",
+    "expandSidebar": "Développer la barre latérale"
   },
   "status": {
     "loading": "Chargement en cours...",
@@ -46,7 +63,11 @@
     "inProgress": "En cours",
     "completed": "Complété",
     "locked": "Verrouillé",
-    "recommended": "Recommandé"
+    "recommended": "Recommandé",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "synchronized": "Synchronisé",
+    "syncing": "Synchronisation..."
   },
   "units": {
     "days": "jours",
@@ -62,5 +83,15 @@
     "emptyState": "Aucune donnée disponible pour le moment.",
     "noResults": "Aucun résultat trouvé pour votre recherche.",
     "retry": "Réessayer"
-  }
+  },
+  "user": {
+    "learnerName": "Apprenant IA",
+    "guestMode": "Mode invité",
+    "syncedAccount": "Compte synchronisé"
+  },
+  "aiTutorBadge": "Tuteur",
+  "pauseAndExit": "Mettre en pause et quitter",
+  "resetSearch": "Réinitialiser la recherche",
+  "bookmark": "Enregistrer",
+  "bookmarked": "Favori"
 }

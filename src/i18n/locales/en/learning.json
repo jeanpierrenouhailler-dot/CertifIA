@@ -80,6 +80,25 @@
     "addToBookmarks": "Save to Bookmarks",
     "removeFromBookmarks": "Remove from Bookmarks",
     "shareTerm": "Copy Factsheet",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "quickGlossaryTab": "Quick Glossary (A-Z)",
+    "encyclopediaTab": "In-Depth Encyclopedia",
+    "detailedArticlesBadge": "Detailed Guides",
+    "bookmarksOnlyTitle": "Show bookmarked terms only",
+    "openFullArticle": "Open full article in Encyclopedia",
+    "encyclopedicArticles": "Encyclopedia Articles",
+    "availableCount": "{{count}} available",
+    "executiveSummary": "Executive Summary",
+    "architecturePrinciples": "Architecture Principles & Functioning",
+    "dataFlowArchitecture": "Data Flow & Architecture",
+    "formalDefinition": "📐 Mathematical Formula / Formal Definition",
+    "criticalExamTrap": "⚠️ Critical Exam Trap",
+    "cloudMapping": "Service Mapping Across Cloud Providers",
+    "keyTakeaways": "Key Takeaways for Exam Success",
+    "relatedConcepts": "🔗 Related Concepts & Links",
+    "shareAction": "Share",
+    "saveAction": "Bookmark",
+    "savedAction": "Bookmarked",
+    "copyDefinitionTooltip": "Copy definition"
   }
 }

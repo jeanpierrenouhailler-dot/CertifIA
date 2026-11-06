@@ -92,15 +92,15 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               onClick={() => onOpenBlueprint ? onOpenBlueprint('ai102') : onNavigate('catalogue')}
               className="text-blue-400 hover:underline flex items-center gap-1"
             >
-              Track Azure AI-102
+              {t('quizzes:trackAzure')}
             </button>
             <span>/</span>
-            <span>Module 03</span>
+            <span>{t('quizzes:moduleThree')}</span>
             <span>/</span>
-            <span className="text-slate-200">Déploiement GenAI & RAG</span>
+            <span className="text-slate-200">{t('quizzes:moduleSubtitle')}</span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-white font-headline">
-            Entraînement : Architectures RAG & Indexation Vectorielle
+            {t('quizzes:sessionTitle')}
           </h1>
         </div>
 
@@ -115,7 +115,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
           {/* Current Session Score */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#171b26] border border-[#262a35] text-xs font-mono">
             <Award className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-slate-300">Score :</span>
+            <span className="text-slate-300">{t('quizzes:scoreLabel')}</span>
             <span className="text-emerald-400 font-bold">6/7 (85.7%)</span>
           </div>
 
@@ -129,7 +129,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             }`}
           >
             <Bookmark className={`w-3.5 h-3.5 ${isFlagged ? 'fill-amber-400 text-amber-400' : ''}`} />
-            <span className="hidden sm:inline">Marquer pour révision</span>
+            <span className="hidden sm:inline">{isFlagged ? t('quizzes:unflag') : t('quizzes:flagForReview')}</span>
           </button>
         </div>
       </div>
@@ -138,11 +138,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
       <div className="p-4 rounded-2xl bg-[#171b26] border border-[#262a35]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 mb-2">
           <span className="font-semibold text-white">
-            Question {currentQ.code === 'Q-7294' ? '7' : activeQuestionIndex + 1} sur 20 • Indexation & Recherche Vectorielle
+            {t('quizzes:questionHeader', { current: currentQ.code === 'Q-7294' ? '7' : activeQuestionIndex + 1, total: 20 })}
           </span>
           <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
-            <span>Seuil requis : 700 / 1000 pts</span>
-            <span className="text-blue-400 font-bold">Progression : 35%</span>
+            <span>{t('quizzes:requiredThreshold')}</span>
+            <span className="text-blue-400 font-bold">{t('quizzes:progressPct', { pct: 35 })}</span>
           </div>
         </div>
         <div className="w-full h-2 bg-[#0a0e18] rounded-full overflow-hidden">
@@ -170,7 +170,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
                 </span>
               </div>
               <span className="text-xs font-mono text-emerald-400 font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-                Pondération : {currentQ.points} pts
+                {t('quizzes:weight', { points: currentQ.points })}
               </span>
             </div>
 
@@ -263,7 +263,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
                   disabled={!selectedOption}
                   className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-blue-600/20 transition-all"
                 >
-                  Valider la réponse
+                  {t('quizzes:validateButton')}
                 </button>
               </div>
             )}
@@ -274,7 +274,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             <div className="p-6 rounded-2xl bg-[#171b26] border border-emerald-500/30 shadow-xl space-y-5 animate-in fade-in slide-in-from-top-3 duration-300">
               <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs font-bold uppercase tracking-wider">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Explication Technique Validée • Option {currentQ.correctKey}</span>
+                <span>{t('quizzes:validatedExplanation', { key: currentQ.correctKey })}</span>
               </div>
 
               <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
@@ -300,7 +300,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] space-y-2.5">
                 <div className="text-xs font-mono font-semibold uppercase text-slate-300 flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                  Décryptage des Pièges & Distracteurs
+                  {t('quizzes:trapsHeading')}
                 </div>
                 <div className="space-y-2">
                   {currentQ.explanation.traps.map((t, idx) => (
@@ -330,7 +330,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
                   rel="noreferrer"
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600/20 text-blue-300 hover:bg-blue-600 hover:text-white text-xs font-medium transition-colors"
                 >
-                  <span>Microsoft Learn</span>
+                  <span>{t('quizzes:officialSource')}</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
@@ -345,11 +345,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#171b26] border border-[#262a35] disabled:opacity-40 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Précédente (Q6)</span>
+              <span>{t('quizzes:prevButton', { num: Math.max(1, activeQuestionIndex) })}</span>
             </button>
 
             <span className="hidden sm:inline text-[11px] text-slate-400 font-mono">
-              Raccourci : Espace ou Touche 1-4 pour répondre
+              {t('quizzes:shortcutHelper')}
             </span>
 
             <button
@@ -357,7 +357,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               disabled={activeQuestionIndex >= questions.length - 1}
               className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-40 transition-colors shadow-md shadow-blue-600/20"
             >
-              <span>Suivante (Q8)</span>
+              <span>{t('quizzes:nextButton', { num: Math.min(questions.length, activeQuestionIndex + 2) })}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -367,9 +367,9 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200 dark:border-[#262a35]">
               <span className="font-mono font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-                Passerelles d’Apprentissage
+                {t('quizzes:bridgesTitle')}
               </span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400">Actions recommandées</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400">{t('quizzes:bridgesSubtitle')}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
@@ -392,10 +392,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               >
                 <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-semibold font-mono text-[11px]">
                   <Bot className="w-3.5 h-3.5" />
-                  Demander au tuteur IA
+                  {t('quizzes:bridgeAITutorTitle')}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Comprendre l'explication et déjouer les pièges de cette question
+                  {t('quizzes:bridgeAITutorDesc')}
                 </div>
               </button>
 
@@ -406,10 +406,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               >
                 <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold font-mono text-[11px]">
                   <Layers className="w-3.5 h-3.5" />
-                  Fiches Mémo associées
+                  {t('quizzes:bridgeFlashcardsTitle')}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Mémoriser la notion avec la répétition espacée SM-2
+                  {t('quizzes:bridgeFlashcardsDesc')}
                 </div>
               </button>
 
@@ -420,10 +420,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               >
                 <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-semibold font-mono text-[11px]">
                   <Clock className="w-3.5 h-3.5" />
-                  Examen Blanc Chrono
+                  {t('quizzes:bridgeExamTitle')}
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Tester vos réflexes en conditions d'examen réelles
+                  {t('quizzes:bridgeExamDesc')}
                 </div>
               </button>
             </div>
@@ -437,13 +437,13 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             <div className="flex items-center justify-between">
               <div className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-blue-400" />
-                Schéma de Référence
+                {t('quizzes:referenceSchema')}
               </div>
               <button
                 onClick={() => setIsDiagramExpanded(!isDiagramExpanded)}
                 className="p-1 text-slate-400 hover:text-white"
-                title="Agrandir le schéma"
-                aria-label="Agrandir le schéma"
+                title={t('quizzes:expandSchema')}
+                aria-label={t('quizzes:expandSchema')}
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </button>
@@ -493,19 +493,19 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               </svg>
             </div>
             <p className="text-[11px] text-slate-400">
-              Pipeline complet avec reranking bi-directionnel et isolation réseau VNet.
+              {t('quizzes:schemaPipelineDesc')}
             </p>
           </div>
 
           {/* Domain Skills Gauges */}
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3.5">
             <div className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-300">
-              Compétences par Domaine
+              {t('quizzes:skillsByDomain')}
             </div>
             <div className="space-y-2.5">
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">GenAI & Solutions RAG</span>
+                  <span className="text-slate-300">{t('quizzes:domainGenAI')}</span>
                   <span className="font-mono text-emerald-400 font-semibold">85%</span>
                 </div>
                 <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
@@ -515,7 +515,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
 
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">Computer Vision Azure</span>
+                  <span className="text-slate-300">{t('quizzes:domainVision')}</span>
                   <span className="font-mono text-rose-400 font-semibold">54%</span>
                 </div>
                 <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
@@ -525,7 +525,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
 
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">Traitement Langage & Speech</span>
+                  <span className="text-slate-300">{t('quizzes:domainNLP')}</span>
                   <span className="font-mono text-blue-400 font-semibold">72%</span>
                 </div>
                 <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
@@ -535,7 +535,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
 
               <div>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">IA Responsable & Sécurité</span>
+                  <span className="text-slate-300">{t('quizzes:domainResponsible')}</span>
                   <span className="font-mono text-amber-400 font-semibold">62%</span>
                 </div>
                 <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
@@ -549,9 +549,9 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-mono font-semibold uppercase tracking-wider text-slate-300">
-                Grille de Navigation
+                {t('quizzes:navigationGrid')}
               </span>
-              <span className="text-slate-400 font-mono text-[11px]">20 Questions</span>
+              <span className="text-slate-400 font-mono text-[11px]">{t('quizzes:totalQuestionsCount', { count: 20 })}</span>
             </div>
 
             <div className="grid grid-cols-5 gap-2">
@@ -596,15 +596,15 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-[#262a35]">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                Correct (5)
+                {t('quizzes:legendCorrect', { count: 5 })}
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-rose-400" />
-                Erreur (1)
+                {t('quizzes:legendIncorrect', { count: 1 })}
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-blue-500" />
-                Actif (Q7)
+                {t('quizzes:legendActive', { num: 7 })}
               </span>
             </div>
           </div>
