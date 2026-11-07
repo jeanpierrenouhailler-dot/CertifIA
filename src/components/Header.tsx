@@ -133,6 +133,17 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="hidden lg:inline">{t('navigation:items.assistant.shortLabel', 'Assistant IA')}</span>
         </button>
 
+        {/* Landing Page Quick Link */}
+        <button
+          onClick={() => onNavigate('landing')}
+          className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors border border-transparent hover:border-slate-200 dark:hover:border-[#262a35]"
+          title={t('navigation:items.landing.label', 'Page de présentation')}
+          aria-label={t('navigation:items.landing.label', 'Page de présentation')}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+          <span>{t('navigation:items.landing.shortLabel', 'Présentation')}</span>
+        </button>
+
         {/* Language Selector (Bilingual French / English) */}
         <LanguageSelector variant="header" />
 

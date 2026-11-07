@@ -143,6 +143,11 @@
       "label": "Installer l’application",
       "shortLabel": "Installer",
       "description": "Ajouter CertifIA à votre écran d’accueil mobile ou bureau"
+    },
+    "landing": {
+      "label": "Page de présentation",
+      "shortLabel": "Présentation",
+      "description": "Découvrir la méthode pédagogique et les piliers d’apprentissage CertifIA"
     }
   },
   "search": {

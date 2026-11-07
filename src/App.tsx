@@ -28,6 +28,7 @@ import { LegalOnboardingModal } from './components/LegalOnboardingModal';
 import { InstallAppModal } from './components/InstallAppModal';
 import { FlashcardsDistributionModal, FlashcardCertId } from './components/FlashcardsDistributionModal';
 import { GlossaryView } from './components/GlossaryView';
+import { LandingPageView } from './components/LandingPageView';
 import { certificationsData } from './data/certificationsData';
 import { AuthProvider } from './context/AuthContext';
 import { ProgressProvider } from './context/ProgressContext';
@@ -131,6 +132,31 @@ function AppContent() {
   };
 
   const selectedBlueprintCert = certificationsData.find((c) => c.id === blueprintExamId) || null;
+
+  if (currentScreen === 'landing') {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0b0e17] dark:text-[#dfe2f1] font-sans selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-200 transition-colors duration-200">
+        <LandingPageView
+          onNavigate={(screen) => setCurrentScreen(screen)}
+          onOpenBlueprint={handleOpenBlueprint}
+          onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
+        />
+        {blueprintExamId && selectedBlueprintCert && (
+          <BlueprintDrawer
+            certification={selectedBlueprintCert}
+            isOpen={!!blueprintExamId}
+            onClose={() => setBlueprintExamId(null)}
+            onStartTraining={handleStartTrainingFromBlueprint}
+          />
+        )}
+        <AIAssistantDrawer
+          isOpen={isAIAssistantDrawerOpen}
+          onClose={() => setIsAIAssistantDrawerOpen(false)}
+          context={aiAssistantContext || undefined}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0f131d] dark:text-[#dfe2f1] font-sans selection:bg-blue-500/30 selection:text-blue-600 dark:selection:text-blue-200 transition-colors duration-200">

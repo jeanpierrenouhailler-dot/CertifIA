@@ -359,6 +359,17 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   </button>
 
                   <button
+                    onClick={() => handleSelectNav('landing')}
+                    className="w-full p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-[#171c2b] dark:hover:bg-[#20273c] border border-slate-200/80 dark:border-[#22283a] flex items-center justify-between text-left"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Sparkles className="w-4 h-4 text-blue-500" />
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.landing.label', 'Page de présentation')}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-400" />
+                  </button>
+
+                  <button
                     onClick={() => {
                       setIsMoreSheetOpen(false);
                       openLegalModal();

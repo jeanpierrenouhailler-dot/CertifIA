@@ -480,6 +480,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
 
                 <button
+                  onClick={() => handleNav('landing')}
+                  className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#1a2030] hover:text-blue-600 dark:hover:text-blue-400"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="truncate">{t('navigation:items.landing.shortLabel', 'Page de présentation')}</span>
+                </button>
+
+                <button
                   onClick={() => {
                     if (onOpenLegalModal) onOpenLegalModal();
                     if (onCloseMobile) onCloseMobile();

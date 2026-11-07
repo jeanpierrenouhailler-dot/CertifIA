@@ -143,6 +143,11 @@
       "label": "Install Application",
       "shortLabel": "Install",
       "description": "Add CertifIA to your mobile or desktop home screen"
+    },
+    "landing": {
+      "label": "Landing Page & Overview",
+      "shortLabel": "Overview",
+      "description": "Discover CertifIA’s pedagogical methodology and learning pillars"
     }
   },
   "search": {

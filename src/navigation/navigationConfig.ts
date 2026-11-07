@@ -346,6 +346,16 @@ export const NAV_ITEMS: NavItemConfig[] = [
     actionKey: 'open-pwa',
     visibility: { desktop: true, mobileBar: false, mobileMore: true, search: true },
   },
+  {
+    id: 'nav-landing',
+    label: 'Page de présentation',
+    shortLabel: 'Présentation',
+    category: 'plus',
+    screen: 'landing',
+    icon: Sparkles,
+    description: 'Découvrir la méthode pédagogique et les piliers d’apprentissage CertifIA',
+    visibility: { desktop: true, mobileBar: false, mobileMore: true, search: true },
+  },
 ];
 
 export interface BreadcrumbInfo {
