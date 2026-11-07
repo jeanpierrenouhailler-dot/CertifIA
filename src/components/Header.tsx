@@ -13,7 +13,8 @@ import {
   ChevronRight,
   Sparkles,
   Layers,
-  Award
+  Award,
+  Compass
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { CertifAILogo } from './CertifAILogo';
@@ -23,10 +24,11 @@ import { useGuide } from '../context/GuideContext';
 import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
+import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { certificationsData } from '../data/certificationsData';
 import { getBreadcrumbForScreen } from '../navigation/navigationConfig';
 import { LanguageSelector } from './LanguageSelector';
-import { useTranslation } from '../i18n';
+import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface HeaderProps {
   currentScreen: AppScreen;
@@ -55,6 +57,8 @@ export const Header: React.FC<HeaderProps> = ({
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { activeCertId } = useProgress();
   const { versionInfo, isChecking } = useSystemUpdate();
+  const { startTour } = useOnboardingTour();
+  const isEn = getCurrentLanguage() === 'en';
 
   // Active target certification
   const currentCert = certificationsData.find((c) => c.id === (activeCertId || 'ai102')) || certificationsData[0];
@@ -114,6 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {/* Active Target Cert Pill */}
         <button
+          data-tour="target-cert"
           onClick={() => onOpenBlueprint ? onOpenBlueprint(currentCert.id) : onNavigate('catalogue')}
           className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/15 border border-blue-500/25 text-xs font-mono font-semibold text-blue-600 dark:text-blue-300 transition-colors"
           title={`${t('dashboard:targetCert')}: ${currentCert.title}`}
@@ -142,6 +147,17 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Sparkles className="w-3.5 h-3.5 text-blue-500" />
           <span>{t('navigation:items.landing.shortLabel', 'Présentation')}</span>
+        </button>
+
+        {/* Guided Tour Trigger Button */}
+        <button
+          onClick={() => startTour(0)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/40 transition-all shadow-sm"
+          title={isEn ? 'Launch Automated Guided Tour' : 'Lancer la visite guidée automatique'}
+          aria-label="Discovery Tour"
+        >
+          <Compass className="w-3.5 h-3.5 text-blue-500 animate-spin-slow" />
+          <span className="hidden sm:inline font-medium">{isEn ? 'Tour' : 'Visite'}</span>
         </button>
 
         {/* Language Selector (Bilingual French / English) */}

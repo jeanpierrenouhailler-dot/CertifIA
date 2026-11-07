@@ -1127,6 +1127,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           ) : (
             <div
               id="active-flashcard-stage"
+              data-tour="flashcards-engine"
               onClick={handleFlip}
               className="relative min-h-[400px] sm:min-h-[440px] rounded-3xl bg-gradient-to-br from-[#172033] via-[#171b26] to-[#0f131d] border border-[#262a35] hover:border-blue-500/40 shadow-2xl p-6 sm:p-8 cursor-pointer transition-all duration-300 select-none flex flex-col justify-between group"
             >

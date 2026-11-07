@@ -30,6 +30,7 @@ import { usePwa } from '../context/PwaContext';
 import { useGuide } from '../context/GuideContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
+import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { NAV_CATEGORIES } from '../navigation/navigationConfig';
 import { useTranslation } from 'react-i18next';
 
@@ -69,6 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { versionInfo } = useSystemUpdate();
   const { certProgress, activeCertId } = useProgress();
+  const { startTour } = useOnboardingTour();
   const { t } = useTranslation(['navigation', 'common', 'settings']);
 
   const activeProgressPct = (activeCertId && certProgress[activeCertId]?.progress) 
@@ -476,6 +478,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="truncate">{t('navigation:items.guide.shortLabel', 'Mode Guide novice')}</span>
                   <span className={`ml-auto text-[9px] font-mono px-1.5 py-0.2 rounded font-bold ${isGuideModeActive ? 'bg-emerald-500/20 text-emerald-500' : 'bg-slate-200 dark:bg-[#202533] text-slate-400'}`}>
                     {isGuideModeActive ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    startTour(0);
+                    if (onCloseMobile) onCloseMobile();
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/20 font-medium"
+                >
+                  <Compass className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="truncate">{t('navigation:items.tour.shortLabel', 'Visite guidée')}</span>
+                  <span className="ml-auto text-[9px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold">
+                    AUTO
                   </span>
                 </button>
 

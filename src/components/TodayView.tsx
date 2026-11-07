@@ -327,7 +327,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Main Hero Card (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="relative rounded-3xl bg-gradient-to-br from-[#172033] via-[#171b26] to-[#0f131d] border border-blue-500/30 p-6 sm:p-8 shadow-2xl overflow-hidden group">
+          <div data-tour="today-session" className="relative rounded-3xl bg-gradient-to-br from-[#172033] via-[#171b26] to-[#0f131d] border border-blue-500/30 p-6 sm:p-8 shadow-2xl overflow-hidden group">
             {/* Background cyber accent glow */}
             <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -444,7 +444,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
               </div>
 
               {/* Target & Progression Bar Section */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-[#0f131d]/90 border border-[#262a35] space-y-3">
+              <div data-tour="today-target-progress" className="p-4 sm:p-5 rounded-2xl bg-[#0f131d]/90 border border-[#262a35] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-base">🎯</span>

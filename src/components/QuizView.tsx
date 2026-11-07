@@ -158,7 +158,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
         {/* Left Column: Question & Options & Explanation (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Question Card */}
-          <div className="p-6 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-xl">
+          <div data-tour="quiz-container" className="p-6 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-xl">
             {/* Meta row */}
             <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">

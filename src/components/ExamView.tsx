@@ -203,7 +203,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Active Question & Radio Options (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="p-6 sm:p-8 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-xl space-y-6">
+          <div data-tour="exam-banner" className="p-6 sm:p-8 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-xl space-y-6">
             {/* Meta Row */}
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono font-semibold text-blue-300 px-2.5 py-1 rounded bg-blue-500/10 border border-blue-500/20">

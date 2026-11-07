@@ -134,7 +134,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
       />
 
       {/* Filter Toolbar */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] space-y-4 shadow-sm">
+      <div data-tour="catalogue-filters" className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] space-y-4 shadow-sm">
         {/* Provider Filters */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
           <span className="font-mono text-slate-400 uppercase text-[10px] font-bold mr-1 shrink-0">{t('certifications:filterByProvider')} :</span>

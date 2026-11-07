@@ -213,7 +213,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
 
       {/* 2. Interactive Diagnostic Stepper (Collapsible / Toggleable) */}
       {(isDiagnosticMode || !profile.completedAt) && (
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#172033] via-[#171b26] to-[#0f131d] border border-blue-500/30 shadow-2xl space-y-8 animate-in fade-in duration-300">
+        <div data-tour="recommendation-pathway" className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#172033] via-[#171b26] to-[#0f131d] border border-blue-500/30 shadow-2xl space-y-8 animate-in fade-in duration-300">
           
           {/* Stepper Tabs */}
           <div className="flex items-center justify-between border-b border-[#262a35] pb-4">

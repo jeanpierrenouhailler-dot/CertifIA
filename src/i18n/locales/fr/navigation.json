@@ -148,6 +148,11 @@
       "label": "Page de présentation",
       "shortLabel": "Présentation",
       "description": "Découvrir la méthode pédagogique et les piliers d’apprentissage CertifIA"
+    },
+    "tour": {
+      "label": "Visite guidée automatique",
+      "shortLabel": "Visite guidée",
+      "description": "Parcours de découverte progressive et automatique de l’interface"
     }
   },
   "search": {

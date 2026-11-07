@@ -33,6 +33,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useGuide } from '../context/GuideContext';
 import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
+import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { NAV_CATEGORIES, NAV_ITEMS, NavCategoryId, NavItemConfig } from '../navigation/navigationConfig';
 import { LanguageSelector } from './LanguageSelector';
 import { useTranslation } from '../i18n';
@@ -68,6 +69,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
   const { isGuideModeActive, toggleGuideMode, openLegalModal } = useGuide();
   const { isInstalled, promptInstall } = usePwa();
   const { versionInfo } = useSystemUpdate();
+  const { startTour } = useOnboardingTour();
 
   if (!isOpen) return null;
 
@@ -84,6 +86,8 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       openLegalModal();
     } else if (item.actionKey === 'open-pwa') {
       promptInstall();
+    } else if (item.actionKey === 'open-tour') {
+      startTour(0);
     } else if (item.category === 'assistant' && onOpenAIAssistant) {
       onOpenAIAssistant();
     } else {

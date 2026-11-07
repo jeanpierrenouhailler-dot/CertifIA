@@ -19,6 +19,7 @@ import {
 import { AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
 import { getLocalizedGlossaryEntries, LocalizedGlossaryEntry } from '../data/localizedGlossaryData';
+import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface CommandPaletteModalProps {
@@ -46,6 +47,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const { t, i18n } = useTranslation(['navigation', 'common']);
+  const { startTour } = useOnboardingTour();
   const lang = (i18n.language === 'en' ? 'en' : 'fr');
 
   useEffect(() => {
@@ -184,6 +186,17 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
       icon: BarChart3,
       onSelect: () => {
         onNavigate('analytics');
+        onClose();
+      },
+    },
+    {
+      id: 'act-tour',
+      type: 'action',
+      title: t('navigation:items.tour.label', 'Visite guidée automatique de l’interface CertifIA'),
+      category: t('navigation:categories.plus', 'Découverte'),
+      icon: Compass,
+      onSelect: () => {
+        startTour(0);
         onClose();
       },
     },

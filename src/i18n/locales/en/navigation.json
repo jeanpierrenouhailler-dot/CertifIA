@@ -148,6 +148,11 @@
       "label": "Landing Page & Overview",
       "shortLabel": "Overview",
       "description": "Discover CertifIA’s pedagogical methodology and learning pillars"
+    },
+    "tour": {
+      "label": "Automated Onboarding Tour",
+      "shortLabel": "Guided Tour",
+      "description": "Progressive automated discovery tour of the CertifIA platform"
     }
   },
   "search": {

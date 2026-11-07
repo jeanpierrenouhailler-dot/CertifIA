@@ -448,7 +448,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
       </div>
 
       {/* 4 Cardinal KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div data-tour="analytics-score" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Indice Préparation Globale */}
         <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] flex items-center justify-between shadow-lg">
           <div>
