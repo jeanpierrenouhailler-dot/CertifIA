@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="quiz-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e18" />
+      <stop offset="100%" stop-color="#0f131d" />
+    </linearGradient>
+    <filter id="q-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#quiz-bg)" />
+
+  <!-- Window Header Bar -->
+  <rect x="0" y="0" width="1280" height="42" fill="#070a12" stroke="#1c1f2a" stroke-width="1" />
+  <circle cx="24" cy="21" r="6" fill="#ef4444" />
+  <circle cx="44" cy="21" r="6" fill="#eab308" />
+  <circle cx="64" cy="21" r="6" fill="#22c55e" />
+  <text x="640" y="26" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">certifia.app • Moteur QCM &amp; Décryptage des Pièges d'Examen</text>
+
+  <!-- Left Sidebar -->
+  <rect x="0" y="42" width="220" height="678" fill="#0c101a" stroke="#1c1f2a" stroke-width="1" />
+  <text x="24" y="80" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="18">Certif<tspan fill="#3b82f6">IA</tspan></text>
+  <text x="24" y="96" fill="#64748b" font-family="monospace" font-size="9">CLOUD AI CERTIF</text>
+
+  <rect x="12" y="120" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="143" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🏠 Today</text>
+  <rect x="12" y="160" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="183" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🧭 Catalog</text>
+  <text x="20" y="224" fill="#475569" font-family="monospace" font-size="10" font-weight="bold">3. LEARNING</text>
+  
+  <rect x="12" y="238" width="196" height="36" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+  <text x="26" y="261" fill="#60a5fa" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">✅ Quizzes &amp; MCQs</text>
+  <rect x="156" y="246" width="40" height="18" rx="6" fill="#10b981" fill-opacity="0.2" />
+  <text x="176" y="259" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">QCM</text>
+
+  <text x="26" y="302" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🎴 Flashcards (SM-2)</text>
+  <text x="26" y="338" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">⏱️ Mock Exam</text>
+  <text x="26" y="374" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">📖 AI Glossary</text>
+
+  <!-- Top Bar -->
+  <rect x="220" y="42" width="1060" height="54" fill="#0d111c" stroke="#1c1f2a" stroke-width="1" />
+  <text x="245" y="74" fill="#64748b" font-family="system-ui, sans-serif" font-size="12">Home &gt; Learning &gt; <tspan fill="#ffffff" font-weight="bold">Scenario Quizzes</tspan></text>
+  <rect x="880" y="54" width="140" height="30" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-opacity="0.3" />
+  <text x="950" y="73" fill="#60a5fa" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">🎯 AI-102 Associate</text>
+  <rect x="1030" y="54" width="100" height="30" rx="8" fill="#1e293b" />
+  <text x="1080" y="73" fill="#34d399" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">Score : 85.7%</text>
+
+  <!-- Quiz Scenario Container -->
+  <g filter="url(#q-shadow)">
+    <rect x="250" y="115" width="985" height="580" rx="20" fill="#131826" stroke="#252b3b" stroke-width="1" />
+    
+    <!-- Quiz Header -->
+    <rect x="250" y="115" width="985" height="60" rx="20" fill="#171e2e" />
+    <rect x="270" y="132" width="130" height="26" rx="6" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-opacity="0.4" />
+    <text x="335" y="149" fill="#60a5fa" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">QUESTION 7 / 12</text>
+    <text x="420" y="150" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12">Domaine : <tspan fill="#ffffff">Architecture RAG &amp; Azure AI Search</tspan></text>
+    <rect x="1090" y="132" width="125" height="26" rx="6" fill="#ef4444" fill-opacity="0.15" />
+    <text x="1152" y="149" fill="#f87171" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">⚠️ PIÈGE EXAMEN</text>
+
+    <!-- Question Scenario Text -->
+    <text x="275" y="210" fill="#ffffff" font-family="system-ui, sans-serif" font-size="15" font-weight="bold">Une banque multinationale déploie un système RAG sur 4 millions de contrats financiers.</text>
+    <text x="275" y="234" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">Elle constate que les requêtes contenant des acronymes juridiques rares et des numéros de clause stricts</text>
+    <text x="275" y="254" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">échouent avec une recherche purement vectorielle. Quelle configuration d'indexation Azure AI Search devez-vous recommander ?</text>
+
+    <!-- Options -->
+    <!-- Option A (Wrong) -->
+    <rect x="275" y="280" width="935" height="48" rx="10" fill="#0f131d" stroke="#252b3b" stroke-width="1" />
+    <circle cx="300" cy="304" r="10" fill="#1e2433" />
+    <text x="300" y="308" fill="#94a3b8" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">A</text>
+    <text x="325" y="309" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">Augmenter la dimension des embeddings de text-embedding-ada-002 vers 3072 dimensions.</text>
+
+    <!-- Option B (Correct) Selected & Validated -->
+    <rect x="275" y="340" width="935" height="48" rx="10" fill="#064e3b" fill-opacity="0.3" stroke="#10b981" stroke-width="1.5" />
+    <circle cx="300" cy="364" r="10" fill="#10b981" />
+    <text x="300" y="368" fill="#ffffff" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">✓</text>
+    <text x="325" y="369" fill="#ffffff" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Recherche Hybride (BM25 inversé + Vecteurs HNSW) combinée au Semantic Ranker (L2 Re-ranking).</text>
+    <text x="1140" y="369" fill="#34d399" font-family="monospace" font-size="11" font-weight="bold">CORRECT (+100)</text>
+
+    <!-- Option C (Wrong) -->
+    <rect x="275" y="400" width="935" height="48" rx="10" fill="#0f131d" stroke="#252b3b" stroke-width="1" />
+    <circle cx="300" cy="424" r="10" fill="#1e2433" />
+    <text x="300" y="428" fill="#94a3b8" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">C</text>
+    <text x="325" y="429" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">Désactiver le découpage (chunking) et ingérer les contrats en documents JSON bruts.</text>
+
+    <!-- Option D (Wrong - Distractor) -->
+    <rect x="275" y="460" width="935" height="48" rx="10" fill="#4c0519" fill-opacity="0.2" stroke="#e11d48" stroke-width="1" />
+    <circle cx="300" cy="484" r="10" fill="#e11d48" />
+    <text x="300" y="488" fill="#ffffff" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">✕</text>
+    <text x="325" y="489" fill="#fda4af" font-family="system-ui, sans-serif" font-size="13">Remplacer Azure AI Search par Azure Cosmos DB avec index vectoriel DiskANN sans analyse lexicale.</text>
+    <text x="1145" y="489" fill="#fb7185" font-family="monospace" font-size="10">PIÈGE DISTRACTEUR</text>
+
+    <!-- Pedagogical Explanation Card -->
+    <rect x="275" y="525" width="935" height="150" rx="12" fill="#0c121e" stroke="#3b82f6" stroke-opacity="0.4" stroke-width="1" />
+    <text x="295" y="550" fill="#60a5fa" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">💡 Règle d'or Pédagogique CertifIA &amp; Justification Officielle Microsoft :</text>
+    <text x="295" y="572" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">La recherche vectorielle pure capture le sens sémantique flou mais échoue sur les termes hors vocabulaire (acronymes de niche,</text>
+    <text x="295" y="590" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">numéros de compte, codes d'erreur). Le standard d'examen AI-102 exige l'hybridation avec l'algorithme BM25 lexical.</text>
+    
+    <!-- Flow Mini Schema -->
+    <rect x="295" y="605" width="130" height="24" rx="4" fill="#1e293b" />
+    <text x="360" y="621" fill="#93c5fd" font-family="monospace" font-size="10" text-anchor="middle">1. Requête Utilisateur</text>
+    <text x="435" y="621" fill="#60a5fa" font-family="sans-serif" font-size="11">→</text>
+    <rect x="450" y="605" width="140" height="24" rx="4" fill="#1e293b" />
+    <text x="520" y="621" fill="#fcd34d" font-family="monospace" font-size="10" text-anchor="middle">2. BM25 + HNSW (RRF)</text>
+    <text x="600" y="621" fill="#60a5fa" font-family="sans-serif" font-size="11">→</text>
+    <rect x="615" y="605" width="150" height="24" rx="4" fill="#065f46" />
+    <text x="690" y="621" fill="#34d399" font-family="monospace" font-size="10" text-anchor="middle">3. Semantic Ranker (L2)</text>
+    <text x="775" y="621" fill="#60a5fa" font-family="sans-serif" font-size="11">→</text>
+    <rect x="790" y="605" width="130" height="24" rx="4" fill="#1e3a8a" />
+    <text x="855" y="621" fill="#bfdbfe" font-family="monospace" font-size="10" text-anchor="middle">4. Contexte Prompt LLM</text>
+
+    <!-- Bottom Action Button -->
+    <rect x="1055" y="640" width="145" height="26" rx="6" fill="#2563eb" />
+    <text x="1127" y="657" fill="#ffffff" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">Question Suivante →</text>
+  </g>
+</svg>

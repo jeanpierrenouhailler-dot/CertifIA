@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="tour-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050811" />
+      <stop offset="100%" stop-color="#0b0f1a" />
+    </linearGradient>
+    <linearGradient id="tour-bar-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="50%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <filter id="tour-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000" flood-opacity="0.8" />
+    </filter>
+  </defs>
+
+  <!-- Background Application (Dimmed) -->
+  <rect width="1280" height="720" fill="url(#tour-bg)" />
+
+  <!-- App Header Bar -->
+  <rect x="0" y="0" width="1280" height="54" fill="#090d16" stroke="#1c202d" stroke-width="1" />
+  <circle cx="28" cy="27" r="14" fill="#2563eb" />
+  <text x="52" y="33" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="16">Certif<tspan fill="#3b82f6">IA</tspan></text>
+  <rect x="180" y="12" width="90" height="30" rx="8" fill="#151b2a" />
+  <text x="225" y="31" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Menu ☰</text>
+
+  <!-- Dimmed Background Content Elements -->
+  <rect x="250" y="80" width="980" height="340" rx="20" fill="#0e1320" stroke="#1c2333" stroke-width="1" opacity="0.4" />
+
+  <!-- Spotlight Ring around Target Element: Cockpit Quotidien Hero -->
+  <!-- Target Cutout / Spotlight Highlight -->
+  <rect x="250" y="75" width="650" height="330" rx="24" fill="#131b2e" stroke="#60a5fa" stroke-width="2.5" />
+  <!-- Spotlight Locator Tag -->
+  <rect x="270" y="60" width="130" height="24" rx="12" fill="#2563eb" />
+  <text x="335" y="76" fill="#ffffff" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">✨ ÉLÉMENT CIBLÉ</text>
+
+  <!-- Content inside Spotlight -->
+  <text x="280" y="115" fill="#60a5fa" font-family="monospace" font-size="10" font-weight="bold">ALGORITHME CERTIFIA • SESSION SUR-MESURE</text>
+  <text x="280" y="145" fill="#ffffff" font-family="system-ui, sans-serif" font-size="22" font-weight="bold">Votre session quotidienne calibrée</text>
+  <rect x="800" y="120" width="80" height="26" rx="13" fill="#6366f1" fill-opacity="0.2" />
+  <text x="840" y="137" fill="#a5b4fc" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">~22 min</text>
+
+  <!-- 3 Mini Cards in spotlight -->
+  <rect x="280" y="170" width="180" height="110" rx="14" fill="#090d16" stroke="#252c40" />
+  <text x="300" y="200" fill="#ffffff" font-size="18">🧠 <tspan font-family="monospace" font-size="10" fill="#60a5fa">SM-2</tspan></text>
+  <text x="300" y="235" fill="#ffffff" font-family="monospace" font-size="22" font-weight="bold">17</text>
+  <text x="300" y="255" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11">fiches à réviser</text>
+
+  <rect x="480" y="170" width="180" height="110" rx="14" fill="#090d16" stroke="#252c40" />
+  <text x="500" y="200" fill="#ffffff" font-size="18">⚠️ <tspan font-family="monospace" font-size="10" fill="#f59e0b">Priorité 4/5</tspan></text>
+  <text x="500" y="235" fill="#fcd34d" font-family="monospace" font-size="22" font-weight="bold">8</text>
+  <text x="500" y="255" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11">notions fragiles</text>
+
+  <rect x="680" y="170" width="180" height="110" rx="14" fill="#090d16" stroke="#252c40" />
+  <text x="700" y="200" fill="#ffffff" font-size="18">❓ <tspan font-family="monospace" font-size="10" fill="#f43f5e">QCM</tspan></text>
+  <text x="700" y="235" fill="#fda4af" font-family="monospace" font-size="22" font-weight="bold">12</text>
+  <text x="700" y="255" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11">questions ciblées</text>
+
+  <rect x="280" y="305" width="580" height="70" rx="14" fill="#090d16" stroke="#252c40" />
+  <text x="300" y="332" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">🎯 AI-102 — Azure AI Engineer Associate</text>
+  <rect x="300" y="348" width="540" height="8" rx="4" fill="#131b2e" />
+  <rect x="300" y="348" width="230" height="8" rx="4" fill="#3b82f6" />
+
+  <!-- Backdrop overlay darkening rest of screen -->
+  <rect x="0" y="0" width="1280" height="720" fill="#020617" fill-opacity="0.5" pointer-events="none" />
+
+  <!-- Floating Contextual Onboarding Tour Card -->
+  <g filter="url(#tour-shadow)">
+    <rect x="300" y="420" width="680" height="275" rx="24" fill="#111624" stroke="#3b82f6" stroke-opacity="0.4" stroke-width="1.5" />
+    
+    <!-- Dynamic Progress Countdown Bar -->
+    <rect x="300" y="420" width="680" height="6" rx="3" fill="#1a2236" />
+    <rect x="300" y="420" width="374" height="6" rx="3" fill="url(#tour-bar-grad)" />
+
+    <!-- Card Header: Step & Badge -->
+    <rect x="325" y="442" width="170" height="24" rx="12" fill="#3b82f6" fill-opacity="0.15" stroke="#3b82f6" stroke-opacity="0.3" />
+    <text x="410" y="458" fill="#60a5fa" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">01/10 • Cockpit Quotidien</text>
+
+    <!-- Auto-advance status indicator -->
+    <circle cx="510" cy="454" r="4" fill="#10b981" />
+    <text x="522" y="458" fill="#34d399" font-family="system-ui, sans-serif" font-size="11" font-weight="bold">Passage auto dans 5s</text>
+
+    <!-- Speed pill -->
+    <rect x="830" y="442" width="75" height="24" rx="8" fill="#1b2336" />
+    <text x="867" y="458" fill="#94a3b8" font-family="monospace" font-size="10" text-anchor="middle">⚡ Vitesse 8s</text>
+
+    <!-- Close button -->
+    <circle cx="945" cy="454" r="12" fill="#1b2336" />
+    <text x="945" y="458" fill="#94a3b8" font-family="sans-serif" font-size="12" text-anchor="middle">✕</text>
+
+    <!-- Step Title -->
+    <text x="325" y="495" fill="#ffffff" font-family="system-ui, sans-serif" font-size="17" font-weight="bold">Cockpit du Jour &amp; Algorithme CertifIA</text>
+    
+    <!-- Step Description -->
+    <text x="325" y="520" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">Chaque matin, l’algorithme CertifIA analyse vos révisions passées et compose une session</text>
+    <text x="325" y="538" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">quotidienne calibrée : fiches SRS prioritaires, notions fragiles et QCM ciblés pour sécuriser votre score.</text>
+
+    <!-- Practical CertifIA Tip Box -->
+    <rect x="325" y="555" width="630" height="42" rx="10" fill="#1e3a8a" fill-opacity="0.25" stroke="#3b82f6" stroke-opacity="0.3" stroke-width="1" />
+    <text x="340" y="580" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11">💡 <tspan font-weight="bold">Astuce CertifIA :</tspan> 15 à 20 min d'entraînement espacé au seuil d'oubli valent 3 heures de bachotage inefficace.</text>
+
+    <!-- Step mini-dots -->
+    <g transform="translate(565, 615)">
+      <circle cx="0" cy="0" r="4" fill="#3b82f6" />
+      <circle cx="15" cy="0" r="3" fill="#334155" />
+      <circle cx="30" cy="0" r="3" fill="#334155" />
+      <circle cx="45" cy="0" r="3" fill="#334155" />
+      <circle cx="60" cy="0" r="3" fill="#334155" />
+      <circle cx="75" cy="0" r="3" fill="#334155" />
+      <circle cx="90" cy="0" r="3" fill="#334155" />
+      <circle cx="105" cy="0" r="3" fill="#334155" />
+      <circle cx="120" cy="0" r="3" fill="#334155" />
+      <circle cx="135" cy="0" r="3" fill="#334155" />
+    </g>
+
+    <!-- Main Navigation Controls: Précédent, Pause / Continuer, Quitter, Suivant -->
+    <!-- Précédent -->
+    <rect x="325" y="635" width="95" height="36" rx="10" fill="#161e30" stroke="#252f47" stroke-width="1" opacity="0.5" />
+    <text x="372" y="657" fill="#64748b" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">← Précédent</text>
+
+    <!-- Pause / Continuer -->
+    <rect x="430" y="635" width="115" height="36" rx="10" fill="#d97706" fill-opacity="0.15" stroke="#f59e0b" stroke-opacity="0.4" stroke-width="1" />
+    <text x="487" y="657" fill="#fcd34d" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">⏸️ Pause</text>
+
+    <!-- Quitter -->
+    <rect x="765" y="635" width="80" height="36" rx="10" fill="transparent" />
+    <text x="805" y="657" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">Quitter</text>
+
+    <!-- Suivant -->
+    <rect x="855" y="635" width="100" height="36" rx="10" fill="#2563eb" />
+    <text x="905" y="657" fill="#ffffff" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">Suivant →</text>
+  </g>
+</svg>

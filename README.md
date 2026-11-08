@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="/icon.svg" alt="Logo CertifIA" width="128" height="128" />
+<img src="assets/icon.svg" alt="Logo CertifIA" width="128" height="128" />
 
 ### *Plateforme intelligente de préparation certifiante et de télémétrie cognitive pour examens Cloud & IA*
 ### *Intelligent Certification Prep & Cognitive Telemetry Platform for Cloud & AI Exams*
@@ -28,7 +28,7 @@
 ### 1. 🏠 Cockpit Quotidien & Algorithme CertifIA (Session du Jour)
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-cockpit-today.png" alt="Cockpit Quotidien CertifIA v2.7.0" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-cockpit-today.png" alt="Cockpit Quotidien CertifIA v2.7.0" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Session Quotidienne Sur-Mesure (~22 min)** : Chaque matin, l'algorithme CertifIA analyse vos révisions passées pour composer votre session optimale :
@@ -44,7 +44,7 @@
 ### 2. ✨ Moteur d'Orientation & Parcours IA Personnalisé (Niveaux 1 à 4)
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-orientation-pathway.png" alt="Moteur d'Orientation & Parcours IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-orientation-pathway.png" alt="Moteur d'Orientation & Parcours IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Diagnostic Structuré en 4 Paliers** :
@@ -60,7 +60,7 @@
 ### 3. 🎯 Suivi des Objectifs d'Examen & Activités Récentes
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-details-activity.png" alt="Objectifs d'Examen et Activités Récentes" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-details-activity.png" alt="Objectifs d'Examen et Activités Récentes" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Suivi de l'Examen Visé (AI-102)** : Date cible fixée, objectif de 85 / 100 révisées par semaine, consultation directe du blueprint officiel en un clic.
@@ -72,7 +72,7 @@
 ### 4. 🧭 Catalogue Officiel des 18 Certifications Cloud & IA
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-catalogue-view.svg" alt="Catalogue des 18 Certifications Cloud & IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-catalogue-view.svg" alt="Catalogue des 18 Certifications Cloud & IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Couverture Exhaustive Multi-Fournisseurs** :
@@ -88,7 +88,7 @@
 ### 5. ✅ Moteur d'Entraînement QCM & Analyse des Pièges d'Examen
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-quiz-engine.svg" alt="Moteur QCM et Décryptage des Pièges" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-quiz-engine.svg" alt="Moteur QCM et Décryptage des Pièges" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Mise en Situation Réelle d'Architecture** : Scénarios d'entreprise réalistes (banque, santé, e-commerce, industrie).
@@ -101,7 +101,7 @@
 ### 6. 🎴 Fiches Mémo & Répétition Espacée SM-2 (2 800 Cartes)
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-flashcards-srs.svg" alt="Fiches Mémo SM-2 Spaced Repetition" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-flashcards-srs.svg" alt="Fiches Mémo SM-2 Spaced Repetition" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Algorithme Scientifique SuperMemo-2 (SM-2) / FSRS** : Calcul automatique du seuil critique d'oubli pour réviser chaque concept au moment mathématique idéal.
@@ -118,7 +118,7 @@
 ### 7. ⏱️ Examens Blancs Chronométrés en Conditions Réelles
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-mock-exam.svg" alt="Examen Blanc Chronométré en Conditions Réelles" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-mock-exam.svg" alt="Examen Blanc Chronométré en Conditions Réelles" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Conditions Réelles Pearson VUE** : Chronomètre officiel (90 à 120 minutes), épreuve complète de 50 à 65 questions, seuil éliminatoire officiel (**700 / 1 000 pts**).
@@ -131,7 +131,7 @@
 ### 8. 🤖 Tuteur Pédagogique IA Contextuel (Dialogue Socratique)
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-ai-tutor.svg" alt="Tuteur Pédagogique IA Socratique" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-ai-tutor.svg" alt="Tuteur Pédagogique IA Socratique" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Approche Socratique d'Apprentissage** : Ne donne jamais la réponse brute sans réflexion : guide l'apprenant à travers les contraintes architecturales de latence, coût et précision.
@@ -144,7 +144,7 @@
 ### 9. 📊 Tableau de Bord & Télémétrie Cognitive
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-analytics-dashboard.svg" alt="Tableau de Bord & Télémétrie Cognitive" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-analytics-dashboard.svg" alt="Tableau de Bord & Télémétrie Cognitive" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **4 KPIs Cardinaux de Préparation** :
@@ -160,7 +160,7 @@
 ### 10. 🧭 Onboarding Tour en Mode Découverte Automatique
 
 <div align="center">
-  <img src="/assets/screenshots/certifia-onboarding-tour.svg" alt="Onboarding Tour Automatique CertifIA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-onboarding-tour.svg" alt="Onboarding Tour Automatique CertifIA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Parcours de Découverte 100% Automatique** : Présentation progressive des 10 modules clés de CertifIA sans intervention obligatoire de l'utilisateur.
