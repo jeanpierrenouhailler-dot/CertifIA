@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="an-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e18" />
+      <stop offset="100%" stop-color="#0f131d" />
+    </linearGradient>
+    <filter id="an-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#an-bg)" />
+
+  <!-- Window Header Bar -->
+  <rect x="0" y="0" width="1280" height="42" fill="#070a12" stroke="#1c1f2a" stroke-width="1" />
+  <circle cx="24" cy="21" r="6" fill="#ef4444" />
+  <circle cx="44" cy="21" r="6" fill="#eab308" />
+  <circle cx="64" cy="21" r="6" fill="#22c55e" />
+  <text x="640" y="26" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">certifia.app • Tableau de Bord &amp; Télémétrie Cognitive</text>
+
+  <!-- Left Sidebar -->
+  <rect x="0" y="42" width="220" height="678" fill="#0c101a" stroke="#1c1f2a" stroke-width="1" />
+  <text x="24" y="80" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="18">Certif<tspan fill="#3b82f6">IA</tspan></text>
+  <text x="24" y="96" fill="#64748b" font-family="monospace" font-size="9">CLOUD AI CERTIF</text>
+
+  <rect x="12" y="120" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="143" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🏠 Today</text>
+  <rect x="12" y="160" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="183" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🧭 Catalog</text>
+  <text x="20" y="224" fill="#475569" font-family="monospace" font-size="10" font-weight="bold">4. PROGRESS</text>
+  
+  <rect x="12" y="238" width="196" height="36" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+  <text x="26" y="261" fill="#60a5fa" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">📊 Dashboard</text>
+  <rect x="156" y="246" width="40" height="18" rx="6" fill="#10b981" fill-opacity="0.2" />
+  <text x="176" y="259" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">74%</text>
+
+  <!-- Top Bar -->
+  <rect x="220" y="42" width="1060" height="54" fill="#0d111c" stroke="#1c1f2a" stroke-width="1" />
+  <text x="245" y="74" fill="#64748b" font-family="system-ui, sans-serif" font-size="12">Home &gt; Progress &gt; <tspan fill="#ffffff" font-weight="bold">Cognitive Analytics</tspan></text>
+  <rect x="1000" y="54" width="140" height="30" rx="8" fill="#10b981" fill-opacity="0.15" />
+  <text x="1070" y="73" fill="#34d399" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">☁️ Firestore Connecté</text>
+
+  <!-- 4 Big Cardinal KPI Cards -->
+  <!-- KPI 1: Readiness Score -->
+  <g filter="url(#an-shadow)">
+    <rect x="250" y="115" width="235" height="135" rx="16" fill="#141926" stroke="#252b3b" stroke-width="1" />
+    <text x="270" y="142" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="bold">INDICE PRÉPARATION</text>
+    <text x="270" y="178" fill="#ffffff" font-family="monospace" font-size="28" font-weight="bold">74%</text>
+    <text x="270" y="200" fill="#34d399" font-family="system-ui, sans-serif" font-size="11" font-weight="bold">✓ Prêt J-6 (+8% s/sem.)</text>
+    <text x="270" y="222" fill="#64748b" font-family="system-ui, sans-serif" font-size="10">Seuil de validation (70%) dépassé</text>
+    <!-- Mini progress circle -->
+    <circle cx="435" cy="180" r="26" fill="none" stroke="#1e2433" stroke-width="5" />
+    <circle cx="435" cy="180" r="26" fill="none" stroke="#10b981" stroke-width="5" stroke-dasharray="163" stroke-dashoffset="42" stroke-linecap="round" />
+    <text x="435" y="184" fill="#ffffff" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">74%</text>
+  </g>
+
+  <!-- KPI 2: Average Score -->
+  <g filter="url(#an-shadow)">
+    <rect x="500" y="115" width="235" height="135" rx="16" fill="#141926" stroke="#252b3b" stroke-width="1" />
+    <text x="520" y="142" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="bold">SCORE MOYEN EXAMENS</text>
+    <text x="520" y="178" fill="#60a5fa" font-family="monospace" font-size="28" font-weight="bold">765 <tspan fill="#64748b" font-size="14">/ 1000</tspan></text>
+    <rect x="520" y="195" width="195" height="6" rx="3" fill="#0f131d" />
+    <rect x="520" y="195" width="150" height="6" rx="3" fill="#3b82f6" />
+    <text x="520" y="222" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold">Cutoff 700 pts : +65 pts de marge</text>
+  </g>
+
+  <!-- KPI 3: Questions Solved -->
+  <g filter="url(#an-shadow)">
+    <rect x="750" y="115" width="235" height="135" rx="16" fill="#141926" stroke="#252b3b" stroke-width="1" />
+    <text x="770" y="142" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="bold">VOLUME DE VALIDATION</text>
+    <text x="770" y="178" fill="#ffffff" font-family="monospace" font-size="28" font-weight="bold">482 <tspan fill="#64748b" font-size="13">qcm</tspan></text>
+    <text x="770" y="202" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11">Précision globale : 78.4%</text>
+    <text x="770" y="222" fill="#64748b" font-family="system-ui, sans-serif" font-size="10">Sur 6 certifications préparées</text>
+  </g>
+
+  <!-- KPI 4: Active Streak -->
+  <g filter="url(#an-shadow)">
+    <rect x="1000" y="115" width="235" height="135" rx="16" fill="#141926" stroke="#252b3b" stroke-width="1" />
+    <text x="1020" y="142" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="bold">SÉRIE &amp; DISCIPLINE</text>
+    <text x="1020" y="178" fill="#f59e0b" font-family="monospace" font-size="28" font-weight="bold">14 <tspan fill="#64748b" font-size="13">jours 🔥</tspan></text>
+    <text x="1020" y="202" fill="#fcd34d" font-family="system-ui, sans-serif" font-size="11">Rythme optimal sans interruption</text>
+    <text x="1020" y="222" fill="#64748b" font-family="system-ui, sans-serif" font-size="10">Prochaine séance : Demain à 8h</text>
+  </g>
+
+  <!-- Lower Section: Competency Radar & Timeline Graph -->
+  <!-- Left Box: Skills Matrix (7 cols) -->
+  <g filter="url(#an-shadow)">
+    <rect x="250" y="270" width="600" height="425" rx="18" fill="#131826" stroke="#252b3b" stroke-width="1" />
+    <text x="275" y="302" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Matrice de Maîtrise par Domaine d'Examen (Azure AI-102)</text>
+    
+    <!-- Domain 1 -->
+    <text x="275" y="340" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">1. Plan &amp; Manage Azure AI Workloads (15-20%)</text>
+    <text x="785" y="340" fill="#34d399" font-family="monospace" font-size="11" font-weight="bold">88%</text>
+    <rect x="275" y="350" width="550" height="8" rx="4" fill="#0f131d" />
+    <rect x="275" y="350" width="484" height="8" rx="4" fill="#10b981" />
+
+    <!-- Domain 2 -->
+    <text x="275" y="385" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">2. Computer Vision &amp; Document Intelligence (20-25%)</text>
+    <text x="785" y="385" fill="#60a5fa" font-family="monospace" font-size="11" font-weight="bold">76%</text>
+    <rect x="275" y="395" width="550" height="8" rx="4" fill="#0f131d" />
+    <rect x="275" y="395" width="418" height="8" rx="4" fill="#3b82f6" />
+
+    <!-- Domain 3 -->
+    <text x="275" y="430" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">3. Natural Language Processing &amp; Speech (20-25%)</text>
+    <text x="785" y="430" fill="#60a5fa" font-family="monospace" font-size="11" font-weight="bold">72%</text>
+    <rect x="275" y="440" width="550" height="8" rx="4" fill="#0f131d" />
+    <rect x="275" y="440" width="396" height="8" rx="4" fill="#3b82f6" />
+
+    <!-- Domain 4 -->
+    <text x="275" y="475" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">4. Knowledge Mining, RAG &amp; Azure AI Search (15-20%)</text>
+    <text x="785" y="475" fill="#f59e0b" font-family="monospace" font-size="11" font-weight="bold">64%</text>
+    <rect x="275" y="485" width="550" height="8" rx="4" fill="#0f131d" />
+    <rect x="275" y="485" width="352" height="8" rx="4" fill="#f59e0b" />
+
+    <!-- Domain 5 -->
+    <text x="275" y="520" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12">5. Generative AI Solutions &amp; Content Safety (15-20%)</text>
+    <text x="785" y="520" fill="#10b981" font-family="monospace" font-size="11" font-weight="bold">82%</text>
+    <rect x="275" y="530" width="550" height="8" rx="4" fill="#0f131d" />
+    <rect x="275" y="530" width="451" height="8" rx="4" fill="#10b981" />
+
+    <!-- Summary Box -->
+    <rect x="275" y="570" width="550" height="100" rx="12" fill="#0e1320" stroke="#1f283d" />
+    <text x="295" y="598" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">🔍 Diagnostic Cognitif &amp; Priorité de Révision :</text>
+    <text x="295" y="622" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Votre point faible actuel se situe sur le Domaine 4 (Knowledge Mining / RAG : 64%).</text>
+    <text x="295" y="642" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11">Recommandation : focalisez vos 3 prochaines séances de flashcards sur les filtres OData et les BM25 analyzers.</text>
+  </g>
+
+  <!-- Right Box: SM-2 Retention Forecast Curve (5 cols) -->
+  <g filter="url(#an-shadow)">
+    <rect x="870" y="270" width="365" height="425" rx="18" fill="#131826" stroke="#252b3b" stroke-width="1" />
+    <text x="895" y="302" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Courbe de Rétention SM-2</text>
+    <text x="895" y="322" fill="#64748b" font-family="monospace" font-size="10">Modélisation mathématique Ebbinghaus vs SRS</text>
+
+    <!-- Curve Graph Area -->
+    <rect x="895" y="340" width="315" height="180" rx="10" fill="#0c101a" />
+    <!-- Grid lines -->
+    <line x1="895" y1="385" x2="1210" y2="385" stroke="#1e2538" stroke-dasharray="3,3" />
+    <line x1="895" y1="430" x2="1210" y2="430" stroke="#1e2538" stroke-dasharray="3,3" />
+    <line x1="895" y1="475" x2="1210" y2="475" stroke="#1e2538" stroke-dasharray="3,3" />
+
+    <!-- Traditional Cramming Drop Curve (Red Dotted) -->
+    <path d="M 915 360 Q 940 460 1190 500" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,4" />
+    <text x="1195" y="495" fill="#f87171" font-family="monospace" font-size="9">Bachotage (15%)</text>
+
+    <!-- SM-2 Repetition Sawtooth Curve (Green Solid) -->
+    <path d="M 915 360 L 960 400 L 960 360 L 1020 380 L 1020 360 L 1110 375 L 1110 360 L 1200 365" fill="none" stroke="#10b981" stroke-width="2.5" />
+    <text x="1145" y="355" fill="#34d399" font-family="monospace" font-size="9" font-weight="bold">CertifIA SM-2 (92%)</text>
+
+    <!-- Explanation -->
+    <text x="895" y="550" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12" font-weight="bold">Pourquoi la méthode CertifIA fonctionne :</text>
+    <text x="895" y="575" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Chaque révision au moment précis où le souvenir</text>
+    <text x="895" y="595" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">menace de s'effacer réinitialise la courbe et</text>
+    <text x="895" y="615" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">multiplie par 2.5 l'intervalle de rétention.</text>
+
+    <!-- Exam Probability Box -->
+    <rect x="895" y="635" width="315" height="40" rx="8" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-opacity="0.3" />
+    <text x="1052" y="660" fill="#34d399" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">Probabilité de réussite au 1er essai : 94.2%</text>
+  </g>
+</svg>

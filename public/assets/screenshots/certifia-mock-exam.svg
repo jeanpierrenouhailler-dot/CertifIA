@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ex-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16" />
+      <stop offset="100%" stop-color="#0e1320" />
+    </linearGradient>
+    <filter id="ex-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#ex-bg)" />
+
+  <!-- Window Header Bar -->
+  <rect x="0" y="0" width="1280" height="42" fill="#070a12" stroke="#1c1f2a" stroke-width="1" />
+  <circle cx="24" cy="21" r="6" fill="#ef4444" />
+  <circle cx="44" cy="21" r="6" fill="#eab308" />
+  <circle cx="64" cy="21" r="6" fill="#22c55e" />
+  <text x="640" y="26" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">certifia.app • Simulation Examen Blanc • Conditions Officielles Pearson VUE</text>
+
+  <!-- Left Sidebar -->
+  <rect x="0" y="42" width="220" height="678" fill="#0c101a" stroke="#1c1f2a" stroke-width="1" />
+  <text x="24" y="80" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="18">Certif<tspan fill="#3b82f6">IA</tspan></text>
+  <text x="24" y="96" fill="#64748b" font-family="monospace" font-size="9">CLOUD AI CERTIF</text>
+
+  <rect x="12" y="120" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="143" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🏠 Today</text>
+  <rect x="12" y="160" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="183" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🧭 Catalog</text>
+  <text x="20" y="224" fill="#475569" font-family="monospace" font-size="10" font-weight="bold">3. LEARNING</text>
+  <text x="26" y="250" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">✅ Quizzes &amp; MCQs</text>
+  <text x="26" y="286" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🎴 Flashcards (SM-2)</text>
+
+  <rect x="12" y="306" width="196" height="36" rx="10" fill="#1e293b" stroke="#f59e0b" stroke-width="1" />
+  <text x="26" y="329" fill="#fcd34d" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">⏱️ Mock Exam</text>
+  <rect x="145" y="314" width="55" height="18" rx="6" fill="#f59e0b" fill-opacity="0.2" />
+  <text x="172" y="327" fill="#fcd34d" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">Chrono</text>
+
+  <text x="26" y="370" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">📖 AI Glossary</text>
+
+  <!-- Top Real-time Exam Bar -->
+  <rect x="220" y="42" width="1060" height="54" fill="#151b2a" stroke="#252c3e" stroke-width="1" />
+  <text x="245" y="74" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">AI-102 : Designing and Implementing a Microsoft Azure AI Solution</text>
+  
+  <!-- Live Countdown Timer -->
+  <rect x="880" y="52" width="160" height="34" rx="10" fill="#451a03" stroke="#f59e0b" stroke-width="1.5" />
+  <circle cx="900" cy="69" r="6" fill="#ef4444" />
+  <text x="918" y="74" fill="#ffffff" font-family="monospace" font-size="14" font-weight="bold">01:18:42</text>
+  <text x="990" y="73" fill="#fcd34d" font-family="monospace" font-size="10">/ 90 min</text>
+
+  <rect x="1055" y="52" width="100" height="34" rx="10" fill="#dc2626" />
+  <text x="1105" y="73" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Terminer</text>
+
+  <!-- Exam Grid Status Map -->
+  <rect x="250" y="115" width="985" height="48" rx="12" fill="#121724" stroke="#232a3b" stroke-width="1" />
+  <text x="270" y="144" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12">Progression : <tspan fill="#ffffff" font-weight="bold">Question 24 / 50</tspan></text>
+  
+  <!-- Mini question dots (50 questions) -->
+  <g transform="translate(420, 134)">
+    <!-- 23 answered (green) -->
+    <circle cx="0" cy="0" r="5" fill="#10b981" />
+    <circle cx="14" cy="0" r="5" fill="#10b981" />
+    <circle cx="28" cy="0" r="5" fill="#10b981" />
+    <circle cx="42" cy="0" r="5" fill="#10b981" />
+    <circle cx="56" cy="0" r="5" fill="#10b981" />
+    <circle cx="70" cy="0" r="5" fill="#10b981" />
+    <circle cx="84" cy="0" r="5" fill="#10b981" />
+    <circle cx="98" cy="0" r="5" fill="#10b981" />
+    <circle cx="112" cy="0" r="5" fill="#10b981" />
+    <circle cx="126" cy="0" r="5" fill="#10b981" />
+    <circle cx="140" cy="0" r="5" fill="#10b981" />
+    <circle cx="154" cy="0" r="5" fill="#10b981" />
+    <circle cx="168" cy="0" r="5" fill="#10b981" />
+    <circle cx="182" cy="0" r="5" fill="#10b981" />
+    <circle cx="196" cy="0" r="5" fill="#10b981" />
+    <circle cx="210" cy="0" r="5" fill="#10b981" />
+    <circle cx="224" cy="0" r="5" fill="#10b981" />
+    <circle cx="238" cy="0" r="5" fill="#10b981" />
+    <circle cx="252" cy="0" r="5" fill="#10b981" />
+    <circle cx="266" cy="0" r="5" fill="#10b981" />
+    <circle cx="280" cy="0" r="5" fill="#10b981" />
+    <circle cx="294" cy="0" r="5" fill="#10b981" />
+    <circle cx="308" cy="0" r="5" fill="#10b981" />
+    <!-- 24 active (blue pulsing) -->
+    <circle cx="322" cy="0" r="7" fill="#3b82f6" stroke="#ffffff" stroke-width="1.5" />
+    <!-- 25-50 pending (slate) -->
+    <circle cx="336" cy="0" r="5" fill="#334155" />
+    <circle cx="350" cy="0" r="5" fill="#334155" />
+    <circle cx="364" cy="0" r="5" fill="#334155" />
+    <circle cx="378" cy="0" r="5" fill="#334155" />
+    <circle cx="392" cy="0" r="5" fill="#334155" />
+    <circle cx="406" cy="0" r="5" fill="#334155" />
+    <circle cx="420" cy="0" r="5" fill="#334155" />
+    <circle cx="434" cy="0" r="5" fill="#334155" />
+    <circle cx="448" cy="0" r="5" fill="#334155" />
+    <circle cx="462" cy="0" r="5" fill="#334155" />
+    <circle cx="476" cy="0" r="5" fill="#334155" />
+    <circle cx="490" cy="0" r="5" fill="#334155" />
+  </g>
+
+  <rect x="1100" y="125" width="115" height="28" rx="6" fill="#1e293b" />
+  <text x="1157" y="143" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">🚩 Marquer (Review)</text>
+
+  <!-- Exam Scenario Body -->
+  <g filter="url(#ex-shadow)">
+    <rect x="250" y="180" width="985" height="495" rx="18" fill="#131724" stroke="#252b3b" stroke-width="1" />
+    
+    <text x="280" y="220" fill="#60a5fa" font-family="monospace" font-size="11" font-weight="bold">QUESTION 24 SUR 50 • ÉVALUATION D'ARCHITECTURE MULTI-RÉPONSE</text>
+    <text x="280" y="250" fill="#ffffff" font-family="system-ui, sans-serif" font-size="15" font-weight="bold">Une chaîne d'hôpitaux souhaite anonymiser 50 000 dossiers médicaux numérisés (PDF &amp; scans TIFF)</text>
+    <text x="280" y="274" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">contenant des données sensibles PII/PHI (Noms, Numéros de sécurité sociale, diagnostics manuscrits).</text>
+    <text x="280" y="294" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13">Quelles solutions Azure AI devez-vous enchaîner pour respecter la norme HIPAA au moindre coût ?</text>
+
+    <!-- Options Selection -->
+    <rect x="280" y="325" width="925" height="52" rx="10" fill="#1e2538" stroke="#3b82f6" stroke-width="1.5" />
+    <rect x="298" y="341" width="20" height="20" rx="4" fill="#2563eb" />
+    <text x="308" y="355" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">✓</text>
+    <text x="330" y="356" fill="#ffffff" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Étape 1 : Azure AI Document Intelligence (modèle Read OCR pour extraction textuelle et manuscrite).</text>
+
+    <rect x="280" y="390" width="925" height="52" rx="10" fill="#1e2538" stroke="#3b82f6" stroke-width="1.5" />
+    <rect x="298" y="406" width="20" height="20" rx="4" fill="#2563eb" />
+    <text x="308" y="420" fill="#ffffff" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">✓</text>
+    <text x="330" y="421" fill="#ffffff" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">Étape 2 : Azure AI Language (fonctionnalité native PII &amp; PHI Redaction pour masquer les identifiants).</text>
+
+    <rect x="280" y="455" width="925" height="52" rx="10" fill="#0c101a" stroke="#252b3b" stroke-width="1" />
+    <rect x="298" y="471" width="20" height="20" rx="4" fill="#1e2433" />
+    <text x="330" y="486" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">Entraîner un modèle Custom Classification Azure AutoML avec 10 000 exemples labellisés manuellement.</text>
+
+    <rect x="280" y="520" width="925" height="52" rx="10" fill="#0c101a" stroke="#252b3b" stroke-width="1" />
+    <rect x="298" y="536" width="20" height="20" rx="4" fill="#1e2433" />
+    <text x="330" y="551" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">Exporter les scans vers Azure Blob Storage et exécuter un script Python avec Tesseract open-source.</text>
+
+    <!-- Bottom Navigation Bar -->
+    <line x1="280" y1="595" x2="1205" y2="595" stroke="#252b3b" stroke-width="1" />
+    <rect x="280" y="615" width="130" height="38" rx="10" fill="#1e2433" />
+    <text x="345" y="638" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">← Précédent</text>
+
+    <rect x="1075" y="615" width="130" height="38" rx="10" fill="#2563eb" />
+    <text x="1140" y="638" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Suivant →</text>
+  </g>
+</svg>

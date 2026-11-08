@@ -51,6 +51,100 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
   const [selectedQuizOption, setSelectedQuizOption] = useState<number | null>(null);
   const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<'all' | 'azure' | 'aws' | 'gcp' | 'ibm'>('all');
+  const [activeScreenshotTab, setActiveScreenshotTab] = useState<string>('today');
+
+  const screenshotsList = [
+    {
+      id: 'today',
+      titleFr: 'Cockpit du Jour & Algorithme SM-2',
+      titleEn: 'Daily Cockpit & SM-2 Algorithm',
+      badge: '01. Cockpit',
+      descFr: 'Composition mathématique quotidienne : 17 fiches prioritaires au seuil d’oubli, 8 notions fragiles, 12 QCM ciblés et progression continue vers le seuil éliminatoire de 700 / 1 000 points.',
+      descEn: 'Calibrated daily session: 17 priority cards at forgetting curve, 8 fragile concepts, 12 targeted MCQs, and real-time progress toward the 700 / 1000 passing threshold.',
+      src: '/assets/screenshots/certifia-cockpit-today.png',
+      screen: 'today' as AppScreen,
+    },
+    {
+      id: 'pathway',
+      titleFr: 'Moteur d’Orientation & Parcours IA en 4 Niveaux',
+      titleEn: 'Orientation Engine & 4-Level AI Pathways',
+      badge: '02. Parcours',
+      descFr: 'Diagnostic modélisé selon votre métier (Développeur, Data Scientist, Architecte), budget et heures disponibles pour éditer votre feuille de route certifiante officielle.',
+      descEn: 'Personalized diagnostic tailored to your role (Developer, Data Scientist, Solution Architect), budget, and weekly study time.',
+      src: '/assets/screenshots/certifia-orientation-pathway.png',
+      screen: 'recommendation' as AppScreen,
+    },
+    {
+      id: 'catalogue',
+      titleFr: 'Catalogue des 18 Certifications Cloud & IA',
+      titleEn: 'Official 18 Cloud AI Certifications Catalog',
+      badge: '03. Catalogue',
+      descFr: 'Référentiel complet bilingue Microsoft Azure, AWS, Google Cloud, IBM watsonx et NVIDIA avec filtres par fournisseur et syllabi officiels.',
+      descEn: 'Comprehensive bilingual catalog covering Microsoft Azure, AWS, Google Cloud, IBM watsonx, and NVIDIA with official syllabus blueprints.',
+      src: '/assets/screenshots/certifia-catalogue-view.svg',
+      screen: 'catalogue' as AppScreen,
+    },
+    {
+      id: 'quiz',
+      titleFr: 'Entraînement QCM & Analyse des Pièges d’Examen',
+      titleEn: 'Scenario MCQs & Exam Pitfall Breakdown',
+      badge: '04. QCM Scénarios',
+      descFr: 'Questions scénarisées d’architecture d’entreprise, décryptage minutieux de chaque distracteur et schéma de flux méthodologique.',
+      descEn: 'Enterprise architecture scenarios, systematic analysis of subtle distractor traps, and official cloud flowcharts.',
+      src: '/assets/screenshots/certifia-quiz-engine.svg',
+      screen: 'quiz' as AppScreen,
+    },
+    {
+      id: 'flashcards',
+      titleFr: 'Fiches Mémo & Moteur de Répétition Espacée SM-2',
+      titleEn: 'Flashcards & SM-2 Spaced Repetition Engine',
+      badge: '05. Fiches SRS',
+      descFr: 'Plus de 2 800 fiches mémo classées par domaine d’examen avec échelle de rappel à 4 boutons (1j, 3j, 7j, 14j) et calcul d’échéance scientifique.',
+      descEn: 'Over 2,800 flashcards categorized by exam domains with a 4-button grading scale (1d, 3d, 7d, 14d) and scientific recall metrics.',
+      src: '/assets/screenshots/certifia-flashcards-srs.svg',
+      screen: 'flashcards' as AppScreen,
+    },
+    {
+      id: 'exam',
+      titleFr: 'Examens Blancs Chronométrés en Conditions Réelles',
+      titleEn: 'Timed Mock Exams Under Real Conditions',
+      badge: '06. Examen Blanc',
+      descFr: 'Simulation en conditions officielles de centre de test (90 à 120 minutes), seuil éliminatoire officiel et rapport détaillé par compétence.',
+      descEn: 'Full test-center simulation (90 to 120 minutes), official 700-point passing cutoff, question flagging, and post-exam domain debrief.',
+      src: '/assets/screenshots/certifia-mock-exam.svg',
+      screen: 'exam' as AppScreen,
+    },
+    {
+      id: 'assistant',
+      titleFr: 'Tuteur Pédagogique IA & Dialogue Socratique',
+      titleEn: 'Socratic AI Pedagogical Tutor',
+      badge: '07. Tuteur IA',
+      descFr: 'Coach contextuel intelligent qui guide la réflexion, explicite les compromis d’architecture et cite les documentations officielles sans tricher.',
+      descEn: 'Contextual AI coach providing Socratic architectural guidance, memory rules, and official vendor citations without spoiling answers.',
+      src: '/assets/screenshots/certifia-ai-tutor.svg',
+      screen: 'assistant' as AppScreen,
+    },
+    {
+      id: 'analytics',
+      titleFr: 'Télémétrie Cognitive & Tableau de Bord Prédictif',
+      titleEn: 'Cognitive Analytics & Readiness Dashboard',
+      badge: '08. Analytics',
+      descFr: 'Indice de préparation globale, courbe de rétention modélisée contre l’oubli passif et matrice de maîtrise par domaine officiel.',
+      descEn: 'Overall readiness index, mathematical Ebbinghaus forgetting curve simulation, and domain-by-domain mastery radar.',
+      src: '/assets/screenshots/certifia-analytics-dashboard.svg',
+      screen: 'analytics' as AppScreen,
+    },
+    {
+      id: 'tour',
+      titleFr: 'Onboarding Tour en Découverte Automatique',
+      titleEn: 'Automated Onboarding Discovery Tour',
+      badge: '09. Visite Guidée',
+      descFr: 'Présentation progressive avec anneau spotlight, compte à rebours fluide, réglage de vitesse et commandes Pause / Précédent / Continuer / Quitter.',
+      descEn: 'Progressive auto-guided walkthrough with visual spotlight rings, dynamic timer bar, speed settings, and Pause / Previous / Resume / Exit controls.',
+      src: '/assets/screenshots/certifia-onboarding-tour.svg',
+      screen: 'today' as AppScreen,
+    },
+  ];
 
   // Filtered certifications for showcase
   const topCerts = certificationsData.filter((c) => {
@@ -104,6 +198,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap shrink-0"
             >
               {currentLang === 'en' ? 'Interactive Demo' : 'Démonstrateur'}
+            </a>
+            <a 
+              href="#captures" 
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap shrink-0 font-semibold text-blue-600 dark:text-blue-400"
+            >
+              {currentLang === 'en' ? 'App Screenshots' : 'Captures d’Écran'}
             </a>
             <a 
               href="#certifications" 
@@ -276,10 +376,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               {/* Main Cockpit Visual */}
               <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
                 <img
-                  src="/src/assets/images/landing_hero_cockpit_1793990596117.jpg"
-                  alt="CertifIA Learning Platform Cockpit"
-                  className="w-full h-full object-cover object-center"
-                  referrerPolicy="no-referrer"
+                  src="/assets/screenshots/certifia-cockpit-today.png"
+                  alt="CertifIA Learning Platform Real Cockpit Interface"
+                  className="w-full h-full object-cover object-top"
                 />
 
                 {/* Live interactive callout badge */}
@@ -803,6 +902,112 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             </div>
 
           </div>
+
+        </div>
+      </section>
+
+      {/* 4.5. REAL APPLICATION SCREENSHOTS & DISCOVERY TOUR */}
+      <section id="captures" className="py-20 bg-slate-50 dark:bg-[#090d16] border-t border-slate-200 dark:border-[#1a1f2e] transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+              {currentLang === 'en' ? 'Interface Transparency' : 'Transparence & Interface Réelle'}
+            </span>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight font-headline">
+              {currentLang === 'en' 
+                ? 'Authentic Screenshots of the CertifIA Platform' 
+                : 'Captures d’Écran Réelles de l’Application CertifIA'}
+            </h2>
+            <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+              {currentLang === 'en'
+                ? 'Explore the genuine user interface: daily SM-2 cockpits, 4-level orientation pathways, scenario MCQs, flashcard engines, timed mock exams, and the automated onboarding tour.'
+                : 'Découvrez l’interface réelle de l’application : cockpit quotidien SM-2, moteur d’orientation 4 niveaux, QCM scénarisés, fiches mémo, examens blancs chronométrés et découverte guidée.'}
+            </p>
+          </div>
+
+          {/* Module Selector Pills */}
+          <div className="flex items-center justify-start lg:justify-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
+            {screenshotsList.map((item) => {
+              const isActive = activeScreenshotTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveScreenshotTab(item.id)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                    isActive
+                      ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/20'
+                      : 'bg-white dark:bg-[#141824] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1c2233] border border-slate-200 dark:border-[#222838]'
+                  }`}
+                >
+                  <span>{item.badge}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Screenshot Display Window */}
+          {(() => {
+            const currentItem = screenshotsList.find((s) => s.id === activeScreenshotTab) || screenshotsList[0];
+            return (
+              <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-[#222838] bg-white dark:bg-[#121622] shadow-2xl shadow-blue-500/10">
+                {/* Window Chrome Header */}
+                <div className="px-4 py-3 border-b border-slate-200 dark:border-[#1e2333] bg-slate-50/80 dark:bg-[#0e121c]/80 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-400/80" />
+                    <div className="w-3 h-3 rounded-full bg-amber-400/80" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-400/80" />
+                    <span className="ml-2 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
+                      certifia.app • {currentLang === 'en' ? currentItem.titleEn : currentItem.titleFr}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onNavigate(currentItem.screen)}
+                      className="px-3 py-1 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 dark:text-blue-400 text-xs font-semibold flex items-center gap-1 transition-colors"
+                    >
+                      <span>{currentLang === 'en' ? 'Open in App' : 'Ouvrir dans l’app'}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Screenshot Visual Frame */}
+                <div className="relative aspect-video w-full overflow-hidden bg-slate-950 flex items-center justify-center">
+                  <img
+                    src={currentItem.src}
+                    alt={currentLang === 'en' ? currentItem.titleEn : currentItem.titleFr}
+                    className="w-full h-full object-contain object-top"
+                  />
+                </div>
+
+                {/* Bottom Context Callout */}
+                <div className="p-6 bg-slate-50 dark:bg-[#0f131d] border-t border-slate-200 dark:border-[#1e2333] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                        {currentItem.badge}
+                      </span>
+                      <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                        {currentLang === 'en' ? currentItem.titleEn : currentItem.titleFr}
+                      </h4>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
+                      {currentLang === 'en' ? currentItem.descEn : currentItem.descFr}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => onNavigate(currentItem.screen)}
+                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shrink-0 shadow-md shadow-blue-500/20 transition-all self-start sm:self-auto"
+                  >
+                    <span>{currentLang === 'en' ? 'Test This Module' : 'Tester ce module'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
 
         </div>
       </section>

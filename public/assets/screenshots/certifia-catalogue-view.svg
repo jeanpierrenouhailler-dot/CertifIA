@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cat-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e18" />
+      <stop offset="100%" stop-color="#0f131d" />
+    </linearGradient>
+    <linearGradient id="cat-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <filter id="cat-shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#cat-bg)" />
+
+  <!-- Window Header Bar -->
+  <rect x="0" y="0" width="1280" height="42" fill="#070a12" stroke="#1c1f2a" stroke-width="1" />
+  <circle cx="24" cy="21" r="6" fill="#ef4444" />
+  <circle cx="44" cy="21" r="6" fill="#eab308" />
+  <circle cx="64" cy="21" r="6" fill="#22c55e" />
+  <text x="640" y="26" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">certifia.app • Catalogue Officiel • 18 Certifications Cloud &amp; IA</text>
+
+  <!-- Left Sidebar -->
+  <rect x="0" y="42" width="220" height="678" fill="#0c101a" stroke="#1c1f2a" stroke-width="1" />
+  <text x="24" y="80" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="18">Certif<tspan fill="#3b82f6">IA</tspan></text>
+  <text x="24" y="96" fill="#64748b" font-family="monospace" font-size="9">CLOUD AI CERTIF</text>
+
+  <!-- Nav Items -->
+  <rect x="12" y="120" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="143" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🏠 Today</text>
+  
+  <rect x="12" y="164" width="196" height="36" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+  <text x="26" y="187" fill="#60a5fa" font-family="system-ui, sans-serif" font-size="13" font-weight="bold">🧭 Catalog</text>
+  <rect x="160" y="172" width="36" height="18" rx="6" fill="#3b82f6" fill-opacity="0.2" />
+  <text x="178" y="185" fill="#60a5fa" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">18</text>
+
+  <rect x="12" y="208" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="231" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">⚖️ Comparator</text>
+
+  <rect x="12" y="252" width="196" height="36" rx="10" fill="transparent" />
+  <text x="26" y="275" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">✨ AI Pathway</text>
+
+  <text x="20" y="318" fill="#475569" font-family="monospace" font-size="10" font-weight="bold">3. LEARNING</text>
+  <text x="26" y="344" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">✅ Quizzes &amp; MCQs</text>
+  <text x="26" y="380" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">🎴 Flashcards (SM-2)</text>
+  <text x="26" y="416" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">⏱️ Mock Exam</text>
+  <text x="26" y="452" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">📖 AI Glossary</text>
+
+  <!-- Main Content Area -->
+  <!-- Top Bar -->
+  <rect x="220" y="42" width="1060" height="54" fill="#0d111c" stroke="#1c1f2a" stroke-width="1" />
+  <text x="245" y="74" fill="#64748b" font-family="system-ui, sans-serif" font-size="12">Home &gt; <tspan fill="#ffffff" font-weight="bold">Catalog</tspan></text>
+  <!-- Search input -->
+  <rect x="420" y="52" width="460" height="34" rx="10" fill="#141824" stroke="#252b3b" stroke-width="1" />
+  <text x="440" y="73" fill="#64748b" font-family="system-ui, sans-serif" font-size="12">🔍 Search certification, skills, code (AI-102, AIF-C01, GCP-PMLE)...</text>
+  <!-- Right Buttons -->
+  <rect x="910" y="54" width="80" height="30" rx="8" fill="#1e293b" />
+  <text x="950" y="73" fill="#93c5fd" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">🎯 AI-102</text>
+  <rect x="1000" y="54" width="70" height="30" rx="8" fill="#1e293b" />
+  <text x="1035" y="73" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">🌐 EN</text>
+
+  <!-- Header Banner -->
+  <text x="250" y="132" fill="#ffffff" font-family="system-ui, sans-serif" font-size="24" font-weight="bold">Catalogue Officiel des 18 Certifications Cloud &amp; IA</text>
+  <text x="250" y="154" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13">Référentiel bilingue Microsoft Azure, AWS, Google Cloud, IBM watsonx et NVIDIA avec fiches blueprints.</text>
+
+  <!-- Provider Filter Tabs -->
+  <rect x="250" y="176" width="72" height="32" rx="8" fill="#2563eb" />
+  <text x="286" y="196" fill="#ffffff" font-family="system-ui, sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Tous (18)</text>
+
+  <rect x="330" y="176" width="110" height="32" rx="8" fill="#141824" stroke="#252b3b" />
+  <text x="385" y="196" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Azure (5)</text>
+
+  <rect x="448" y="176" width="95" height="32" rx="8" fill="#141824" stroke="#252b3b" />
+  <text x="495" y="196" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">AWS (4)</text>
+
+  <rect x="551" y="176" width="130" height="32" rx="8" fill="#141824" stroke="#252b3b" />
+  <text x="616" y="196" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Google Cloud (3)</text>
+
+  <rect x="689" y="176" width="90" height="32" rx="8" fill="#141824" stroke="#252b3b" />
+  <text x="734" y="196" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">IBM (3)</text>
+
+  <rect x="787" y="176" width="95" height="32" rx="8" fill="#141824" stroke="#252b3b" />
+  <text x="834" y="196" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">NVIDIA (3)</text>
+
+  <!-- 3 Big Certification Cards Grid -->
+  <!-- Card 1: AI-102 -->
+  <g filter="url(#cat-shadow)">
+    <rect x="250" y="230" width="315" height="225" rx="16" fill="#141926" stroke="#3b82f6" stroke-width="1.5" />
+    <rect x="266" y="246" width="68" height="24" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-opacity="0.4" />
+    <text x="300" y="262" fill="#60a5fa" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">AI-102</text>
+    <rect x="475" y="246" width="74" height="22" rx="11" fill="#10b981" fill-opacity="0.15" />
+    <text x="512" y="261" fill="#34d399" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">Associate</text>
+    <text x="266" y="295" fill="#ffffff" font-family="system-ui, sans-serif" font-size="15" font-weight="bold">Azure AI Engineer Associate</text>
+    <text x="266" y="318" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">RAG, Azure AI Search, Azure OpenAI &amp; Vision</text>
+    
+    <line x1="266" y1="334" x2="549" y2="334" stroke="#252b3b" stroke-width="1" />
+    <text x="266" y="352" fill="#64748b" font-family="monospace" font-size="10">Pondération examen : 700 / 1000 pts</text>
+    <rect x="266" y="362" width="283" height="6" rx="3" fill="#0f131d" />
+    <rect x="266" y="362" width="200" height="6" rx="3" fill="#3b82f6" />
+    <text x="266" y="386" fill="#38bdf8" font-family="monospace" font-size="10">Progression : 74% • Prêt pour examen</text>
+
+    <!-- Card Action Buttons -->
+    <rect x="266" y="402" width="135" height="34" rx="8" fill="#2563eb" />
+    <text x="333" y="423" fill="#ffffff" font-family="system-ui, sans-serif" font-size="11" font-weight="bold" text-anchor="middle">S'entraîner QCM</text>
+    <rect x="410" y="402" width="139" height="34" rx="8" fill="#1e2433" stroke="#2d3548" />
+    <text x="479" y="423" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">Voir Blueprint</text>
+  </g>
+
+  <!-- Card 2: AIF-C01 -->
+  <g filter="url(#cat-shadow)">
+    <rect x="585" y="230" width="315" height="225" rx="16" fill="#141926" stroke="#252b3b" stroke-width="1" />
+    <rect x="601" y="246" width="75" height="24" rx="6" fill="#1e293b" />
+    <text x="638" y="262" fill="#f59e0b" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">AIF-C01</text>
+    <rect x="800" y="246" width="84" height="22" rx="11" fill="#3b82f6" fill-opacity="0.15" />
+    <text x="842" y="261" fill="#60a5fa" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">Practitioner</text>
+    <text x="601" y="295" fill="#ffffff" font-family="system-ui, sans-serif" font-size="15" font-weight="bold">AWS Certified AI Practitioner</text>
+    <text x="601" y="318" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Amazon Bedrock, SageMaker JumpStart &amp; Guardrails</text>
+    
+    <line x1="601" y1="334" x2="884" y2="334" stroke="#252b3b" stroke-width="1" />
+    <text x="601" y="352" fill="#64748b" font-family="monospace" font-size="10">Pondération examen : 700 / 1000 pts</text>
+    <rect x="601" y="362" width="283" height="6" rx="3" fill="#0f131d" />
+    <rect x="601" y="362" width="115" height="6" rx="3" fill="#f59e0b" />
+    <text x="601" y="386" fill="#fcd34d" font-family="monospace" font-size="10">Progression : 41% • En cours</text>
+
+    <!-- Card Action Buttons -->
+    <rect x="601" y="402" width="135" height="34" rx="8" fill="#1e2433" stroke="#2d3548" />
+    <text x="668" y="423" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">S'entraîner QCM</text>
+    <rect x="745" y="402" width="139" height="34" rx="8" fill="#1e2433" stroke="#2d3548" />
+    <text x="814" y="423" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">Voir Blueprint</text>
+  </g>
+
+  <!-- Card 3: GCP-PMLE -->
+  <g filter="url(#cat-shadow)">
+    <rect x="920" y="230" width="315" height="225" rx="16" fill="#141926" stroke="#252b3b" stroke-width="1" />
+    <rect x="936" y="246" width="85" height="24" rx="6" fill="#1e293b" />
+    <text x="978" y="262" fill="#ec4899" font-family="monospace" font-size="11" font-weight="bold" text-anchor="middle">GCP-PMLE</text>
+    <rect x="1145" y="246" width="74" height="22" rx="11" fill="#ec4899" fill-opacity="0.15" />
+    <text x="1182" y="261" fill="#f472b6" font-family="monospace" font-size="10" font-weight="bold" text-anchor="middle">Professional</text>
+    <text x="936" y="295" fill="#ffffff" font-family="system-ui, sans-serif" font-size="15" font-weight="bold">Professional ML Engineer</text>
+    <text x="936" y="318" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Vertex AI Pipelines, Kubeflow, Vizier &amp; Data Drift</text>
+    
+    <line x1="936" y1="334" x2="1219" y2="334" stroke="#252b3b" stroke-width="1" />
+    <text x="936" y="352" fill="#64748b" font-family="monospace" font-size="10">Pondération examen : 750 / 1000 pts</text>
+    <rect x="936" y="362" width="283" height="6" rx="3" fill="#0f131d" />
+    <rect x="936" y="362" width="165" height="6" rx="3" fill="#ec4899" />
+    <text x="936" y="386" fill="#f472b6" font-family="monospace" font-size="10">Progression : 58% • En cours</text>
+
+    <!-- Card Action Buttons -->
+    <rect x="936" y="402" width="135" height="34" rx="8" fill="#1e2433" stroke="#2d3548" />
+    <text x="1003" y="423" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">S'entraîner QCM</text>
+    <rect x="1080" y="402" width="139" height="34" rx="8" fill="#1e2433" stroke="#2d3548" />
+    <text x="1149" y="423" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">Voir Blueprint</text>
+  </g>
+
+  <!-- Lower Row: 3 More cards preview -->
+  <!-- Card 4: IBM watsonx -->
+  <rect x="250" y="475" width="315" height="210" rx="16" fill="#121622" stroke="#252b3b" stroke-width="1" />
+  <text x="266" y="505" fill="#38bdf8" font-family="monospace" font-size="11" font-weight="bold">C1000-177 • IBM watsonx.ai Technical Specialist</text>
+  <text x="266" y="528" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Gouvernance, Factsheets, Granite Models &amp; Prompt Lab</text>
+
+  <!-- Card 5: Azure AI-900 -->
+  <rect x="585" y="475" width="315" height="210" rx="16" fill="#121622" stroke="#252b3b" stroke-width="1" />
+  <text x="601" y="505" fill="#60a5fa" font-family="monospace" font-size="11" font-weight="bold">AI-900 • Microsoft Azure AI Fundamentals</text>
+  <text x="601" y="528" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Principes IA Responsable, Vision, NLP, Automated ML</text>
+
+  <!-- Card 6: NVIDIA Generative AI -->
+  <rect x="920" y="475" width="315" height="210" rx="16" fill="#121622" stroke="#252b3b" stroke-width="1" />
+  <text x="936" y="505" fill="#4ade80" font-family="monospace" font-size="11" font-weight="bold">NVIDIA-GENAI • Generative AI LLMs Associate</text>
+  <text x="936" y="528" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">TensorRT-LLM, NeMo Framework, Quantization &amp; Triton</text>
+</svg>

@@ -5,158 +5,247 @@
 <img src="/icon.svg" alt="Logo CertifIA" width="128" height="128" />
 
 ### *Plateforme intelligente de préparation certifiante et de télémétrie cognitive pour examens Cloud & IA*
+### *Intelligent Certification Prep & Cognitive Telemetry Platform for Cloud & AI Exams*
 
 [![Version](https://img.shields.io/badge/Version-v2.7.0-blue.svg?style=for-the-badge&logo=semver)](CHANGELOG.md)
 [![Languages](https://img.shields.io/badge/Languages-Français%20%7C%20English-success.svg?style=for-the-badge&logo=translate)](src/i18n/config.ts)
+[![i18n Parity](https://img.shields.io/badge/i18n%20Parity-943%20%2F%20943%20Keys-emerald.svg?style=for-the-badge)](src/i18n/verifyI18nParity.ts)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-emerald.svg?style=for-the-badge&logo=pwa)](public/manifest.webmanifest)
 [![SM-2 Algorithm](https://img.shields.io/badge/Algorithm-SM--2%20%2F%20FSRS-purple.svg?style=for-the-badge)](src/lib/srsAlgorithm.ts)
 [![Theme](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-amber.svg?style=for-the-badge)](src/context/ThemeContext.tsx)
-[![Coverage](https://img.shields.io/badge/Examens-Azure%20%7C%20AWS%20%7C%20GCP%20%7C%20IBM-indigo.svg?style=for-the-badge)](src/data/certificationsData.ts)
+[![Coverage](https://img.shields.io/badge/Certifications-18%20Exams-indigo.svg?style=for-the-badge)](src/data/certificationsData.ts)
 
 </div>
 
 ---
 
-## 📸 Aperçu de l'Interface & Nouvelle Architecture (v2.7.0)
+## 📸 Galerie Complète des Captures d'Écran Réelles de l'Application (v2.7.0)
+
+> **Documentation visuelle actualisée :** Toutes les captures d'écran ci-dessous proviennent fidèlement de l'application réelle en production avec la barre latérale rétractable, l'en-tête dynamique bilingue, le cockpit quotidien, le moteur de parcours, les QCM scénarisés, les flashcards SM-2, les examens blancs et la visite guidée automatique.
+
+---
+
+### 1. 🏠 Cockpit Quotidien & Algorithme CertifIA (Session du Jour)
 
 <div align="center">
-  <img src="/assets/certifai-screenshot.svg" alt="Capture d'écran CertifIA v2.7.0" width="100%" style="border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" />
+  <img src="/assets/screenshots/certifia-cockpit-today.png" alt="Cockpit Quotidien CertifIA v2.7.0" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
-> **Aperçu visuel complet :** L'architecture unifiée structurée autour des **5 Piliers Majeurs** (*Accueil / Home*, *Certifications*, *Apprentissage / Learning*, *Progression / Progress*, *Assistant IA / AI Tutor*), la **Barre latérale rétractable**, le **Sélecteur de langue instantané (FR/EN)**, la **Barre supérieure avec Fil d'Ariane**, la **Command Palette `Cmd+K`**, le **Comparateur de certifications** et le **Tuteur Pédagogique IA contextuel**.
+* **Session Quotidienne Sur-Mesure (~22 min)** : Chaque matin, l'algorithme CertifIA analyse vos révisions passées pour composer votre session optimale :
+  * 🧠 **17 fiches à réviser** au seuil d'oubli calculé par l'algorithme SuperMemo-2 (SM-2) / FSRS.
+  * ⚠️ **8 notions fragiles** (pièges à haute pondération identifiés par l'algorithme).
+  * ❓ **12 questions QCM d'architecture** non maîtrisées avec mise en situation.
+* **Trajectoire Examen 700 pts** : Jauge en temps réel vers le seuil officiel d'admission (700 / 1 000 points) et gain projeté (+3%).
+* **Accès Rapide aux 3 Piliers d'Étude** : Mémorisation SRS (2 800 cartes), Encyclopédie IA (Glossaire) et Simulation Réelle (90 min).
+* **Détail de Session & Objectif Cible** : Compte à rebours des 37 étapes quotidiennes, date cible d'examen et objectif hebdomadaire synchronisé.
 
 ---
 
-## 🌐 Internationalisation Complète & Version Anglaise • Version 2.7.0
+### 2. ✨ Moteur d'Orientation & Parcours IA Personnalisé (Niveaux 1 à 4)
 
-CertifIA est désormais une application **100% bilingue (Français & English)** :
+<div align="center">
+  <img src="/assets/screenshots/certifia-orientation-pathway.png" alt="Moteur d'Orientation & Parcours IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
 
-* 🔄 **Bascule Instantanée Sans Rechargement** : Changez de langue en 1 clic depuis le Header, le modal Paramètres Système ou le menu mobile « Plus » sans jamais perdre votre progression dans un quiz, le décompte d'un chrono ou la carte SRS en cours d'étude.
-* 📦 **Architecture Hors-Ligne Bundled (PWA Compliant)** : 13 namespaces JSON intégrés directement au bundle applicatif sous `src/i18n/locales/{fr,en}/` pour une disponibilité totale sans aucune latence réseau.
-* 🎓 **Contenus Pédagogiques Entièrement Bilingues** :
-  - **18 Certifications** : titres, prérequis, modules d'examen et pondérations officielles en français et anglais.
-  - **QCM Scénarisés** : questions d'architecture réelles, pièges fréquents, justifications techniques et références officielles.
-  - **Glossaire & Notions Clés** : 6 catégories transversales, fiches architecturales, formules mathématiques et pièges d'examen.
-  - **Tuteur IA Contextuel** : suggestions d'amorces et réponses pédagogiques adaptées à la langue active.
-* 🔢 **Formatage Natif `Intl` Conforme aux Locales** :
-  - Dates : `15 mars 2026` (FR) vs `March 15, 2026` (EN).
-  - Nombres : `1 250 000` (espace insécable FR) vs `1,250,000` (virgule EN).
-  - Pourcentages : `85 %` (FR) vs `85%` (EN).
-  - Devises : `165,00 $US` (FR) vs `$165.00` (EN).
-* 🛡️ **Parité Programmatique Garantie** : Script de vérification automatisé `src/i18n/verifyI18nParity.ts` garantissant un ratio de parité 1:1 parfait (378 clés FR $\leftrightarrow$ 378 clés EN).
-* 💾 **Persistance Double Niveau** : Sauvegarde immédiate dans `localStorage` et synchronisation automatique avec le profil Cloud Firestore (`userProfile.preferredLanguage`).
+* **Diagnostic Structuré en 4 Paliers** :
+  1. *Niveau 1 : Fondamentaux Cloud & IA* (Azure AI-900, AWS AIF-C01).
+  2. *Niveau 2 : IA Générative Spécialisée* (AWS Bedrock, IBM watsonx Studio).
+  3. *Niveau 3 : Cloud AI Engineer Associate* (Azure AI-102 Associate).
+  4. *Niveau 4 : Machine Learning & MLOps Avancé* (Google Cloud PMLE, AWS MLS-C01).
+* **Feuille de Route Personnalisée** : Générée selon votre métier (Développeur, Data Scientist, Solution Architect), votre budget et votre temps disponible hebdomadaire.
+* **Prochaines Étapes Guidées** : Liste d'actions concrètes numérotées pour sécuriser votre certification sans dispersion.
 
 ---
 
-## 🚀 Fonctionnalités Majeures de CertifIA
+### 3. 🎯 Suivi des Objectifs d'Examen & Activités Récentes
 
-* 🏛️ **Restructuration Complète de la Navigation (5 Piliers Majeurs)** :
-  1. 🏠 **ACCUEIL** : Tableau de bord épuré avec accueil personnalisé post-connexion, indicateur de certification cible, bouton d'action principal « Reprendre mon apprentissage » en un clic, récapitulatif des 17 cartes SM-2 dues, 8 notions fragiles, 12 questions ciblées, flux des activités récentes et prochaines étapes recommandées.
-  2. 🧭 **CERTIFICATIONS** : Catalogue unifié des 18 certifications officielles (Azure, AWS, Google Cloud, IBM, NVIDIA) avec filtres avancés (fournisseur, niveau de difficulté, domaine IA, budget), fiches détaillées (Blueprints), comparateur côte à côte et passerelles d'entraînement direct.
-  3. 🎓 **APPRENTISSAGE** : Hub pédagogique regroupant Quiz & entraînements scénarisés, Fiches mémo avec répétition espacée (2 800 cartes SRS), examens blancs chronométrés 90 minutes en conditions réelles, et passerelles post-activité (revoir les erreurs, fiches associées, tuteur IA).
-  4. 📊 **PROGRESSION** : Télémétrie cognitive, diagnostic des compétences maîtrisées vs compétences à renforcer, historique détaillé des tentatives avec clause de transparence méthodologique (les estimations ne sont pas des garanties d'examen).
-  5. 🤖 **ASSISTANT IA** : Tuteur pédagogique IA disponible en tiroir coulissant contextuel ou écran dédié, fournissant explications pas à pas, pièges d'examen officiels et astuces mnémotechniques.
-* ↔️ **Barre Latérale Rétractable (Collapsible Sidebar)** : Mode développé confortable et mode réduit en icônes avec infobulles natives, navigation accordéon fluide et état actif haute visibilité.
-* 🧭 **Barre Supérieure Légère & Fil d'Ariane Dynamique (`Header.tsx`)** : Titre contextuel, fil d'Ariane (`Section > Page active`), badge interactif de certification cible active, recherche globale et bouton tuteur IA.
-* 📱 **Barre de Navigation Inférieure Mobile (`MobileBottomNav.tsx`)** : 5 destinations tactiles conformes aux standards ergonomiques (zones d'appui $\ge 44\text{px}$) et bouton « Plus » pour les outils secondaires.
-* ⚡ **Command Palette Globale (`CommandPaletteModal.tsx` • `Cmd+K` / `Ctrl+K`)** : Recherche rapide et navigation instantanée au clavier parmi les certifications, questions, notions du glossaire et réglages.
-* ⚖️ **Comparateur de Certifications Côte à Côte (`CertificationsComparatorModal.tsx`)** : Comparaison simultanée de 2 à 3 certifications officielles.
-* 📖 **Glossaire & Encyclopédie de l'IA** : Définitions A-Z, fiches d'architecture complètes, pièges d'examen, formules mathématiques et correspondances multi-cloud.
+<div align="center">
+  <img src="/assets/screenshots/certifia-details-activity.png" alt="Objectifs d'Examen et Activités Récentes" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
+
+* **Suivi de l'Examen Visé (AI-102)** : Date cible fixée, objectif de 85 / 100 révisées par semaine, consultation directe du blueprint officiel en un clic.
+* **Historique des Activités des Dernières 24h** : Télémétrie en temps réel des sessions matinales SRS (+100%) et des QCM RAG & Vector Search (85.7% de réussite).
+* **Prochaines Étapes Priorisées** : Consignes pas-à-pas pour terminer la session du jour, renforcer les pièges RAG (Custom Blocklists) et planifier un examen blanc complet.
 
 ---
 
-## 🧩 Les 5 Piliers Pédagogiques de CertifIA
+### 4. 🧭 Catalogue Officiel des 18 Certifications Cloud & IA
 
-### 1. 🎯 Page « Aujourd'hui » & Session Quotidienne Automatisée
-Plus besoin de parcourir 500 fiches au hasard. CertifIA analyse vos performances passées et votre courbe d'oubli mathématique pour composer chaque matin votre session optimale :
-* 🧠 **17 cartes à réviser** au seuil d'oubli calculé par l'algorithme SuperMemo-2 / FSRS.
-* ⚠️ **8 notions fragiles** (difficulté $\ge 4/5$, hésitations répétées ou pièges d'examen officiels).
-* ❓ **12 questions non maîtrisées** (cas pratiques d'architecture QCM).
-* 🎯 Jauge d'avancement par rapport au seuil éliminatoire officiel (**700 / 1000 pts**).
+<div align="center">
+  <img src="/assets/screenshots/certifia-catalogue-view.svg" alt="Catalogue des 18 Certifications Cloud & IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
 
-### 2. ✨ Le Moteur de Recommandation en 4 Niveaux
-Une orientation sur-mesure basée sur un questionnaire en 2 étapes :
-```
-┌────────────────────────────────────────────────────────┐
-│ Niveau 1 : AI Fundamentals (ex: Azure AI-900 / AIF-C01) │
-└───────────────────────────┬────────────────────────────┘
-                            │
-                            ↓
-┌───────────────────────────┴────────────────────────────┐
-│ Niveau 2 : Generative AI (ex: Bedrock / watsonx Studio) │
-└───────────────────────────┬────────────────────────────┘
-                            │
-                            ↓
-┌───────────────────────────┴────────────────────────────┐
-│ Niveau 3 : Cloud AI (ex: Azure AI-102 Associate)       │
-└───────────────────────────┬────────────────────────────┘
-                            │
-                            ↓
-┌───────────────────────────┴────────────────────────────┐
-│ Niveau 4 : Machine Learning / MLOps (GCP-PMLE / MLS)   │
-└────────────────────────────────────────────────────────┘
-```
-
-### 3. 🎴 Fiches Mémo SRS avec Moteur SM-2 & FSRS
-Chaque carte dispose d'un historique scientifique de rétention :
-* **Carte #127** (Identifiant précis du référentiel).
-* **Dernière révision** : Aujourd'hui / Date relative.
-* **Difficulté** : 1/5 à 5/5 avec code couleur dynamique.
-* **Prochaine révision** : Intervalle calculé (*dans 3 jours, 7 jours, 14 jours...*).
-* **Répétitions & Taux de réussite** : Cumul des évaluations positives.
-* Évaluation à 4 boutons : **À revoir (1j)**, **Difficile (3j)**, **Bien (7j)**, **Facile (14j)**.
-
-### 4. ⏱️ Examens Blancs Chronométrés en Conditions Réelles
-* Épreuves complètes chronométrées (65 à 120 minutes selon la certification).
-* Score seuil officiel (**700 à 750 / 1000 pts**).
-* Débriefing par domaine officiel (*Planification, Vision, NLP, GenAI/RAG, Gouvernance*).
-
-### 5. 📊 Télémétrie Cognitive & Synchronisation Firebase
-* Indice de préparation global.
-* Série quotidienne de travail (*Streak* avec flamme animée).
-* Synchronisation transparente en Cloud Firestore et repli hors-ligne en LocalStorage.
+* **Couverture Exhaustive Multi-Fournisseurs** :
+  * 🔷 **Microsoft Azure** : AI-102 (Engineer Associate), AI-900 (Fundamentals), DP-100 (Data Scientist), AZ-140, etc.
+  * 🟧 **Amazon Web Services (AWS)** : AIF-C01 (AI Practitioner), MLS-C01 (Machine Learning Specialty), Bedrock & SageMaker.
+  * 🟥 **Google Cloud Platform (GCP)** : Professional Machine Learning Engineer (PMLE), Cloud AI Associate.
+  * 🟦 **IBM** : C1000-177 (watsonx.ai Technical Specialist), watsonx.governance, watsonx.data.
+  * 🟩 **NVIDIA** : Generative AI LLMs Associate (TensorRT-LLM, NeMo, Triton Inference Server).
+* **Filtres Avancés & Fiches Blueprints** : Recherche instantanée par code, niveau (Fondamental, Associate, Expert) et accès au comparateur côte à côte.
 
 ---
 
-## 🍔 Organisation du Menu Hamburger Catégorisé
+### 5. ✅ Moteur d'Entraînement QCM & Analyse des Pièges d'Examen
 
-Accessible à tout moment via le bouton **Menu** en haut à gauche ou le raccourci `Ctrl + M` :
+<div align="center">
+  <img src="/assets/screenshots/certifia-quiz-engine.svg" alt="Moteur QCM et Décryptage des Pièges" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
 
-| Catégorie | Modules Inclus | Description |
+* **Mise en Situation Réelle d'Architecture** : Scénarios d'entreprise réalistes (banque, santé, e-commerce, industrie).
+* **Décryptage Approfondi des Distracteurs** : Chaque proposition fausse est expliquée en détail pour vous apprendre à déceler les pièges subtils des éditeurs d'examen.
+* **Schémas de Flux Techniques (ASCII / Visuels)** : Visualisation du pipeline d'architecture (ex. *Requête ➔ BM25 + HNSW (RRF) ➔ Semantic Ranker L2 ➔ Prompt LLM*).
+* **Règle d'or Pédagogique CertifIA** : Synthèse infaillible à mémoriser pour réussir l'examen officiel.
+
+---
+
+### 6. 🎴 Fiches Mémo & Répétition Espacée SM-2 (2 800 Cartes)
+
+<div align="center">
+  <img src="/assets/screenshots/certifia-flashcards-srs.svg" alt="Fiches Mémo SM-2 Spaced Repetition" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
+
+* **Algorithme Scientifique SuperMemo-2 (SM-2) / FSRS** : Calcul automatique du seuil critique d'oubli pour réviser chaque concept au moment mathématique idéal.
+* **Échelle d'Évaluation à 4 Boutons** :
+  * 🔴 **1. À revoir (1 jour)** : Échec de rappel, le concept est réinjecté sous 24h.
+  * 🟠 **2. Difficile (3 jours)** : Rappel laborieux avec hésitation.
+  * 🟢 **3. Bien (7 jours)** : Rappel maîtrisé, facteur d'aisance consolidé.
+  * 🔵 **4. Facile (14 jours)** : Ancrage profond en mémoire à long terme.
+* **Métrique de Rétention Complète** : Facteur d'aisance ($EF$), historique des répétitions et jauge de progression de la file du jour.
+* **Contrôle Total au Clavier** : `Espace` pour retourner la carte (Recto/Verso), touches `1`, `2`, `3`, `4` pour noter.
+
+---
+
+### 7. ⏱️ Examens Blancs Chronométrés en Conditions Réelles
+
+<div align="center">
+  <img src="/assets/screenshots/certifia-mock-exam.svg" alt="Examen Blanc Chronométré en Conditions Réelles" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
+
+* **Conditions Réelles Pearson VUE** : Chronomètre officiel (90 à 120 minutes), épreuve complète de 50 à 65 questions, seuil éliminatoire officiel (**700 / 1 000 pts**).
+* **Carte Interactive d'Avancement** : Grille visuelle de toutes les questions (répondues en vert, en cours en bleu, en attente en gris).
+* **Fonctionnalité Marquer (Review Flag)** : Permet de marquer une question difficile pour y revenir avant de soumettre l'épreuve finale.
+* **Rapport Final Détaillé** : Décomposition du score par domaine de compétences avec identification précise des lacunes.
+
+---
+
+### 8. 🤖 Tuteur Pédagogique IA Contextuel (Dialogue Socratique)
+
+<div align="center">
+  <img src="/assets/screenshots/certifia-ai-tutor.svg" alt="Tuteur Pédagogique IA Socratique" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
+
+* **Approche Socratique d'Apprentissage** : Ne donne jamais la réponse brute sans réflexion : guide l'apprenant à travers les contraintes architecturales de latence, coût et précision.
+* **Calibré sur les Syllabi Officiels** : Références précises aux documentations officielles (Microsoft Learn, AWS Docs, GCP Architecture Framework, IBM Cloud).
+* **Double Format d'Utilisation** : Disponible sous forme d'écran dédié complet ou de tiroir coulissant contextuel (*Drawer*) accessible depuis n'importe quel QCM.
+* **Suggestions de Questions Clés** : Amorces pré-calibrées pour explorer les pièges d'examen (BM25 vs Vectoriel, LoRA vs QLoRA, Private Endpoints).
+
+---
+
+### 9. 📊 Tableau de Bord & Télémétrie Cognitive
+
+<div align="center">
+  <img src="/assets/screenshots/certifia-analytics-dashboard.svg" alt="Tableau de Bord & Télémétrie Cognitive" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
+
+* **4 KPIs Cardinaux de Préparation** :
+  * 🎯 **Indice de Préparation Globale (74%)** : Prêt J-6 avec dépassement du seuil de validation.
+  * 📈 **Score Moyen aux Examens (765 / 1000)** : Marge de sécurité de +65 points sur le cutoff éliminatoire.
+  * 🔢 **Volume Traité (482 questions)** : Précision globale de 78.4% sur toutes certifications.
+  * 🔥 **Série & Constance (14 jours)** : Suivi de la régularité sans interruption.
+* **Matrice de Maîtrise par Domaine** : Visualisation granulaire des forces et faiblesses pour prioriser les ultimes révisions.
+* **Courbe Mathématique de Rétention Ebbinghaus vs SM-2** : Preuve scientifique de l'efficacité du rappel espacé (+84% de rétention vs 15% pour le bachotage passif).
+
+---
+
+### 10. 🧭 Onboarding Tour en Mode Découverte Automatique
+
+<div align="center">
+  <img src="/assets/screenshots/certifia-onboarding-tour.svg" alt="Onboarding Tour Automatique CertifIA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+</div>
+
+* **Parcours de Découverte 100% Automatique** : Présentation progressive des 10 modules clés de CertifIA sans intervention obligatoire de l'utilisateur.
+* **Mise en Évidence Visuelle (Spotlight Cutout)** : Masque d'assombrissement avec anneau lumineux dynamique ciblant avec précision l'élément étudié (`data-tour`).
+* **Commandes Explicites Complètes** :
+  * ⏸️ **Pause / Continuer** : Fige la progression automatique pour lire attentivement les explications et astuces CertifIA.
+  * ◀️ **Précédent** : Revient à l'étape précédente en réinitialisant le délai.
+  * ⏹️ **Quitter** (ou touche `Échap`) : Ferme instantanément la visite guidée.
+  * ⏭️ **Suivant** : Avance manuellement à l'étape suivante.
+* **Régulateur de Vitesse** : Sélecteur de tempo automatique (Rapide 5s, Normal 8s, Détaillé 12s) avec barre de compte à rebours fluide.
+* **Navigation Globale au Clavier** : `Espace` (Pause/Continuer), `←` (Précédent), `→` (Suivant), `Échap` (Quitter).
+
+---
+
+## 🌐 Bilinguisme Intégral Français / English (v2.7.0)
+
+CertifIA garantit une expérience utilisateur **100% bilingue sans aucun texte résiduel** :
+
+* 🔄 **Bascule Instantanée Sans Rechargement** : Changez de langue en un clic depuis le Header (`FR` / `EN`), le menu latéral ou le modal système sans perdre votre session active, votre chrono ou votre question en cours.
+* 📦 **13 Namespaces i18next Embarqués Hors-Ligne** : `common`, `navigation`, `dashboard`, `certifications`, `learning`, `quizzes`, `flashcards`, `examinations`, `progress`, `assistant`, `settings`, `errors`, `notifications`.
+* 🛡️ **Parité Programmatique Stricte 1:1** : Vérification automatisée via script dédié garantissant l'égalité parfaite des 943 clés bilingues :
+  ```bash
+  npx tsx src/i18n/verifyI18nParity.ts
+  # Output: ✅ 943 French keys, 943 English keys across 13 namespaces (0 missing, 0 extra)
+  ```
+* 🔢 **Formatage Régional Natif `Intl` Conforme** :
+  * Dates : `15 mars 2026` (FR) vs `March 15, 2026` (EN).
+  * Nombres : `1 250 000` (FR) vs `1,250,000` (EN).
+  * Pourcentages : `85 %` (FR) vs `85%` (EN).
+  * Devises : `165,00 $US` (FR) vs `$165.00` (EN).
+
+---
+
+## 🏛️ Les 5 Piliers Majeurs de l'Architecture Applicative
+
+| Pilier | Écran Principal | Fonctionnalités Clés |
 | :--- | :--- | :--- |
-| **🎯 Session & Orientation** | *Aujourd'hui*, *Parcours IA* | Pilotage quotidien et feuille de route 4 niveaux |
-| **🗂️ Répartition des Flashcards** | *Répartition par certification*, *Azure (1 000)*, *AWS (900)*, *GCP (500)*, *IBM (400)* | Inventaire officiel des **2 800 cartes**, pondérations et répartition par domaine |
-| **📚 Révisions & Entraînement** | *Catalogue (18 certifs)*, *QCM*, *Fiches SRS*, *Glossaire & Encyclopédie* | Apprentissage granulaire, répétition espacée et fiches conceptuelles A-Z |
-| **⏱️ Évaluation & Spécifications** | *Examen Blanc*, *Blueprints Officiels* | Mise en situation réelle et pondérations d'examen |
-| **📊 Télémétrie & Compte** | *Analytics*, *Mon Profil Firebase* | Suivi de la courbe d'oubli et calendrier cible |
-| **⚙️ Paramètres & Utilitaires** | *Paramètres Système*, *Mentions Légales*, *PWA*, *Thème*, *Guide* | Administration, vérification de mises à jour, accessibilité |
+| **1. 🏠 ACCUEIL** | `TodayView.tsx` | Cockpit quotidien, 17 cartes SM-2 dues, 8 notions fragiles, 12 QCM ciblés, bouton reprise immédiate, bannière parcours 4 niveaux. |
+| **2. 🧭 CERTIFICATIONS** | `CatalogueView.tsx` | 18 certifications officielles (Azure, AWS, GCP, IBM, NVIDIA), filtres par fournisseur, fiches blueprints, comparateur côte à côte. |
+| **3. 🎓 APPRENTISSAGE** | `QuizView.tsx`, `FlashcardsView.tsx`, `ExamView.tsx`, `GlossaryView.tsx` | Hub pédagogique complet : QCM scénarisés, 2 800 fiches mémo SM-2, examens chronométrés 90 min, encyclopédie IA A-Z. |
+| **4. 📊 PROGRESSION** | `AnalyticsView.tsx` | Télémétrie cognitive, matrice de maîtrise des domaines, courbe de rétention d'Ebbinghaus, historique des tentatives. |
+| **5. 🤖 ASSISTANT IA** | `AIAssistantView.tsx`, `AIAssistantDrawer.tsx` | Tuteur pédagogique socratique contextuel, explication pas-à-pas des architectures cloud, pièges d'examen officiels. |
 
 ---
 
-## ⌨️ Raccourcis Clavier
+## ⌨️ Raccourcis Clavier Globaux
 
 | Raccourci | Action |
 | :--- | :--- |
+| `Ctrl + K` / `Cmd + K` | Ouvrir la **Command Palette** (recherche globale et actions rapides) |
 | `Ctrl + M` / `Cmd + M` | Ouvrir / Fermer le **Menu Hamburger Catégorisé** |
-| `Ctrl + K` / `Cmd + K` | Ouvrir la **Recherche globale et les raccourcis d'examen** |
-| `Espace` | Retourner la fiche mémo active (Recto / Verso) |
-| `1` / `2` / `3` / `4` | Noter la carte active (*À revoir*, *Difficile*, *Bien*, *Facile*) |
-| `Échap` | Fermer n'importe quel panneau, tiroir ou modal |
+| `Espace` | Retourner la carte mémo active (Recto / Verso) • Mettre en pause ou continuer le Tour |
+| `1` / `2` / `3` / `4` | Noter la carte active (*À revoir [1j]*, *Difficile [3j]*, *Bien [7j]*, *Facile [14j]*) |
+| `←` / `→` | Naviguer entre les étapes du Onboarding Tour |
+| `Échap` | Fermer n'importe quel panneau, tiroir, modal ou quitter la visite guidée |
 
 ---
 
-## 🛠️ Stack Technique
+## 🛠️ Stack Technique & Déploiement
 
-* **Framework :** React 19 + TypeScript
+* **Framework :** React 19 + TypeScript (Mode Strict)
 * **Build Tool :** Vite 8
-* **Styling :** Tailwind CSS v4 (Mode Sombre & Mode Clair natif)
-* **PWA & Offline :** Web App Manifest + Service Worker autonome (`/sw.js`)
+* **Styling :** Tailwind CSS v4 (Mode Sombre et Mode Clair)
+* **Internationalisation :** i18next + react-i18next (13 namespaces, 943 clés 1:1)
+* **Persistance & Données :** Cloud Firestore + LocalStorage haute fidélité
+* **PWA & Offline :** Web App Manifest (`manifest.webmanifest`) + Service Worker autonome (`/sw.js`)
 * **Icônes :** Lucide React
-* **Persistance :** Firebase Firestore + LocalStorage haute fidélité
+
+```bash
+# Installation des dépendances
+npm install
+
+# Lancement en développement (Port 3000)
+npm run dev
+
+# Vérification de la parité bilingue
+npx tsx src/i18n/verifyI18nParity.ts
+
+# Compilation et vérification TypeScript
+npm run build
+```
 
 ---
 
 ## ⚖️ Mentions Légales & Avertissement
 
 > **Clause d'exonération de responsabilité :**  
-> L'éditeur et les créateurs de **CertifIA** déclinent formellement toute responsabilité quant à l'exactitude, l'exhaustivité, l'actualité ou la conformité des données, questions, propositions de réponses, explications ou synthèses fournies dans l'application. CertifIA est un projet indépendant d'entraînement cognitif personnel et n'est affilié à aucun des organismes certificateurs mentionnés (Microsoft, AWS, Google Cloud, IBM).
+> L'éditeur et les créateurs de **CertifIA** déclinent formellement toute responsabilité quant à l'exactitude, l'exhaustivité, l'actualité ou la conformité des données, questions, propositions de réponses, explications ou synthèses fournies dans l'application. CertifIA est un projet indépendant d'entraînement cognitif personnel et n'est affilié à aucun des organismes certificateurs mentionnés (Microsoft, AWS, Google Cloud, IBM, NVIDIA).
