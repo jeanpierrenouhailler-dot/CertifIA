@@ -58,7 +58,17 @@ export default function App() {
 }
 
 function AppContent() {
-  const [currentScreen, setCurrentScreen] = useState<AppScreen>('today');
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get('view') || params.get('screen');
+      if (viewParam === 'landing' || window.location.hash === '#landing') return 'landing';
+      if (viewParam && ['today', 'recommendation', 'catalogue', 'quiz', 'flashcards', 'exam', 'analytics', 'profile', 'glossary', 'assistant'].includes(viewParam)) {
+        return viewParam as AppScreen;
+      }
+    }
+    return 'today';
+  });
   const [activeProviderFilter, setActiveProviderFilter] = useState<CloudProvider>('Tous');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
