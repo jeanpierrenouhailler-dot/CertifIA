@@ -179,5 +179,13 @@
     "accessApp": "Access CertifIA",
     "preferences": "Display Preferences",
     "themeLabel": "Interface Theme"
+  },
+  "headerMenu": {
+    "aria": "Account, preferences, and tools menu",
+    "preferencesSection": "Preferences",
+    "discoverSection": "Discover & Help",
+    "systemSection": "System",
+    "languageLabel": "Language",
+    "quickMenu": "Quick Navigation"
   }
 }

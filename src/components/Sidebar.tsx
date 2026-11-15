@@ -123,16 +123,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-4 border-b border-slate-200 dark:border-[#1c202d] flex items-center justify-between">
           <div 
             onClick={() => handleNav('today')}
-            className="flex items-center gap-3 cursor-pointer overflow-hidden select-none"
+            className="flex items-center gap-2.5 cursor-pointer min-w-0 select-none"
           >
-            <CertifAILogo showSubtitle={false} />
+            <CertifAILogo iconOnly className="shrink-0" />
             {!isCollapsed && (
-              <div className="flex flex-col truncate">
-                <span className="text-base font-extrabold text-slate-900 dark:text-white font-headline tracking-tight leading-none">
+              <div className="flex flex-col min-w-0">
+                <span className="text-base font-extrabold text-slate-900 dark:text-white font-headline tracking-tight leading-none truncate">
                   Certif<span className="text-blue-600 dark:text-blue-400">IA</span>
                 </span>
-                <span className="text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider">
-                  Cloud AI Certification Prep
+                <span className="text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider truncate">
+                  Cloud AI Prep
                 </span>
               </div>
             )}

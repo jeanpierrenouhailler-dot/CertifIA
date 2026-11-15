@@ -121,13 +121,13 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       >
         {/* Drawer Header */}
         <div className="p-4 border-b border-slate-200 dark:border-[#22283a] flex items-center justify-between bg-slate-50/70 dark:bg-[#141824]/70">
-          <div className="flex items-center gap-3">
-            <CertifAILogo showSubtitle={false} />
-            <div>
-              <div className="font-extrabold text-slate-900 dark:text-white text-base">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <CertifAILogo iconOnly className="shrink-0" />
+            <div className="min-w-0">
+              <div className="font-extrabold text-slate-900 dark:text-white text-base leading-none">
                 Certif<span className="text-blue-600 dark:text-blue-400">IA</span>
               </div>
-              <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+              <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider truncate mt-0.5">
                 {t('navigation:unifiedArchitecture', 'Architecture de navigation unifiée')}
               </div>
             </div>

@@ -179,5 +179,13 @@
     "accessApp": "Accéder à CertifIA",
     "preferences": "Préférences d'affichage",
     "themeLabel": "Thème d'interface"
+  },
+  "headerMenu": {
+    "aria": "Menu compte, préférences et outils",
+    "preferencesSection": "Préférences",
+    "discoverSection": "Découverte & Aide",
+    "systemSection": "Système",
+    "languageLabel": "Langue",
+    "quickMenu": "Navigation rapide"
   }
 }

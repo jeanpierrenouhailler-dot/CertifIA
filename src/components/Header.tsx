@@ -1,34 +1,33 @@
-import React from 'react';
-import { 
-  Search, 
-  Command, 
-  Menu, 
-  User, 
-  Sun, 
-  Moon, 
-  Settings, 
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Search,
+  Command,
+  Menu,
+  User,
+  Sun,
+  Moon,
+  Settings,
   HelpCircle,
   Bot,
   Target,
   ChevronRight,
+  ChevronDown,
   Sparkles,
-  Layers,
-  Award,
-  Compass
+  Compass,
+  Globe,
+  LayoutGrid,
 } from 'lucide-react';
 import { AppScreen } from '../types';
-import { CertifAILogo } from './CertifAILogo';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useGuide } from '../context/GuideContext';
-import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
 import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { certificationsData } from '../data/certificationsData';
 import { getBreadcrumbForScreen } from '../navigation/navigationConfig';
 import { LanguageSelector } from './LanguageSelector';
-import { useTranslation, getCurrentLanguage } from '../i18n';
+import { useTranslation } from '../i18n';
 
 interface HeaderProps {
   currentScreen: AppScreen;
@@ -51,166 +50,325 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenBlueprint,
   onOpenAIAssistant,
 }) => {
-  const { t } = useTranslation(['common', 'navigation']);
+  const { t } = useTranslation(['common', 'navigation', 'dashboard']);
   const { user, userProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { activeCertId } = useProgress();
   const { versionInfo, isChecking } = useSystemUpdate();
   const { startTour } = useOnboardingTour();
-  const isEn = getCurrentLanguage() === 'en';
+
+  const [isWorkspaceMenuOpen, setIsWorkspaceMenuOpen] = useState(false);
+  const menuContainerRef = useRef<HTMLDivElement>(null);
 
   // Active target certification
-  const currentCert = certificationsData.find((c) => c.id === (activeCertId || 'ai102')) || certificationsData[0];
+  const currentCert =
+    certificationsData.find((c) => c.id === (activeCertId || 'ai102')) || certificationsData[0];
 
   // Dynamic breadcrumb from centralized navigation config
   const breadcrumb = getBreadcrumbForScreen(currentScreen);
   const BreadcrumbIcon = breadcrumb.categoryIcon;
 
+  const userName =
+    user?.displayName || userProfile?.displayName || t('common:user.learnerName', 'Apprenant IA');
+  const userInitial = userName.charAt(0).toUpperCase();
+
+  // Close workspace dropdown on outside click or Escape
+  useEffect(() => {
+    if (!isWorkspaceMenuOpen) return;
+
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (menuContainerRef.current && !menuContainerRef.current.contains(e.target as Node)) {
+        setIsWorkspaceMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsWorkspaceMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isWorkspaceMenuOpen]);
+
   return (
     <header
       id="app-header"
-      className="sticky top-0 z-30 h-16 bg-white/95 dark:bg-[#0f131d]/90 backdrop-blur-xl border-b border-slate-200 dark:border-[#1c1f2a] px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 transition-colors duration-200"
+      className="sticky top-0 z-30 h-16 bg-white/95 dark:bg-[#0f131d]/95 backdrop-blur-xl border-b border-slate-200 dark:border-[#1c1f2a] px-3 sm:px-6 flex items-center justify-between gap-3 sm:gap-5 transition-colors duration-200"
     >
-      {/* Left: Mobile Drawer Trigger + Breadcrumb */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      {/* Zone 1 (Gauche) : Menu mobile (< lg uniquement, la Sidebar est déjà visible sur desktop) + Fil d'Ariane */}
+      <div className="flex items-center gap-2.5 min-w-0 shrink-0">
         <button
-          onClick={onOpenHamburgerMenu}
-          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#171b26] dark:hover:bg-[#262a35] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#262a35] transition-all flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-          aria-label={t('navigation:categories.plus', 'Menu')}
-          title="Menu"
+          type="button"
+          onClick={onOpenMobileMenu}
+          className="lg:hidden w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#171b26] dark:hover:bg-[#262a35] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#262a35] transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          aria-label={t('navigation:hamburger.aria', 'Menu')}
+          title={t('navigation:hamburger.aria', 'Menu')}
         >
-          <Menu className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <span className="hidden xl:inline font-mono text-xs font-semibold">Menu</span>
+          <Menu className="w-4 h-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
         </button>
 
-        {/* Dynamic Breadcrumb with WCAG AA semantic markup */}
-        <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
-            <BreadcrumbIcon className="w-3.5 h-3.5 text-blue-500" />
-            <span>{t(`navigation:categories.${breadcrumb.categoryKey || 'accueil'}`, breadcrumb.categoryLabel)}</span>
-          </div>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600" />
-          <span className="text-slate-900 dark:text-white font-bold truncate max-w-[140px] md:max-w-xs" aria-current="page">
+        {/* Clean contextual breadcrumb */}
+        <nav
+          aria-label="Breadcrumb"
+          className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 min-w-0"
+        >
+          <span className="inline-flex items-center gap-1.5 font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+            <BreadcrumbIcon className="w-3.5 h-3.5 text-blue-500 shrink-0" aria-hidden="true" />
+            <span>
+              {t(`navigation:categories.${breadcrumb.categoryKey || 'accueil'}`, breadcrumb.categoryLabel)}
+            </span>
+          </span>
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-600 shrink-0" aria-hidden="true" />
+          <span
+            className="text-slate-900 dark:text-white font-semibold truncate max-w-[140px] md:max-w-[200px]"
+            aria-current="page"
+          >
             {t(`navigation:items.${breadcrumb.itemKey || 'today'}.label`, breadcrumb.itemLabel)}
           </span>
         </nav>
       </div>
 
-      {/* Middle: Global Quick Search Button (Command Palette) */}
-      <div className="flex-1 max-w-md mx-2 sm:mx-4">
+      {/* Zone 2 (Centre) : Recherche rapide globale (⌘K) */}
+      <div className="flex-1 max-w-md min-w-0">
         <button
+          type="button"
           onClick={onOpenCommandPalette}
-          className="w-full pl-3.5 pr-3 py-2 text-xs sm:text-sm bg-slate-100 hover:bg-slate-200/80 dark:bg-[#171b26]/90 dark:hover:bg-[#202533] border border-slate-200 dark:border-[#262a35] rounded-xl text-slate-500 dark:text-slate-400 flex items-center justify-between transition-all"
+          className="w-full h-9 pl-3 pr-2.5 text-xs sm:text-sm bg-slate-100/90 hover:bg-slate-200/80 dark:bg-[#171b26] dark:hover:bg-[#1e2331] border border-slate-200 dark:border-[#262a35] rounded-xl text-slate-500 dark:text-slate-400 flex items-center justify-between gap-2 transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           title={t('navigation:search.commandKey', 'Ctrl+K')}
         >
-          <div className="flex items-center gap-2.5 truncate">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" />
-            <span className="truncate">{t('navigation:search.placeholder', 'Rechercher une notion, QCM, certif...')}</span>
-          </div>
-          <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded border border-slate-200 dark:border-[#262a35] bg-white dark:bg-[#0a0e18] text-[10px] font-mono text-slate-400 dark:text-slate-300 shrink-0">
-            <Command className="w-3 h-3" /> K
+          <span className="flex items-center gap-2 min-w-0">
+            <Search className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+            <span className="truncate">
+              {t('navigation:search.placeholder', 'Rechercher une notion, QCM, certif...')}
+            </span>
+          </span>
+          <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-slate-200 dark:border-[#2a2f3d] bg-white dark:bg-[#0b0e17] text-[10px] font-mono text-slate-400 dark:text-slate-400 shrink-0">
+            <Command className="w-2.5 h-2.5" aria-hidden="true" />K
           </kbd>
         </button>
       </div>
 
-      {/* Right: Active Target Cert Badge + Assistant IA + Language Selector + Theme + Settings & Profile */}
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        {/* Active Target Cert Pill */}
+      {/* Zone 3 (Droite) : 4 contrôles clairs et bien hiérarchisés */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* 1. Active Target Certification (Blueprint) */}
         <button
+          type="button"
           data-tour="target-cert"
-          onClick={() => onOpenBlueprint ? onOpenBlueprint(currentCert.id) : onNavigate('catalogue')}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/15 border border-blue-500/25 text-xs font-mono font-semibold text-blue-600 dark:text-blue-300 transition-colors"
-          title={`${t('dashboard:targetCert')}: ${currentCert.title}`}
+          onClick={() => (onOpenBlueprint ? onOpenBlueprint(currentCert.id) : onNavigate('catalogue'))}
+          className="hidden md:inline-flex items-center gap-1.5 h-9 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-[#171b26] dark:hover:bg-[#1e2331] border border-slate-200 dark:border-[#262a35] text-xs font-mono font-semibold text-slate-700 dark:text-slate-200 transition-colors whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          title={`${t('dashboard:targetCert', 'Certification cible')}: ${currentCert.title}`}
         >
-          <Target className="w-3.5 h-3.5 text-blue-500" />
+          <Target className="w-3.5 h-3.5 text-blue-500 shrink-0" aria-hidden="true" />
           <span>{currentCert.code}</span>
         </button>
 
-        {/* AI Pedagogical Assistant Quick Action */}
+        {/* 2. Primary Action: AI Pedagogical Tutor */}
         <button
+          type="button"
           onClick={onOpenAIAssistant || (() => onNavigate('assistant'))}
-          className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-blue-600/10 to-indigo-600/10 hover:from-blue-600/20 hover:to-indigo-600/20 border border-blue-500/30 text-blue-600 dark:text-blue-300 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+          className="h-9 px-2.5 sm:px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-sm shadow-blue-600/20 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           title={t('navigation:items.assistant.label', 'Assistant IA')}
           aria-label={t('navigation:items.assistant.label', 'Assistant IA')}
         >
-          <Bot className="w-4 h-4 text-blue-500" />
-          <span className="hidden lg:inline">{t('navigation:items.assistant.shortLabel', 'Assistant IA')}</span>
+          <Bot className="w-4 h-4 shrink-0" aria-hidden="true" />
+          <span className="hidden sm:inline">{t('navigation:items.assistant.shortLabel', 'Tuteur IA')}</span>
         </button>
 
-        {/* Landing Page Quick Link */}
+        {/* 3. Theme Toggle (1-click Light / Dark) */}
         <button
-          onClick={() => onNavigate('landing')}
-          className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors border border-transparent hover:border-slate-200 dark:hover:border-[#262a35]"
-          title={t('navigation:items.landing.label', 'Page de présentation')}
-          aria-label={t('navigation:items.landing.label', 'Page de présentation')}
-        >
-          <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-          <span>{t('navigation:items.landing.shortLabel', 'Présentation')}</span>
-        </button>
-
-        {/* Guided Tour Trigger Button */}
-        <button
-          onClick={() => startTour(0)}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/40 transition-all shadow-sm"
-          title={isEn ? 'Launch Automated Guided Tour' : 'Lancer la visite guidée automatique'}
-          aria-label="Discovery Tour"
-        >
-          <Compass className="w-3.5 h-3.5 text-blue-500 animate-spin-slow" />
-          <span className="hidden sm:inline font-medium">{isEn ? 'Tour' : 'Visite'}</span>
-        </button>
-
-        {/* Language Selector (Bilingual French / English) */}
-        <LanguageSelector variant="header" />
-
-        {/* Theme Toggle (Light / Dark) */}
-        <button
+          type="button"
           onClick={toggleTheme}
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors"
+          className="w-9 h-9 rounded-xl border border-slate-200 dark:border-[#262a35] bg-white dark:bg-[#171b26] hover:bg-slate-100 dark:hover:bg-[#1e2331] text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           title={theme === 'dark' ? t('common:theme.lightMode') : t('common:theme.darkMode')}
           aria-label={t('common:theme.toggle')}
         >
-          {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
-        </button>
-
-        {/* Guide mode toggle */}
-        <button
-          onClick={toggleGuideMode}
-          className={`p-2 rounded-xl transition-colors ${
-            isGuideModeActive
-              ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/40'
-              : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2030]'
-          }`}
-          title={isGuideModeActive ? t('common:guide.disable') : t('common:guide.enable')}
-          aria-label={t('common:guide.enable')}
-        >
-          <HelpCircle className="w-4 h-4" />
-        </button>
-
-        {/* System Settings & Updates button */}
-        <button
-          onClick={onOpenSystemSettings}
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors relative"
-          title={t('navigation:items.settings.label')}
-          aria-label={t('navigation:items.settings.label')}
-        >
-          <Settings className="w-4 h-4" />
-          {isChecking && (
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-700" aria-hidden="true" />
           )}
         </button>
 
-        {/* User Profile Avatar */}
-        <button
-          onClick={() => onNavigate('profile')}
-          className="p-1.5 rounded-xl border border-slate-200 dark:border-[#262a35] hover:border-blue-500 transition-all flex items-center gap-1.5 text-xs"
-          title={t('navigation:items.profile.label')}
-          aria-label={t('navigation:items.profile.label')}
-        >
-          <div className="w-7 h-7 rounded-lg bg-blue-600/15 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">
-            {user?.displayName ? user.displayName.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
-          </div>
-        </button>
+        {/* 4. Unified Account, Preferences & Tools Dropdown */}
+        <div className="relative" ref={menuContainerRef}>
+          <button
+            type="button"
+            onClick={() => setIsWorkspaceMenuOpen((prev) => !prev)}
+            className={`h-9 pl-1.5 pr-2 rounded-xl border transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+              isWorkspaceMenuOpen
+                ? 'border-blue-500 bg-blue-50/60 dark:bg-blue-950/30'
+                : 'border-slate-200 dark:border-[#262a35] bg-white dark:bg-[#171b26] hover:bg-slate-100 dark:hover:bg-[#1e2331]'
+            }`}
+            aria-haspopup="menu"
+            aria-expanded={isWorkspaceMenuOpen}
+            aria-label={t('navigation:headerMenu.aria', 'Menu compte, préférences et outils')}
+            title={t('navigation:headerMenu.aria', 'Menu compte, préférences et outils')}
+          >
+            <div className="w-6 h-6 rounded-lg bg-blue-600/15 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+              {user?.displayName || userProfile?.displayName ? (
+                userInitial
+              ) : (
+                <User className="w-3.5 h-3.5" aria-hidden="true" />
+              )}
+            </div>
+            <ChevronDown
+              className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 ${
+                isWorkspaceMenuOpen ? 'rotate-180' : ''
+              }`}
+              aria-hidden="true"
+            />
+            {isChecking && (
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" aria-hidden="true" />
+            )}
+          </button>
+
+          {isWorkspaceMenuOpen && (
+            <div
+              role="menu"
+              aria-label={t('navigation:headerMenu.aria', 'Menu compte, préférences et outils')}
+              className="absolute right-0 mt-2 w-72 rounded-2xl bg-white dark:bg-[#141824] border border-slate-200 dark:border-[#262a35] shadow-2xl overflow-hidden z-50"
+            >
+              {/* Identity Header -> Profile */}
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setIsWorkspaceMenuOpen(false);
+                  onNavigate('profile');
+                }}
+                className="w-full px-4 py-3 text-left flex items-center justify-between gap-3 bg-slate-50/80 dark:bg-[#111520] hover:bg-slate-100 dark:hover:bg-[#1a2030] border-b border-slate-200 dark:border-[#1f2433] transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-blue-600/15 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm shrink-0">
+                    {userInitial}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      {userName}
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                      {user
+                        ? t('common:user.syncedAccount', 'Compte synchronisé')
+                        : t('common:user.guestMode', 'Mode invité')}
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+              </button>
+
+              {/* Section 1: Preferences (Language + Guide Mode) */}
+              <div className="p-3 border-b border-slate-100 dark:border-[#1f2433] space-y-2.5">
+                <div className="px-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+                  {t('navigation:headerMenu.preferencesSection', 'Préférences')}
+                </div>
+
+                <div className="flex items-center justify-between gap-2 px-1">
+                  <span className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                    <Globe className="w-3.5 h-3.5 text-blue-500 shrink-0" aria-hidden="true" />
+                    <span>{t('navigation:headerMenu.languageLabel', 'Langue')}</span>
+                  </span>
+                  <LanguageSelector variant="compact" />
+                </div>
+
+                <button
+                  type="button"
+                  role="menuitemcheckbox"
+                  aria-checked={isGuideModeActive}
+                  onClick={toggleGuideMode}
+                  className="w-full px-2 py-2 rounded-xl flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <HelpCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+                    <span>{t('navigation:items.guide.shortLabel', 'Guide novice')}</span>
+                  </span>
+                  <span
+                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${
+                      isGuideModeActive
+                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-slate-200/80 dark:bg-[#22283a] text-slate-500 dark:text-slate-400'
+                    }`}
+                  >
+                    {isGuideModeActive ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+              </div>
+
+              {/* Section 2: Discover & Navigation */}
+              <div className="p-2 border-b border-slate-100 dark:border-[#1f2433] space-y-0.5">
+                <div className="px-2 py-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+                  {t('navigation:headerMenu.discoverSection', 'Découverte & Aide')}
+                </div>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsWorkspaceMenuOpen(false);
+                    startTour(0);
+                  }}
+                  className="w-full px-2.5 py-2 rounded-xl flex items-center gap-2.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors"
+                >
+                  <Compass className="w-4 h-4 text-blue-500 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t('navigation:items.tour.label', 'Visite guidée automatique')}</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsWorkspaceMenuOpen(false);
+                    onNavigate('landing');
+                  }}
+                  className="w-full px-2.5 py-2 rounded-xl flex items-center gap-2.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors"
+                >
+                  <Sparkles className="w-4 h-4 text-indigo-500 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t('navigation:items.landing.label', 'Page de présentation')}</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsWorkspaceMenuOpen(false);
+                    onOpenHamburgerMenu();
+                  }}
+                  className="w-full px-2.5 py-2 rounded-xl flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors"
+                >
+                  <span className="flex items-center gap-2.5 truncate">
+                    <LayoutGrid className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+                    <span className="truncate">{t('navigation:headerMenu.quickMenu', 'Navigation rapide')}</span>
+                  </span>
+                  <kbd className="text-[10px] font-mono text-slate-400">Ctrl+M</kbd>
+                </button>
+              </div>
+
+              {/* Section 3: System */}
+              <div className="p-2">
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsWorkspaceMenuOpen(false);
+                    onOpenSystemSettings();
+                  }}
+                  className="w-full px-2.5 py-2 rounded-xl flex items-center justify-between text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#1a2030] transition-colors"
+                >
+                  <span className="flex items-center gap-2.5 truncate">
+                    <Settings className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+                    <span className="truncate">{t('navigation:items.settings.label', 'Paramètres système')}</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">{versionInfo.version}</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
