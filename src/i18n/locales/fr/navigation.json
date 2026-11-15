@@ -164,5 +164,20 @@
   },
   "breadcrumb": {
     "home": "Accueil"
+  },
+  "landingNav": {
+    "subtitle": "Cloud & AI Certifications",
+    "navAria": "Navigation principale",
+    "mobileMenuAria": "Menu de navigation mobile",
+    "openMenuAria": "Ouvrir le menu de navigation",
+    "closeMenuAria": "Fermer le menu de navigation",
+    "homeAria": "Retour en haut de la page CertifIA",
+    "features": "Fonctionnalités",
+    "certifications": "Certifications",
+    "method": "Méthode",
+    "faq": "FAQ",
+    "accessApp": "Accéder à CertifIA",
+    "preferences": "Préférences d'affichage",
+    "themeLabel": "Thème d'interface"
   }
 }

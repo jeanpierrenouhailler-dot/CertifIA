@@ -3,13 +3,18 @@ import React from 'react';
 interface CertifAILogoProps {
   className?: string;
   showSubtitle?: boolean;
+  iconOnly?: boolean;
 }
 
-export const CertifAILogo: React.FC<CertifAILogoProps> = ({ className = '', showSubtitle = true }) => {
+export const CertifAILogo: React.FC<CertifAILogoProps> = ({
+  className = '',
+  showSubtitle = true,
+  iconOnly = false,
+}) => {
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
       <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-900 p-0.5 shadow-lg shadow-blue-500/20 flex items-center justify-center shrink-0 ring-1 ring-white/15">
-        <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
           {/* Neural cloud nodes and connection links */}
           <path
             d="M12 4L4 18H20L12 4Z"
@@ -32,16 +37,18 @@ export const CertifAILogo: React.FC<CertifAILogoProps> = ({ className = '', show
         </svg>
       </div>
 
-      <div className="flex flex-col">
-        <span className="font-bold text-lg tracking-tight text-white flex items-center gap-1 font-headline">
-          Certif<span className="text-blue-400">AI</span>
-        </span>
-        {showSubtitle && (
-          <span className="text-[9px] font-mono tracking-wider uppercase text-blue-300/60 font-semibold">
-            Enterprise Engine
+      {!iconOnly && (
+        <div className="flex flex-col">
+          <span className="font-bold text-lg tracking-tight text-white flex items-center gap-1 font-headline">
+            Certif<span className="text-blue-400">AI</span>
           </span>
-        )}
-      </div>
+          {showSubtitle && (
+            <span className="text-[9px] font-mono tracking-wider uppercase text-blue-300/60 font-semibold">
+              Enterprise Engine
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
