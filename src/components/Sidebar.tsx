@@ -531,8 +531,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Bottom Section: Profile & Settings */}
+        {/* Bottom Section: Install PWA, Settings & Profile */}
         <div className="p-3 border-t border-slate-200 dark:border-[#1c202d] space-y-1">
+          {!isInstalled && (
+            <button
+              onClick={() => {
+                promptInstall();
+                if (onCloseMobile) onCloseMobile();
+              }}
+              title={isCollapsed ? t('navigation:items.pwa.label', 'Installer l’application') : undefined}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold bg-blue-600/10 hover:bg-blue-600/20 text-blue-600 dark:text-blue-400 border border-blue-500/20 transition-all"
+            >
+              <Download className="w-4 h-4 shrink-0" />
+              {!isCollapsed && (
+                <span className="truncate">{t('navigation:items.pwa.label', 'Installer l’application')}</span>
+              )}
+            </button>
+          )}
+
           {/* Settings button */}
           <button
             onClick={() => {

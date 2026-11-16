@@ -46,6 +46,7 @@ import {
   getTodayDateString 
 } from '../lib/srsAlgorithm';
 import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage, formatLocalizedNumber, formatLocalizedDate } from '../i18n';
 
 interface TodayViewProps {
@@ -292,6 +293,8 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
           </div>
         </div>
       </div>
+
+      <ScreenGuideBanner screenKey="today" />
 
       {/* 2. Target Certification Switcher Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[#171b26] border border-[#262a35]">

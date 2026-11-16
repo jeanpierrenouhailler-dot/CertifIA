@@ -7,8 +7,7 @@ import {
   PlusSquare, 
   CheckCircle2, 
   X, 
-  Sparkles, 
-  Globe 
+  Sparkles
 } from 'lucide-react';
 import { usePwa } from '../context/PwaContext';
 import { useTranslation } from '../i18n';
@@ -19,7 +18,7 @@ interface InstallAppModalProps {
 }
 
 export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClose }) => {
-  const { isInstalled } = usePwa();
+  const { isInstalled, hasNativePrompt, promptInstall } = usePwa();
   const { t, i18n } = useTranslation(['settings', 'common']);
   const isEn = i18n.language === 'en';
 
@@ -32,9 +31,12 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
         {/* Header Ribbon */}
         <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-[#262a35] flex items-center justify-between gap-4 bg-slate-50 dark:bg-[#0f131d]/60">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-600/10 dark:bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-              <Download className="w-5 h-5" />
-            </div>
+            <img
+              src="/pwa-192x192.png"
+              alt="Icône CertifIA PWA"
+              className="w-11 h-11 rounded-2xl border border-blue-500/30 shadow-md shrink-0"
+              referrerPolicy="no-referrer"
+            />
             <div>
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 {t('settings:pwa.subtitle', 'Installation Progressive Web App')}
@@ -68,12 +70,35 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
               </div>
             </div>
           ) : (
-            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-              {isEn 
-                ? 'Add CertifIA directly to your smartphone, tablet, or desktop home screen for a lightning-fast full-screen experience available offline.'
-                : 'Ajoutez CertifIA directement sur l\'écran d\'accueil de votre smartphone, tablette ou bureau PC/Mac pour une expérience plein écran ultra-rapide et accessible hors-ligne.'
-              }
-            </p>
+            <div className="space-y-3">
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                {isEn 
+                  ? 'Add CertifIA directly to your smartphone, tablet, or desktop home screen for a lightning-fast full-screen experience available offline.'
+                  : 'Ajoutez CertifIA directement sur l\'écran d\'accueil de votre smartphone, tablette ou bureau PC/Mac pour une expérience plein écran ultra-rapide et accessible hors-ligne.'
+                }
+              </p>
+
+              {hasNativePrompt && (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-600/10 via-indigo-600/10 to-transparent border border-blue-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="font-bold text-slate-900 dark:text-white text-xs">
+                      {isEn ? '1-Click Native Installation Available' : 'Installation directe en 1 clic disponible'}
+                    </div>
+                    <div className="text-[11px] text-slate-600 dark:text-slate-300">
+                      {isEn ? 'Your browser supports instant installation on your home screen or desktop.' : 'Votre navigateur autorise l\'ajout immédiat sur votre écran d\'accueil ou bureau.'}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => promptInstall()}
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-mono text-xs font-bold shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 shrink-0 transition-all"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>{t('settings:pwa.installAction', 'Installer l’application maintenant')}</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Instructions Tabs / Accordion */}

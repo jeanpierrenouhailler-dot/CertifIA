@@ -187,5 +187,77 @@
     "systemSection": "Système",
     "languageLabel": "Langue",
     "quickMenu": "Navigation rapide"
+  },
+  "screenGuides": {
+    "today": {
+      "title": "Cockpit Quotidien (Aujourd’hui)",
+      "summary": "Cet écran centralise votre plan d’étude du jour calculé automatiquement à partir de votre courbe d’oubli SM-2 et de vos scores récents.",
+      "step1": "1. Sélectionnez votre certification cible en haut pour adapter les cartes et questions du jour.",
+      "step2": "2. Lancez « Votre session du jour » (~22 min) : 17 cartes SM-2, 8 notions fragiles et 12 QCM ciblés.",
+      "step3": "3. Survolez les icônes (?) pour comprendre chaque métrique ou ouvrez le blueprint officiel."
+    },
+    "catalogue": {
+      "title": "Catalogue des 18 Certifications",
+      "summary": "Explorez, filtrez et comparez les 18 certifications majeures Cloud & IA (Azure, AWS, Google Cloud, IBM, NVIDIA) pour bâtir votre stratégie.",
+      "step1": "1. Filtrez par fournisseur Cloud, niveau (Fondamental, Associate, Expert) ou domaine (GenAI, MLOps).",
+      "step2": "2. Ouvrez « Comparer » pour mettre côte à côte durées, seuils de réussite et domaines évalués.",
+      "step3": "3. Cliquez sur le Blueprint d’un examen ou sur le Tuteur IA pour inspecter son programme détaillé."
+    },
+    "recommendation": {
+      "title": "Moteur de Recommandation & Parcours IA",
+      "summary": "Obtenez une feuille de route personnalisée du Niveau 1 au Niveau 4 selon votre métier, votre budget et votre disponibilité hebdomadaire.",
+      "step1": "1. Renseignez ou ajustez vos 7 critères de profil (rôle, objectif, budget, rythme d’étude).",
+      "step2": "2. Comparez les parcours recommandés et consultez les certifications prérequises par palier.",
+      "step3": "3. Adoptez directement une certification comme objectif actif pour synchroniser tout votre cockpit."
+    },
+    "quiz": {
+      "title": "Entraînement QCM & Décryptage des Pièges",
+      "summary": "Pratiquez sur des scénarios techniques réalistes avec correction instantanée, justification architecturale et analyse des distracteurs d’examen.",
+      "step1": "1. Lisez le contexte architectural et sélectionnez l’option A, B, C ou D avant de valider.",
+      "step2": "2. Après validation, étudiez pourquoi les autres réponses sont des pièges typiques d’éditeur.",
+      "step3": "3. Marquez les questions délicates avec l’icône signet ou demandez une clarification au Tuteur IA."
+    },
+    "flashcards": {
+      "title": "Fiches Mémo & Répétition Espacée (SM-2)",
+      "summary": "Ancrez durablement les quotas, SLA, commandes SDK et règles d’or grâce à l’algorithme de répétition espacée SuperMemo-2 (2 800 fiches).",
+      "step1": "1. Choisissez la session du jour (cartes dues) ou filtrez par domaine et niveau de difficulté.",
+      "step2": "2. Retournez la carte (Espace) et évaluez sincèrement votre rappel : À revoir (1), Difficile (2), Bien (3), Facile (4).",
+      "step3": "3. L’intervalle optimal (J+1, J+3, J+7…) est sauvegardé automatiquement pour vos futures sessions."
+    },
+    "exam": {
+      "title": "Simulateur d’Examen Blanc Chronométré",
+      "summary": "Testez votre endurance et votre gestion du temps dans les conditions réelles d’un centre d’examen officiel (65 questions, seuil 700/1 000).",
+      "step1": "1. Surveillez le compte à rebours en haut à droite et utilisez « Pause » uniquement si nécessaire.",
+      "step2": "2. Utilisez « Marquer pour révision » sur les questions incertaines et naviguez via la grille des 65 numéros.",
+      "step3": "3. Terminez l’épreuve pour obtenir votre score pondéré sur 1 000 pts et votre bilan par domaine."
+    },
+    "glossary": {
+      "title": "Glossaire & Encyclopédie IA Multi-Cloud",
+      "summary": "Consultez instantanément les définitions précises, acronymes et pièges d’examen transversaux entre Azure, AWS, Google Cloud et IBM.",
+      "step1": "1. Recherchez un terme ou acronyme (RAG, LoRA, Drift) ou filtrez par lettre et fournisseur.",
+      "step2": "2. Basculez vers l’onglet « Encyclopédie Approfondie » pour accéder aux fiches architecturales complètes.",
+      "step3": "3. Ajoutez vos notions clés en favoris pour y revenir en un clic avant l’examen."
+    },
+    "analytics": {
+      "title": "Tableau de Bord & Analytics Cognitives",
+      "summary": "Suivez votre indice de préparation réel, l’historique de vos examens blancs et la maîtrise détaillée de chaque sous-domaine.",
+      "step1": "1. Changez de certification cible dans la matrice pour inspecter son niveau de préparation.",
+      "step2": "2. Consultez l’onglet « Examens » pour rouvrir le rapport détaillé de chaque tentative.",
+      "step3": "3. Repérez les domaines sous 70 % pour concentrer vos prochains QCM et flashcards ciblés."
+    },
+    "assistant": {
+      "title": "Assistant Pédagogique & Tuteur IA",
+      "summary": "Clarifiez instantanément un service cloud, un piège d’examen ou une formule mathématique grâce aux fiches guidées et au mode socratique.",
+      "step1": "1. Sélectionnez votre certification cible et choisissez une notion clé du syllabus à gauche.",
+      "step2": "2. Naviguez entre Concepts, Pièges d’examen et Mnémotechniques ou posez votre question personnalisée.",
+      "step3": "3. Enchaînez directement vers un quiz ou des flashcards pour valider l’acquis en pratique."
+    },
+    "profile": {
+      "title": "Mon Profil, Objectifs & Conformité RGPD",
+      "summary": "Gérez votre identité apprenant, la certification visée, la synchronisation Cloud Firestore et l’export intégral de vos données.",
+      "step1": "1. Modifiez votre nom d’affichage ou connectez votre compte Google pour sauvegarder dans le Cloud.",
+      "step2": "2. Définissez votre certification objectif prioritaire parmi les pistes proposées.",
+      "step3": "3. Ouvrez « Aide & RGPD » pour consulter les données stockées et exporter votre historique au format JSON."
+    }
   }
 }

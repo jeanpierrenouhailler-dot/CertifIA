@@ -4,6 +4,34 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 
 ---
 
+## [2.9.0] - 2026-11-16 • Expérience PWA Complète, Onboarding Contextuel 10 Écrans & Navigation Allégée
+
+### 📱 PWA, Icônes Officielles & Installation Mobile/Desktop
+* **Pack Complet d’Icônes PWA PNG (`public/pwa-192x192.png`, `public/pwa-512x512.png`, `public/pwa-maskable-512x512.png`, `public/apple-touch-icon.png`) :**
+  * Déclarées dans `public/manifest.webmanifest` et `index.html` pour une installation conforme sur Android, iOS Safari et navigateurs Desktop.
+  * Copie dédiée des logos dans `assets/` pour la documentation.
+* **Bouton « Installer l’application » & Installation 1-Clic (`PwaContext.tsx`, `InstallAppModal.tsx`, `Header.tsx`, `Sidebar.tsx`) :**
+  * Exposition de `hasNativePrompt` pour déclencher l’installation native en 1 clic directement dans le modal lorsque le navigateur l’autorise, en complément des guides illustrés iOS/Android/Desktop.
+  * Accès direct depuis le menu Compte de l’en-tête, le pied de la barre latérale, les paramètres système et le menu hamburger.
+
+### ⚙️ Mises à Jour Automatiques en Arrière-Plan & Paramètres Système
+* **Moteur Service Worker Auto-Update (`SystemUpdateContext.tsx` & `public/sw.js` `v2.9.0`) :**
+  * Écoute de l’événement `updatefound` du Service Worker et envoi automatique de `{ type: 'SKIP_WAITING' }` lorsque la surveillance en arrière-plan est active, avec vérification périodique toutes les 3 minutes et contrôle non caché sur `/manifest.webmanifest`.
+  * Affichage dynamique de la **Date de sortie** (`16 Novembre 2026`), de la **Date de dernière vérification**, des boutons **« Vérifier les mises à jour »** et **« Forcer la mise à jour »**, ainsi qu’un bandeau *Appliquer la mise à jour* lorsqu’une version est en attente.
+
+### 💡 Onboarding Contextuel & Infobulles sur Tous les Écrans + Cadre Légal Renforcé
+* **Onboarding Contextuel Unifié (`ScreenGuideBanner.tsx`) & Infobulles (`InfoTooltip.tsx`) :**
+  * Déploiement du bandeau rétractable `ScreenGuideBanner` (explication + 3 étapes rapides + accès direct à la Visite Guidée) sur **chacun des 10 écrans** (`today`, `catalogue`, `recommendation`, `quiz`, `flashcards`, `exam`, `glossary`, `analytics`, `assistant`, `profile`).
+  * Ajout d’infobulles explicatives `InfoTooltip` dans les 6 écrans qui en étaient dépourvus (`CatalogueView`, `QuizView`, `ExamView`, `AnalyticsView`, `AIAssistantView`, `ProfileView`).
+* **Clause de Non-Responsabilité Explicite (`LegalOnboardingModal.tsx` & `settings.json`) :**
+  * Clarification juridique en français et en anglais précisant explicitement que l’éditeur et le concepteur ne sont en aucun cas responsables des données, informations, questions, réponses ou simulations fournies dans l’application.
+
+### 🧭 Barre Supérieure Allégée & Menu Hamburger Catégorisé
+* **Refonte du Header (`Header.tsx`) :** Réorganisation en 3 zones épurées avec regroupement des contrôles secondaires dans le menu unifié *Compte & Préférences* et bouton Hamburger `< lg` connecté au `CategorizedHamburgerMenu` (`Ctrl+M`).
+* **Parité i18n Stricte 1:1 :** Validation automatisée de **1 012 clés FR / 1 012 clés EN** sur les 13 namespaces via `verifyI18nParity.ts`.
+
+---
+
 ## [2.8.0] - 2026-11-04 • Version Anglaise & Internationalisation Complète (i18n)
 
 ### 🌐 Internationalisation (i18n) & Bilinguisme Français / English

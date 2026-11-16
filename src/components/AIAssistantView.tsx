@@ -18,6 +18,8 @@ import {
 import { AppScreen } from '../types';
 import { PageHeader } from './ui/PageHeader';
 import { certificationsData } from '../data/certificationsData';
+import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface AIAssistantViewProps {
@@ -146,6 +148,8 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
         }
       />
 
+      <ScreenGuideBanner screenKey="assistant" />
+
       {/* Target Certification Selector Bar */}
       <div className="p-4 rounded-2xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -153,8 +157,14 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
             <Bot className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs font-mono uppercase text-slate-500 dark:text-slate-400">
+            <div className="text-xs font-mono uppercase text-slate-500 dark:text-slate-400 inline-flex items-center gap-1.5">
               {isEn ? 'Target Certification' : 'Certification Cible'}
+              <InfoTooltip
+                title={isEn ? 'Blueprint Calibration' : 'Calibration sur le Blueprint'}
+                content={isEn
+                  ? 'Select a certification to adapt all explanations, exam traps, and mnemonics directly to its official vendor services.'
+                  : 'Sélectionnez une certification pour adapter automatiquement les explications, pièges d’examen et mnémotechniques aux services officiels.'}
+              />
             </div>
             <div className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <span>{currentCertData.code} - {currentCertData.title}</span>
@@ -196,8 +206,16 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
         <div className="lg:col-span-4 space-y-4">
           <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] space-y-3">
             <div className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
-              <span>Notions au Programme</span>
-              <span>{currentTopics.length} clés</span>
+              <span className="inline-flex items-center gap-1.5">
+                {isEn ? 'Syllabus Topics' : 'Notions au Programme'}
+                <InfoTooltip
+                  title={isEn ? 'Guided AI Study Modes' : 'Modes d’explication IA'}
+                  content={isEn
+                    ? 'Click any topic below to explore core Concepts, common Exam Traps, Memory Aids, or ask your own custom technical question.'
+                    : 'Cliquez sur une notion ci-dessous pour afficher Concepts, Pièges d’examen, Mnémotechniques ou poser une question sur-mesure.'}
+                />
+              </span>
+              <span>{currentTopics.length} {isEn ? 'key' : 'clés'}</span>
             </div>
 
             <div className="space-y-1.5">

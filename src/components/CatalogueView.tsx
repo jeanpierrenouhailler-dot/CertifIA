@@ -19,6 +19,8 @@ import {
 import { Certification, CloudProvider, CertificationLevel, AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
 import { PageHeader } from './ui/PageHeader';
+import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface CatalogueViewProps {
@@ -133,11 +135,21 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
         }
       />
 
+      <ScreenGuideBanner screenKey="catalogue" />
+
       {/* Filter Toolbar */}
       <div data-tour="catalogue-filters" className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#171b26] border border-slate-200 dark:border-[#262a35] space-y-4 shadow-sm">
         {/* Provider Filters */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
-          <span className="font-mono text-slate-400 uppercase text-[10px] font-bold mr-1 shrink-0">{t('certifications:filterByProvider')} :</span>
+          <span className="font-mono text-slate-400 uppercase text-[10px] font-bold mr-1 shrink-0 inline-flex items-center gap-1">
+            {t('certifications:filterByProvider')} :
+            <InfoTooltip
+              title={lang === 'en' ? 'Filter by Cloud Provider' : 'Filtrer par fournisseur Cloud'}
+              content={lang === 'en'
+                ? 'Isolate certifications by ecosystem (Microsoft Azure, AWS, Google Cloud, IBM) or combine with level and domain filters below.'
+                : 'Isolez les certifications par écosystème (Microsoft Azure, AWS, Google Cloud, IBM) puis affinez par niveau ou domaine ci-dessous.'}
+            />
+          </span>
           <button
             onClick={() => setProviderFilter('Tous')}
             className={`px-3 py-1.5 rounded-xl font-medium whitespace-nowrap transition-all ${
@@ -249,6 +261,12 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               <option value="progress">{t('certifications:filters.sortProgress', 'Tri : Progression')}</option>
               <option value="duration">{t('certifications:filters.sortDuration', 'Tri : Durée d’examen')}</option>
             </select>
+            <InfoTooltip
+              title={lang === 'en' ? 'Blueprints & Comparator' : 'Blueprints & Comparateur'}
+              content={lang === 'en'
+                ? 'Each card gives access to the official weighted syllabus (Blueprint), side-by-side comparison, and dedicated AI Tutor.'
+                : 'Chaque carte ouvre le référentiel officiel pondéré (Blueprint), le comparateur côte à côte et le Tuteur IA dédié à l’examen.'}
+            />
           </div>
         </div>
       </div>

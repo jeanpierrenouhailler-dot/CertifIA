@@ -6,13 +6,10 @@ import {
   CheckCircle2, 
   Calendar, 
   Clock, 
-  ShieldCheck, 
   Cpu, 
   Layers, 
-  AlertTriangle, 
   X, 
   Download, 
-  Sparkles, 
   Terminal,
   Zap,
   Info
@@ -22,7 +19,7 @@ import { useGuide } from '../context/GuideContext';
 import { usePwa } from '../context/PwaContext';
 import { useTheme } from '../context/ThemeContext';
 import { LanguageSelector } from './LanguageSelector';
-import { useTranslation, formatLocalizedDate } from '../i18n';
+import { useTranslation } from '../i18n';
 
 interface SystemSettingsModalProps {
   isOpen: boolean;
@@ -39,16 +36,19 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
     isChecking, 
     isUpdating, 
     isAutoUpdateEnabled,
+    hasPendingUpdate,
     updateStatusMessage, 
     toggleAutoUpdate, 
     checkForUpdates, 
-    forceUpdate 
+    forceUpdate,
+    applyPendingUpdate
   } = useSystemUpdate();
 
   const { isGuideModeActive, toggleGuideMode, openLegalModal } = useGuide();
   const { theme, toggleTheme } = useTheme();
   const { isInstalled, promptInstall } = usePwa();
-  const { t } = useTranslation(['settings', 'common']);
+  const { t, i18n } = useTranslation(['settings', 'common']);
+  const isEn = i18n.language === 'en';
   const [activeTab, setActiveTab] = useState<'system' | 'changelog' | 'cache'>('system');
 
   if (!isOpen) return null;
@@ -176,6 +176,22 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
                 <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-500/30 text-blue-800 dark:text-blue-200 text-xs font-mono font-medium flex items-center gap-2.5 animate-in fade-in">
                   <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                   <span>{updateStatusMessage}</span>
+                </div>
+              )}
+
+              {/* Staged Pending Update Notification */}
+              {hasPendingUpdate && (
+                <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-500/30 flex items-center justify-between gap-3">
+                  <div className="text-xs font-mono text-emerald-800 dark:text-emerald-200">
+                    {isEn ? 'A new version was downloaded in the background and is ready.' : 'Une nouvelle version a été téléchargée en arrière-plan.'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={applyPendingUpdate}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold shrink-0 transition-colors"
+                  >
+                    {isEn ? 'Apply update' : 'Appliquer la mise à jour'}
+                  </button>
                 </div>
               )}
 
@@ -380,7 +396,7 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
         {/* Footer */}
         <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-[#262a35] bg-slate-50 dark:bg-[#0f131d]/60 flex items-center justify-between">
           <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-            Système CertifIA v2.4.0 • Build {versionInfo.buildNumber}
+            Système CertifIA {versionInfo.version} • Build {versionInfo.buildNumber}
           </span>
           <button
             onClick={onClose}

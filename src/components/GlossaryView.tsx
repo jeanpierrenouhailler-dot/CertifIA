@@ -37,6 +37,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { SupportedLanguage } from '../i18n';
 import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 
 interface GlossaryViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -278,6 +279,8 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
           </button>
         </div>
       </div>
+
+      <ScreenGuideBanner screenKey="glossary" className="mb-6" />
 
       {/* Search & Filters Bar */}
       <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 mb-6 shadow-sm">

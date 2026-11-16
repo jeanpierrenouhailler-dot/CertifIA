@@ -11,6 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 interface PwaContextType {
   isInstallable: boolean;
+  hasNativePrompt: boolean;
   isInstalled: boolean;
   isInstallModalOpen: boolean;
   openInstallModal: () => void;
@@ -90,6 +91,7 @@ export const PwaProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <PwaContext.Provider
       value={{
         isInstallable: Boolean(deferredPrompt) || !isInstalled,
+        hasNativePrompt: Boolean(deferredPrompt),
         isInstalled,
         isInstallModalOpen,
         openInstallModal,

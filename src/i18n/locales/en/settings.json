@@ -156,7 +156,7 @@
     "subtitle": "Official sources, independence and data disclaimer",
     "tabLegal": "Legal Notices & Disclaimer",
     "tabGuide": "Beginner Educational Guide",
-    "disclaimerText": "CertifIA is an independent training and learning platform. Questions, revision flashcards, and mock exams are pedagogical simulations designed to prepare for official certifications. CertifIA is neither affiliated with nor endorsed by Microsoft, Amazon Web Services, Google Cloud, IBM, or NVIDIA. The publisher declines any liability regarding results obtained during official examinations.",
+    "disclaimerText": "CertifIA is an independent training and learning platform. The publisher and author are not responsible for any data, information, questions, answers, or simulations provided within the application, which are strictly indicative. CertifIA is neither affiliated with nor endorsed by Microsoft, Amazon Web Services, Google Cloud, IBM, or NVIDIA, and the publisher declines all liability regarding official examination results.",
     "accept": "I have read and accept the educational terms",
     "continue": "Enter Application"
   },

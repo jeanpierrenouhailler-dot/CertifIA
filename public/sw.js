@@ -1,11 +1,13 @@
-// CertifIA Service Worker v2.4.0
-const CACHE_NAME = 'certifai-cache-v2.4.0';
+// CertifIA Service Worker v2.9.0
+const CACHE_NAME = 'certifai-cache-v2.9.0';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
   '/icon.svg',
-  '/assets/certifai-screenshot.svg'
+  '/pwa-192x192.png',
+  '/pwa-512x512.png',
+  '/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -17,6 +19,12 @@ self.addEventListener('install', (event) => {
       });
     })
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {
@@ -34,13 +42,22 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first with fallback to cache for HTML and dynamic scripts
+  if (event.request.method !== 'GET') return;
+
+  // Network first with fallback to cache for HTML navigation
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => {
         return caches.match('/') || caches.match('/index.html');
       })
     );
+    return;
+  }
+
+  // Always bypass cache for manifest / service worker update checks
+  const url = new URL(event.request.url);
+  if (url.pathname === '/manifest.webmanifest' || url.pathname === '/sw.js') {
+    event.respondWith(fetch(event.request));
     return;
   }
 

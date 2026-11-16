@@ -23,6 +23,8 @@ import {
 import { QuizQuestion, AppScreen } from '../types';
 import { quizMatrixItems } from '../data/quizData';
 import { getLocalizedQuizQuestions } from '../data/localizedQuizData';
+import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface QuizViewProps {
@@ -117,6 +119,13 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             <Award className="w-3.5 h-3.5 text-emerald-400" />
             <span className="text-slate-300">{t('quizzes:scoreLabel')}</span>
             <span className="text-emerald-400 font-bold">6/7 (85.7%)</span>
+            <InfoTooltip
+              title={lang === 'en' ? 'Scenario Practice Scoring' : 'Score d’entraînement QCM'}
+              content={lang === 'en'
+                ? 'Tracks your accuracy during this scenario drill. Aim for 70%+ consistently before attempting timed mock exams.'
+                : 'Mesure votre précision en entraînement guidé. Visez un maintien au-dessus de 70 % avant de lancer un examen blanc chronométré.'}
+              position="bottom"
+            />
           </div>
 
           {/* Flag button */}
@@ -134,6 +143,8 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
         </div>
       </div>
 
+      <ScreenGuideBanner screenKey="quiz" />
+
       {/* Global Progress Bar Strip */}
       <div className="p-4 rounded-2xl bg-[#171b26] border border-[#262a35]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 mb-2">
@@ -141,7 +152,16 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             {t('quizzes:questionHeader', { current: currentQ.code === 'Q-7294' ? '7' : activeQuestionIndex + 1, total: 20 })}
           </span>
           <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
-            <span>{t('quizzes:requiredThreshold')}</span>
+            <span className="inline-flex items-center gap-1.5">
+              {t('quizzes:requiredThreshold')}
+              <InfoTooltip
+                title={lang === 'en' ? 'Official 700/1000 Standard' : 'Seuil officiel 700/1 000'}
+                content={lang === 'en'
+                  ? 'Most Cloud AI exams (Azure AI-102, AWS AIF-C01) require at least 700/1000 scaled points. Inspect distractors below each answer to avoid common traps.'
+                  : 'La majorité des certifications Cloud IA (Azure AI-102, AWS AIF-C01) exigent un score pondéré minimum de 700/1 000. Analysez chaque piège après validation.'}
+                position="bottom"
+              />
+            </span>
             <span className="text-blue-400 font-bold">{t('quizzes:progressPct', { pct: 35 })}</span>
           </div>
         </div>

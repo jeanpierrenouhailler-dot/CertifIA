@@ -16,11 +16,13 @@ import {
   Compass,
   Globe,
   LayoutGrid,
+  Download,
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useGuide } from '../context/GuideContext';
+import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
 import { useOnboardingTour } from '../context/OnboardingTourContext';
@@ -54,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { user, userProfile } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { isGuideModeActive, toggleGuideMode } = useGuide();
+  const { isInstalled, promptInstall } = usePwa();
   const { activeCertId } = useProgress();
   const { versionInfo, isChecking } = useSystemUpdate();
   const { startTour } = useOnboardingTour();
@@ -101,11 +104,11 @@ export const Header: React.FC<HeaderProps> = ({
       id="app-header"
       className="sticky top-0 z-30 h-16 bg-white/95 dark:bg-[#0f131d]/95 backdrop-blur-xl border-b border-slate-200 dark:border-[#1c1f2a] px-3 sm:px-6 flex items-center justify-between gap-3 sm:gap-5 transition-colors duration-200"
     >
-      {/* Zone 1 (Gauche) : Menu mobile (< lg uniquement, la Sidebar est déjà visible sur desktop) + Fil d'Ariane */}
+      {/* Zone 1 (Gauche) : Menu hamburger catégorisé (< lg uniquement, la Sidebar est déjà visible sur desktop) + Fil d'Ariane */}
       <div className="flex items-center gap-2.5 min-w-0 shrink-0">
         <button
           type="button"
-          onClick={onOpenMobileMenu}
+          onClick={onOpenHamburgerMenu}
           className="lg:hidden w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#171b26] dark:hover:bg-[#262a35] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#262a35] transition-colors flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           aria-label={t('navigation:hamburger.aria', 'Menu')}
           title={t('navigation:hamburger.aria', 'Menu')}
@@ -348,8 +351,23 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
 
-              {/* Section 3: System */}
-              <div className="p-2">
+              {/* Section 3: System & PWA Install */}
+              <div className="p-2 space-y-0.5">
+                {!isInstalled && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setIsWorkspaceMenuOpen(false);
+                      promptInstall();
+                    }}
+                    className="w-full px-2.5 py-2 rounded-xl flex items-center gap-2.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
+                  >
+                    <Download className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <span className="truncate">{t('navigation:items.pwa.label', 'Installer l’application')}</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   role="menuitem"

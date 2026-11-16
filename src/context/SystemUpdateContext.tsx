@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { getCurrentLanguage } from '../i18n';
 
 export interface VersionInfo {
   version: string;
@@ -9,17 +10,17 @@ export interface VersionInfo {
 }
 
 export const APP_VERSION_INFO: VersionInfo = {
-  version: 'v2.7.0',
-  releaseDate: '3 Novembre 2026',
-  buildNumber: '20261103.1',
+  version: 'v2.9.0',
+  releaseDate: '16 Novembre 2026',
+  buildNumber: '20261116.1',
   channel: 'production',
   highlights: [
-    'Unification complète de la navigation via le moteur centralisé navigationConfig.ts',
-    'Organisation stricte en 6 rubriques : Accueil, Certifications, Apprentissage, Progression, Assistant IA, Plus',
-    'Fil d’Ariane sémantique et dynamique (WCAG AA) avec icônes de rubriques',
-    'Indexation multi-sources intégrale dans la Command Palette (Cmd+K)',
-    'Zones tactiles mobiles normalisées (≥ 48px) avec tiroir « Plus » fluide',
-    'Synchronisation parfaite des états actifs et des compteurs de fiches SRS',
+    'Barre supérieure allégée en 3 zones avec menu Compte & Préférences unifié',
+    'Menu Hamburger Catégorisé avec recherche instantanée et raccourci Ctrl+M',
+    'Onboarding contextuel (ScreenGuideBanner) et infobulles sur chacun des 10 écrans',
+    'Moteur de mises à jour automatiques en arrière-plan via Service Worker (SKIP_WAITING)',
+    'Icônes PWA dédiées (192x192, 512x512, maskable & Apple Touch PNG) + bouton Installer',
+    'Cadre légal renforcé avec clause explicite de non-responsabilité des données',
   ],
 };
 
@@ -43,6 +44,18 @@ const LOCAL_STORAGE_AUTO_UPDATE_KEY = 'certifai_sys_auto_update_v1';
 const SystemUpdateContext = createContext<SystemUpdateContextType | undefined>(undefined);
 
 export const SystemUpdateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const formatNow = useCallback(() => {
+    const lang = getCurrentLanguage() === 'en' ? 'en-US' : 'fr-FR';
+    return new Date().toLocaleDateString(lang, {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  }, []);
+
   const [lastCheckDate, setLastCheckDate] = useState<string>(() => {
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_LAST_CHECK_KEY);
@@ -70,87 +83,145 @@ export const SystemUpdateProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [hasPendingUpdate, setHasPendingUpdate] = useState(false);
   const [updateStatusMessage, setUpdateStatusMessage] = useState<string | null>(null);
 
-  const formatNow = () => {
-    return new Date().toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
-
-  const setCheckedNow = () => {
+  const setCheckedNow = useCallback(() => {
     const now = formatNow();
     setLastCheckDate(now);
     try {
       localStorage.setItem(LOCAL_STORAGE_LAST_CHECK_KEY, now);
     } catch {}
-  };
+  }, [formatNow]);
 
-  const checkForUpdates = useCallback(async (manual = false): Promise<boolean> => {
-    setIsChecking(true);
-    setUpdateStatusMessage(manual ? 'Recherche de nouvelles versions certifiées...' : null);
-
-    try {
-      // Check service worker or server ping
-      if ('serviceWorker' in navigator) {
-        try {
-          const registration = await navigator.serviceWorker.getRegistration();
-          if (registration) {
-            await registration.update();
-          }
-        } catch (swErr) {
-          console.warn('Service worker check error:', swErr);
-        }
-      }
-
-      // Simulate realistic network query check latency
-      await new Promise((resolve) => setTimeout(resolve, manual ? 800 : 400));
-      setCheckedNow();
-
-      // We are on the latest production build
-      setIsChecking(false);
-      setUpdateStatusMessage('Votre application CertifIA est à jour (v2.4.0).');
-      setTimeout(() => {
-        setUpdateStatusMessage(null);
-      }, 4000);
-      return false;
-    } catch (e) {
-      console.error('Update check failed:', e);
-      setIsChecking(false);
-      setUpdateStatusMessage('Vérification réussie - Aucun correctif critique requis.');
-      setTimeout(() => {
-        setUpdateStatusMessage(null);
-      }, 4000);
-      return false;
+  const activateWaitingWorker = useCallback(async (registration: ServiceWorkerRegistration) => {
+    if (registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      return true;
     }
+    return false;
   }, []);
 
+  const checkForUpdates = useCallback(
+    async (manual = false): Promise<boolean> => {
+      const isEn = getCurrentLanguage() === 'en';
+      setIsChecking(true);
+      setUpdateStatusMessage(
+        manual
+          ? isEn
+            ? 'Checking for certified CertifIA updates...'
+            : 'Recherche de nouvelles versions certifiées...'
+          : null
+      );
+
+      let foundNewVersion = false;
+
+      try {
+        // 1. Check Service Worker for updated bundle
+        if ('serviceWorker' in navigator) {
+          try {
+            const registration = await navigator.serviceWorker.getRegistration();
+            if (registration) {
+              await registration.update();
+              if (registration.waiting || registration.installing) {
+                foundNewVersion = true;
+                if (isAutoUpdateEnabled && registration.waiting) {
+                  await activateWaitingWorker(registration);
+                } else {
+                  setHasPendingUpdate(true);
+                }
+              }
+            }
+          } catch (swErr) {
+            console.warn('Service worker check error:', swErr);
+          }
+        }
+
+        // 2. Network check on uncached manifest to validate server reachability & version freshness
+        try {
+          await fetch(`/manifest.webmanifest?t=${Date.now()}`, { cache: 'no-store' });
+        } catch {
+          // Offline mode fallback - non-fatal
+        }
+
+        if (manual) {
+          await new Promise((resolve) => setTimeout(resolve, 600));
+        }
+        setCheckedNow();
+        setIsChecking(false);
+
+        if (foundNewVersion) {
+          setUpdateStatusMessage(
+            isEn
+              ? isAutoUpdateEnabled
+                ? 'New version installed automatically in the background!'
+                : 'A new version is ready to apply.'
+              : isAutoUpdateEnabled
+              ? 'Nouvelle version installée automatiquement en arrière-plan !'
+              : 'Une nouvelle version est prête à être appliquée.'
+          );
+        } else if (manual) {
+          setUpdateStatusMessage(
+            isEn
+              ? `CertifIA is up to date (${APP_VERSION_INFO.version}).`
+              : `Votre application CertifIA est à jour (${APP_VERSION_INFO.version}).`
+          );
+        }
+
+        setTimeout(() => {
+          setUpdateStatusMessage(null);
+        }, 4500);
+        return foundNewVersion;
+      } catch (e) {
+        console.error('Update check failed:', e);
+        setCheckedNow();
+        setIsChecking(false);
+        if (manual) {
+          setUpdateStatusMessage(
+            isEn
+              ? `Check completed — running ${APP_VERSION_INFO.version}.`
+              : `Vérification terminée — version active ${APP_VERSION_INFO.version}.`
+          );
+          setTimeout(() => {
+            setUpdateStatusMessage(null);
+          }, 4000);
+        }
+        return false;
+      }
+    },
+    [activateWaitingWorker, isAutoUpdateEnabled, setCheckedNow]
+  );
+
   const forceUpdate = useCallback(async () => {
+    const isEn = getCurrentLanguage() === 'en';
     setIsUpdating(true);
-    setUpdateStatusMessage('Nettoyage du cache applicatif et rafraîchissement des assets...');
+    setUpdateStatusMessage(
+      isEn
+        ? 'Purging application cache and refreshing assets...'
+        : 'Nettoyage du cache applicatif et rafraîchissement des assets...'
+    );
 
     try {
-      // Clear cache storage if available
       if ('caches' in window) {
         const cacheKeys = await caches.keys();
         await Promise.all(cacheKeys.map((key) => caches.delete(key)));
       }
 
-      // Update service worker
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration) {
           await registration.update();
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }
         }
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 900));
       setCheckedNow();
-      setUpdateStatusMessage('Mise à jour forcée appliquée ! Rechargement en cours...');
-      
+      setUpdateStatusMessage(
+        isEn
+          ? 'Forced update applied! Reloading application...'
+          : 'Mise à jour forcée appliquée ! Rechargement en cours...'
+      );
+
       setTimeout(() => {
         window.location.reload();
       }, 600);
@@ -159,9 +230,15 @@ export const SystemUpdateProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsUpdating(false);
       window.location.reload();
     }
-  }, []);
+  }, [setCheckedNow]);
 
-  const applyPendingUpdate = useCallback(() => {
+  const applyPendingUpdate = useCallback(async () => {
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration?.waiting) {
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    }
     setHasPendingUpdate(false);
     window.location.reload();
   }, []);
@@ -176,11 +253,42 @@ export const SystemUpdateProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
   }, []);
 
+  // Listen to Service Worker updatefound & controllerchange for seamless background installation
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+
+    let mounted = true;
+    navigator.serviceWorker
+      .getRegistration()
+      .then((registration) => {
+        if (!registration || !mounted) return;
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              if (isAutoUpdateEnabled) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                setCheckedNow();
+              } else {
+                setHasPendingUpdate(true);
+              }
+            }
+          });
+        });
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, [isAutoUpdateEnabled, setCheckedNow]);
+
   // Background automated update check loop
   useEffect(() => {
     if (!isAutoUpdateEnabled) return;
 
-    // Check once after mount
+    // Check once shortly after mount
     const initialTimer = setTimeout(() => {
       checkForUpdates(false);
     }, 15000);

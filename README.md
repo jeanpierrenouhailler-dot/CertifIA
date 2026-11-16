@@ -7,9 +7,9 @@
 ### *Plateforme intelligente de préparation certifiante et de télémétrie cognitive pour examens Cloud & IA*
 ### *Intelligent Certification Prep & Cognitive Telemetry Platform for Cloud & AI Exams*
 
-[![Version](https://img.shields.io/badge/Version-v2.7.0-blue.svg?style=for-the-badge&logo=semver)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-v2.9.0-blue.svg?style=for-the-badge&logo=semver)](CHANGELOG.md)
 [![Languages](https://img.shields.io/badge/Languages-Français%20%7C%20English-success.svg?style=for-the-badge&logo=translate)](src/i18n/config.ts)
-[![i18n Parity](https://img.shields.io/badge/i18n%20Parity-943%20%2F%20943%20Keys-emerald.svg?style=for-the-badge)](src/i18n/verifyI18nParity.ts)
+[![i18n Parity](https://img.shields.io/badge/i18n%20Parity-1012%20%2F%201012%20Keys-emerald.svg?style=for-the-badge)](src/i18n/verifyI18nParity.ts)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-emerald.svg?style=for-the-badge&logo=pwa)](public/manifest.webmanifest)
 [![SM-2 Algorithm](https://img.shields.io/badge/Algorithm-SM--2%20%2F%20FSRS-purple.svg?style=for-the-badge)](src/lib/srsAlgorithm.ts)
 [![Theme](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-amber.svg?style=for-the-badge)](src/context/ThemeContext.tsx)
@@ -19,16 +19,51 @@
 
 ---
 
-## 📸 Galerie Complète des Captures d'Écran Réelles de l'Application (v2.7.0)
+## 📱 Logo PWA Officiel & Installation sur Écran d'Accueil
 
-> **Documentation visuelle actualisée :** Toutes les captures d'écran ci-dessous proviennent fidèlement de l'application réelle en production avec la barre latérale rétractable, l'en-tête dynamique bilingue, le cockpit quotidien, le moteur de parcours, les QCM scénarisés, les flashcards SM-2, les examens blancs et la visite guidée automatique.
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="160">
+        <img src="assets/pwa-192x192.png" alt="Logo PWA Installé CertifIA 192x192" width="112" height="112" style="border-radius: 24px;" />
+        <br />
+        <sub><strong>Icône PWA Officielle</strong><br /><code>192×192</code> • <code>512×512</code> • Maskable</sub>
+      </td>
+      <td align="left">
+        <ul>
+          <li>📲 <strong>Bouton « Installer l’application »</strong> : accessible depuis l’en-tête (menu Compte), la barre latérale et les paramètres système pour ajouter CertifIA en 1 clic sur mobile (iOS/Android) ou bureau (Chrome/Edge/macOS).</li>
+          <li>🖼️ <strong>Pack d’Icônes PWA Natif</strong> : génération dédiée <code>pwa-192x192.png</code>, <code>pwa-512x512.png</code>, <code>pwa-maskable-512x512.png</code> et <code>apple-touch-icon.png</code> (<code>180×180</code>) pour un rendu natif sur l’écran d’accueil sans barre de navigateur.</li>
+          <li>🔄 <strong>Mises à Jour Automatiques en Arrière-Plan</strong> : Service Worker autonome (<code>certifai-cache-v2.9.0</code>) avec détection <code>updatefound</code> et activation silencieuse (<code>SKIP_WAITING</code>) toutes les 3 minutes.</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## ✨ Architecture UX/UI, Gouvernance & Accompagnement (v2.9.0)
+
+| Module | Composant Clé | Fonctionnalités Implémentées |
+| :--- | :--- | :--- |
+| 🍔 **Menu Hamburger Catégorisé** | `CategorizedHamburgerMenu.tsx` | Regroupement de toutes les vues et outils en **6 catégories** (*Accueil, Certifications, Apprentissage, Progression, Assistant IA, Plus*) avec recherche instantanée et raccourci `Ctrl+M`. |
+| 🧭 **Barre Supérieure Allégée** | `Header.tsx` | Organisation épurée en **3 zones** (Navigation + Breadcrumb, Recherche `Ctrl+K`, Commandes & Menu Compte unifié) pour zéro encombrement visuel de `360px` à `1440px+`. |
+| ⚙️ **Paramètres Système & Auto-Update** | `SystemSettingsModal.tsx` | Affiche la **Date de sortie** (`16 Novembre 2026`), la **Dernière vérification**, le bouton **« Vérifier les mises à jour »**, le bouton **« Forcer la mise à jour »** et le commutateur de mises à jour automatiques. |
+| 💡 **Onboarding Contextuel & Infobulles** | `ScreenGuideBanner.tsx`, `InfoTooltip.tsx` | Bandeau explicatif rétractable en 3 étapes + infobulles d’aide (?) intégrées sur **chacun des 10 écrans** de l’application, synchronisés avec le mode Guide Novice. |
+| ⚖️ **Onboarding & Mentions Légales** | `LegalOnboardingModal.tsx` | Acceptation obligatoire à la première ouverture précisant explicitement que **l’éditeur et le concepteur ne sont pas responsables des données, questions ou réponses fournies**. |
+
+---
+
+## 📸 Galerie Complète des Captures d'Écran Réelles de l'Application (v2.9.0)
+
+> **Documentation visuelle actualisée :** Toutes les captures d'écran ci-dessous illustrent les écrans réels de CertifIA avec la barre latérale rétractable, l'en-tête allégé, le menu hamburger catégorisé, l'onboarding contextuel et les infobulles sur chaque écran, le cockpit quotidien, le moteur de parcours, les QCM scénarisés, les flashcards SM-2, les examens blancs et la visite guidée automatique.
 
 ---
 
 ### 1. 🏠 Cockpit Quotidien & Algorithme CertifIA (Session du Jour)
 
 <div align="center">
-  <img src="assets/screenshots/certifia-cockpit-today.png" alt="Cockpit Quotidien CertifIA v2.7.0" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-cockpit-today.png" alt="Cockpit Quotidien CertifIA v2.9.0" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
 * **Session Quotidienne Sur-Mesure (~22 min)** : Chaque matin, l'algorithme CertifIA analyse vos révisions passées pour composer votre session optimale :
@@ -175,16 +210,16 @@
 
 ---
 
-## 🌐 Bilinguisme Intégral Français / English (v2.7.0)
+## 🌐 Bilinguisme Intégral Français / English (v2.9.0)
 
 CertifIA garantit une expérience utilisateur **100% bilingue sans aucun texte résiduel** :
 
 * 🔄 **Bascule Instantanée Sans Rechargement** : Changez de langue en un clic depuis le Header (`FR` / `EN`), le menu latéral ou le modal système sans perdre votre session active, votre chrono ou votre question en cours.
 * 📦 **13 Namespaces i18next Embarqués Hors-Ligne** : `common`, `navigation`, `dashboard`, `certifications`, `learning`, `quizzes`, `flashcards`, `examinations`, `progress`, `assistant`, `settings`, `errors`, `notifications`.
-* 🛡️ **Parité Programmatique Stricte 1:1** : Vérification automatisée via script dédié garantissant l'égalité parfaite des 943 clés bilingues :
+* 🛡️ **Parité Programmatique Stricte 1:1** : Vérification automatisée via script dédié garantissant l'égalité parfaite des **1 012 clés bilingues** :
   ```bash
   npx tsx src/i18n/verifyI18nParity.ts
-  # Output: ✅ 943 French keys, 943 English keys across 13 namespaces (0 missing, 0 extra)
+  # Output: ✅ 1012 French keys, 1012 English keys across 13 namespaces (0 missing, 0 extra)
   ```
 * 🔢 **Formatage Régional Natif `Intl` Conforme** :
   * Dates : `15 mars 2026` (FR) vs `March 15, 2026` (EN).
@@ -224,9 +259,9 @@ CertifIA garantit une expérience utilisateur **100% bilingue sans aucun texte r
 * **Framework :** React 19 + TypeScript (Mode Strict)
 * **Build Tool :** Vite 8
 * **Styling :** Tailwind CSS v4 (Mode Sombre et Mode Clair)
-* **Internationalisation :** i18next + react-i18next (13 namespaces, 943 clés 1:1)
+* **Internationalisation :** i18next + react-i18next (13 namespaces, 1 012 clés 1:1)
 * **Persistance & Données :** Cloud Firestore + LocalStorage haute fidélité
-* **PWA & Offline :** Web App Manifest (`manifest.webmanifest`) + Service Worker autonome (`/sw.js`)
+* **PWA & Offline :** Web App Manifest (`manifest.webmanifest`), icônes PNG `192×192` / `512×512` / `maskable` + Service Worker auto-update (`/sw.js`)
 * **Icônes :** Lucide React
 
 ```bash
@@ -248,4 +283,4 @@ npm run build
 ## ⚖️ Mentions Légales & Avertissement
 
 > **Clause d'exonération de responsabilité :**  
-> L'éditeur et les créateurs de **CertifIA** déclinent formellement toute responsabilité quant à l'exactitude, l'exhaustivité, l'actualité ou la conformité des données, questions, propositions de réponses, explications ou synthèses fournies dans l'application. CertifIA est un projet indépendant d'entraînement cognitif personnel et n'est affilié à aucun des organismes certificateurs mentionnés (Microsoft, AWS, Google Cloud, IBM, NVIDIA).
+> L'éditeur et les créateurs de **CertifIA** ne sont en aucun cas responsables des données, informations, questions, propositions de réponses, explications, simulations ou synthèses fournies dans l'application, lesquelles restent purement indicatives. CertifIA est un projet indépendant d'entraînement cognitif personnel et n'est affilié à aucun des organismes certificateurs mentionnés (Microsoft, AWS, Google Cloud, IBM, NVIDIA).

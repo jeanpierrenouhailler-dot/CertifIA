@@ -7,7 +7,7 @@ Plutôt qu'un catalogue passif de 500 fiches et de centaines de questions, Certi
 1. Calculer précisément la **courbe d'oubli** de l'utilisateur grâce à l'algorithme **SuperMemo-2 (SM-2)** et au modèle **FSRS**.
 2. Composer chaque matin une **session quotidienne personnalisée** ("Aujourd'hui") ciblant 17 cartes prioritaires, 8 notions fragiles et 12 questions non maîtrisées.
 3. Structurer l'orientation de carrière grâce à un **moteur de recommandation en 4 niveaux** (Fondations → IA Générative → Cloud AI → Machine Learning & MLOps).
-4. Offrir une expérience logicielle de niveau professionnel : **Menu Hamburger catégorisé**, **mode clair et mode sombre**, **panneau de paramètres système avec mises à jour automatiques en arrière-plan**, **infobulles novice**, **onboarding légal avec décharge de responsabilité**, et **installation PWA mobile/desktop**.
+4. Offrir une expérience logicielle de niveau professionnel : **Menu Hamburger catégorisé** (`Ctrl+M`), **barre supérieure allégée en 3 zones**, **mode clair et mode sombre**, **paramètres système avec mises à jour automatiques en arrière-plan (`SKIP_WAITING`)**, **onboarding contextuel et infobulles sur les 10 écrans**, **onboarding légal avec décharge explicite de responsabilité des données**, et **installation PWA mobile/desktop avec icônes dédiées**.
 
 ---
 
@@ -55,16 +55,17 @@ Une trajectoire en 4 paliers interconnectés :
 ## 4. Architecture Système, PWA & Mises à Jour
 
 ### Paramètres Système & Mises à Jour en Arrière-Plan (`src/context/SystemUpdateContext.tsx`)
-* **Version actuelle :** `v2.4.0`
-* **Date de sortie :** `2 Novembre 2026`
-* **Surveillance continue :** Un timer autonome vérifie toutes les 3 minutes la disponibilité de nouvelles versions ou correctifs et met à jour l'horodatage de dernière vérification.
-* **Bouton Vérifier les mises à jour :** Contrôle instantané avec retour visuel clair.
-* **Bouton Forcer la mise à jour :** Purge les caches du navigateur via l'API `caches`, force la mise à jour du `ServiceWorker` et recharge proprement l'application.
+* **Version actuelle :** `v2.9.0` (`buildNumber: 20261116.1`)
+* **Date de sortie :** `16 Novembre 2026`
+* **Surveillance continue :** Un timer autonome vérifie toutes les 3 minutes (et au focus fenêtre) la disponibilité de nouvelles versions via `registration.update()` + contrôle non caché de `/manifest.webmanifest`, et met à jour l'horodatage de dernière vérification.
+* **Installation silencieuse (`SKIP_WAITING`) :** Lorsqu'un nouveau Service Worker est détecté (`updatefound`) et que l'auto-mise à jour est activée, l'ordre `{ type: 'SKIP_WAITING' }` est envoyé automatiquement en arrière-plan (ou déclenchable via la bannière *Appliquer la mise à jour* dans `SystemSettingsModal.tsx`).
+* **Bouton « Vérifier les mises à jour » :** Contrôle instantané avec retour visuel bilingue.
+* **Bouton « Forcer la mise à jour » :** Purge les caches du navigateur via l'API `caches`, force la mise à jour du `ServiceWorker` et recharge proprement l'application.
 
 ### Progressive Web App (PWA) (`public/manifest.webmanifest` & `public/sw.js`)
-* Conformité aux standards d'installation PWA (`display: standalone`, `id: /`, icônes `icon.svg` masquables et standard).
-* Interception de l'événement `beforeinstallprompt` dans `src/context/PwaContext.tsx`.
-* Modal interactif avec instructions pas à pas pour Safari iOS (Partager → Sur l'écran d'accueil), Chrome Android et Desktop.
+* Conformité complète aux standards d'installation PWA (`display: standalone`, `id: /`, cache `certifai-cache-v2.9.0`) avec icônes PNG et vectorielles : `pwa-192x192.png`, `pwa-512x512.png`, `pwa-maskable-512x512.png` (marge de sécurité 14%), `apple-touch-icon.png` (`180×180`) et `icon.svg`.
+* Interception de l'événement `beforeinstallprompt` dans `src/context/PwaContext.tsx` (exposition de `hasNativePrompt` pour installation native en 1 clic dans `InstallAppModal.tsx`).
+* Bouton **« Installer l’application »** intégré dans le menu Compte du Header, le pied de la barre latérale (`Sidebar.tsx`) et les paramètres système, ouvrant un modal illustré pour Safari iOS, Android Chrome et Desktop.
 
 ### Thème Sombre & Thème Clair (`src/context/ThemeContext.tsx`)
 * Gestion centralisée par classe CSS `dark` / `light` sur la racine `<html>`.
@@ -74,10 +75,10 @@ Une trajectoire en 4 paliers interconnectés :
 ---
 
 ## 5. Cadre Juridique & Mentions Légales
-Dans `src/components/LegalOnboardingModal.tsx` :
-* Décharge de responsabilité formelle indiquant que l'éditeur ne saurait être tenu responsable des données, questions ou réponses fournies dans le cadre de l'outil d'entraînement.
-* Acceptation obligatoire lors de la première utilisation (`localStorage` : `certifai_legal_accepted_v1`).
-* Consultation accessible à tout moment depuis le menu hamburger, la barre latérale et les paramètres.
+### Cadre Juridique & Mentions Légales (`src/components/LegalOnboardingModal.tsx`)
+* Clause explicite de non-responsabilité indiquant que l'éditeur et le concepteur ne sont en aucun cas responsables des données, informations, questions, réponses ou simulations fournies dans l'application, qui demeurent purement indicatives.
+* Déclaration d'indépendance vis-à-vis de Microsoft, AWS, Google Cloud, IBM et NVIDIA.
+* Acceptation obligatoire lors de la première utilisation (`localStorage` : `certifai_legal_accepted_v1`), avec accès permanent depuis le menu hamburger, le menu compte et les paramètres système.
 
 ---
 
@@ -109,28 +110,29 @@ Conçu pour combler le fossé entre la mémorisation brute et la compréhension 
 
 ---
 
-## 8. Nouvelle Architecture de Navigation & UX/UI (v2.6.0)
+## 8. Architecture de Navigation Allégée & Onboarding Contextuel (v2.9.0)
 Restructuration fondée sur 5 piliers cardinaux et un design anti-slop à haute lisibilité :
 1. **ACCUEIL (`today`)** : Message de bienvenue, progression générale, certification en cours, bouton d'action principal « Reprendre mon apprentissage » en 1 clic, récapitulatif des 17 cartes SM-2 dues, 8 notions fragiles, 12 questions ciblées, flux des activités récentes et prochaines étapes recommandées.
 2. **CERTIFICATIONS (`catalogue`)** : Catalogue des 18 certifications officielles, filtres (fournisseur, niveau, domaine, budget), fiches détaillées (Blueprints), comparateur interactif côte à côte (`CertificationsComparatorModal.tsx`) et passerelles directes d'entraînement.
 3. **APPRENTISSAGE (`quiz`, `flashcards`, `exam`, `recommendation`)** : Mes parcours, Quiz & entraînements scénarisés, Fiches mémo avec répétition espacée SRS SM-2 (2 800 cartes), examens blancs chronométrés 90 minutes en conditions réelles, et passerelles post-activité (revoir les erreurs, fiches associées, tuteur IA).
 4. **PROGRESSION (`analytics`)** : Télémétrie cognitive, diagnostic des compétences maîtrisées vs compétences à renforcer, historique des tentatives avec clause de rigueur méthodologique (les estimations ne sont pas des garanties d'examen).
 5. **ASSISTANT IA (`assistant` & `AIAssistantDrawer.tsx`)** : Tuteur pédagogique IA disponible en tiroir latéral contextuel ou écran dédié, fournissant explications pas à pas, pièges d'examen officiels et astuces mnémotechniques.
-* **Barre Latérale Rétractable** : Mode étendu (72) et mode icônes avec tooltips natifs.
-* **Barre Supérieure Légère & Fil d'Ariane Dynamique** : Titre contextuel, fil d'Ariane, certification cible active, Command Palette (`Cmd+K`) et accès profil.
+* **Barre Latérale Rétractable (`Sidebar.tsx`)** : Mode étendu (72) et mode réduit (icônes avec tooltips natifs), avec accès rapide **« Installer l’application »** lorsque non installée.
+* **Barre Supérieure Allégée en 3 Zones (`Header.tsx`)** : Navigation + Fil d'Ariane à gauche (bouton Hamburger visible `< lg`), Command Palette (`Ctrl+K`) au centre, certification cible + Menu unifié Compte & Préférences (Thème, Langue, Mode Guide, Tour, Paramètres, Installer) à droite.
+* **Onboarding Contextuel & Infobulles sur Tous les Écrans (`ScreenGuideBanner.tsx` & `InfoTooltip.tsx`)** : Présents sur l'intégralité des 10 écrans applicatifs (`today`, `catalogue`, `recommendation`, `quiz`, `flashcards`, `exam`, `glossary`, `analytics`, `assistant`, `profile`) pour expliquer clairement le fonctionnement de chaque vue et guider les utilisateurs novices.
 * **Barre Inférieure Mobile (`MobileBottomNav.tsx`)** : 5 destinations tactiles conformes ($\ge 44\text{px}$) + menu tiroir pour les options secondaires.
 * **Composants d'État Réutilisables** : `PageHeader.tsx`, `EmptyState.tsx`, `LoadingState.tsx`, `ErrorState.tsx`.
 
 ---
 
-## 9. Architecture d'Internationalisation (i18n) & Bilinguisme FR/EN (v2.7.0)
+## 9. Architecture d'Internationalisation (i18n) & Bilinguisme FR/EN (v2.9.0)
 
 CertifIA intègre un système d'internationalisation de niveau production conçu pour être robuste, sans régression et conforme aux contraintes PWA offline :
 
 ### 9.1 Organisation des Ressources & Namespaces
-Les traductions sont découpées en **13 namespaces sémantiques** statiquement bundlés sous `src/i18n/locales/{fr,en}/` :
+Les traductions sont découpées en **13 namespaces sémantiques** (totalisant **1 012 clés FR / 1 012 clés EN** en parité stricte 1:1) statiquement bundlés sous `src/i18n/locales/{fr,en}/` :
 1. `common.json` : Actions universelles, statuts, badges, boutons génériques.
-2. `navigation.json` : Les 5 catégories majeures, libellés courts et longs des 16 écrans, raccourcis.
+2. `navigation.json` : Les 6 catégories majeures, libellés courts et longs des écrans, `headerMenu`, `screenGuides` (10 écrans) et raccourcis.
 3. `dashboard.json` : Cockpit du jour (« Aujourd'hui »), cartes SM-2 dues, indicateurs et flux d'activité.
 4. `certifications.json` : Filtres, statuts, niveaux, comparateur et fiches Blueprints.
 5. `learning.json` : Moteur de recommandation, questionnaire 4 niveaux, parcours IA et glossaire.

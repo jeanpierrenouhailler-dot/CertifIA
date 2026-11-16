@@ -19,6 +19,8 @@ import { AppScreen } from '../types';
 import { getInitialExamGrid } from '../data/examData';
 import { getLocalizedExamQuestionsBank } from '../data/localizedExamData';
 import { useProgress } from '../context/ProgressContext';
+import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage } from '../i18n';
 
 interface ExamViewProps {
@@ -155,6 +157,13 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
             <span className="text-sm sm:text-base font-bold tracking-wider">
               {formatTimer(timeLeftSeconds)}
             </span>
+            <InfoTooltip
+              title={lang === 'en' ? 'Official Exam Timer & Passing Threshold' : 'Chronomètre & Seuil 700/1 000'}
+              content={lang === 'en'
+                ? 'Simulates strict testing-center timing across 65 questions. A scaled score of 700 / 1,000 is required to pass.'
+                : 'Simule la contrainte temporelle officielle sur 65 questions. Un score pondéré de 700 / 1 000 est exigé pour réussir.'}
+              position="bottom"
+            />
           </div>
 
           {/* Pause Button */}
@@ -176,6 +185,8 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
           </button>
         </div>
       </div>
+
+      <ScreenGuideBanner screenKey="exam" />
 
       {/* Telemetry Strip */}
       <div className="p-4 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-2">
@@ -305,8 +316,15 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
           {/* 65 Questions Grid */}
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-mono font-semibold uppercase tracking-wider text-slate-300">
+              <span className="font-mono font-semibold uppercase tracking-wider text-slate-300 inline-flex items-center gap-1.5">
                 {t('examinations:runner.examGrid')}
+                <InfoTooltip
+                  title={lang === 'en' ? 'Question Status Grid' : 'Grille de navigation 65 questions'}
+                  content={lang === 'en'
+                    ? 'Green = answered, Purple = flagged for later review, Blue = active question. Click any number to jump immediately.'
+                    : 'Vert = répondu, Violet = marqué pour révision ultérieure, Bleu = question en cours. Cliquez sur un numéro pour y accéder.'}
+                  position="left"
+                />
               </span>
               <span className="text-slate-400 font-mono text-[11px]">{t('examinations:runner.totalQuestions', { count: 65 })}</span>
             </div>

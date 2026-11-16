@@ -187,5 +187,77 @@
     "systemSection": "System",
     "languageLabel": "Language",
     "quickMenu": "Quick Navigation"
+  },
+  "screenGuides": {
+    "today": {
+      "title": "Daily Cockpit (Today)",
+      "summary": "This screen centralizes your daily study plan calculated automatically from your SM-2 forgetting curve and recent practice history.",
+      "step1": "1. Select your target certification at the top to tailor today’s cards and questions.",
+      "step2": "2. Launch “Your Daily Session” (~22 min): 17 SM-2 flashcards, 8 fragile concepts, and 12 targeted MCQs.",
+      "step3": "3. Hover or click the (?) tooltips to inspect every metric or open the official exam blueprint."
+    },
+    "catalogue": {
+      "title": "18 Cloud & AI Certifications Catalog",
+      "summary": "Browse, filter, and compare 18 official certifications across Azure, AWS, Google Cloud, IBM, and NVIDIA to plan your learning track.",
+      "step1": "1. Filter by Cloud provider, certification level (Fundamental, Associate, Expert), or domain (GenAI, MLOps).",
+      "step2": "2. Click “Compare” to evaluate exam duration, passing scores, and domain weights side by side.",
+      "step3": "3. Open any certification’s Blueprint or AI Tutor to review its full official syllabus."
+    },
+    "recommendation": {
+      "title": "AI Recommendation Engine & Pathways",
+      "summary": "Generate a tailored certification roadmap from Level 1 to Level 4 based on your role, budget, and weekly study availability.",
+      "step1": "1. Fill in or update your 7 profile criteria (job role, goal, budget, and weekly time).",
+      "step2": "2. Review recommended pathways and prerequisite certifications step by step.",
+      "step3": "3. Adopt any certification as your active goal to synchronize your daily cockpit and analytics."
+    },
+    "quiz": {
+      "title": "Scenario MCQs & Pitfall Breakdown",
+      "summary": "Train on realistic exam scenarios with instant validation, architectural explanations, and analysis of subtle vendor distractors.",
+      "step1": "1. Read the technical scenario carefully and pick option A, B, C, or D before validating.",
+      "step2": "2. After validation, inspect why incorrect choices represent classic certification exam traps.",
+      "step3": "3. Flag tricky questions with the bookmark icon or ask the AI Tutor for deeper clarification."
+    },
+    "flashcards": {
+      "title": "Flashcards & SM-2 Spaced Repetition",
+      "summary": "Lock in service quotas, SLAs, SDK commands, and golden exam rules using the SuperMemo-2 spaced repetition engine (2,800 cards).",
+      "step1": "1. Start with today’s due queue or filter cards by exam domain and difficulty status.",
+      "step2": "2. Flip the card (Space) and honestly rate your recall: Again (1), Hard (2), Good (3), Easy (4).",
+      "step3": "3. Optimal intervals (Day +1, +3, +7…) are saved automatically for upcoming study days."
+    },
+    "exam": {
+      "title": "Timed Mock Exam Simulator",
+      "summary": "Test your pacing and endurance under authentic testing-center conditions (65 questions, 700 / 1,000 passing scale).",
+      "step1": "1. Monitor the countdown timer in the top-right corner and pause only when needed.",
+      "step2": "2. Flag uncertain questions for review and jump between numbers using the 65-question navigator grid.",
+      "step3": "3. Submit the exam to get your scaled 1,000-point score and domain-by-domain breakdown."
+    },
+    "glossary": {
+      "title": "Multi-Cloud AI Glossary & Encyclopedia",
+      "summary": "Look up exact definitions, acronyms, and cross-cloud exam pitfalls across Microsoft Azure, AWS, Google Cloud, and IBM.",
+      "step1": "1. Search any term or acronym (RAG, LoRA, Drift) or filter alphabetically and by provider.",
+      "step2": "2. Switch to the “In-Depth Encyclopedia” tab to read full architectural reference sheets.",
+      "step3": "3. Bookmark essential terms to revisit them rapidly right before exam day."
+    },
+    "analytics": {
+      "title": "Dashboard & Cognitive Analytics",
+      "summary": "Track your live exam readiness index, historical mock exam attempts, and mastery levels across every certification domain.",
+      "step1": "1. Select a certification from the matrix to inspect its up-to-date readiness metrics.",
+      "step2": "2. Open the “Exams” tab to revisit full reports from previous mock exam simulations.",
+      "step3": "3. Spot domains below 70% to focus your next targeted quizzes and SRS flashcards."
+    },
+    "assistant": {
+      "title": "Pedagogical AI Assistant & Tutor",
+      "summary": "Clarify cloud AI services, exam pitfalls, or mathematical metrics instantly using structured guides and Socratic prompts.",
+      "step1": "1. Pick your target certification and select a syllabus topic from the left panel.",
+      "step2": "2. Switch between Concepts, Exam Traps, and Mnemonics, or ask a custom question.",
+      "step3": "3. Jump directly into practice quizzes or flashcards to reinforce what you just learned."
+    },
+    "profile": {
+      "title": "My Profile, Goals & GDPR Compliance",
+      "summary": "Manage your learner identity, active certification target, Firestore Cloud synchronization, and full personal data export.",
+      "step1": "1. Edit your display name or sign in with Google to sync study progress across devices.",
+      "step2": "2. Choose your priority certification goal from the active tracks list.",
+      "step3": "3. Open “Help & GDPR” to inspect stored data and export your learning history as JSON."
+    }
   }
 }

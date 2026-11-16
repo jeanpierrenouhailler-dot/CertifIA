@@ -30,6 +30,7 @@ import {
 import { AppScreen } from '../types';
 import { useProgress } from '../context/ProgressContext';
 import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { 
   getCardSRSMetrics, 
   predictNextIntervals, 
@@ -385,6 +386,8 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
           </div>
         </div>
       </div>
+
+      <ScreenGuideBanner screenKey="flashcards" />
 
       {/* Daily SRS Intelligent Queue Hero Announcement */}
       <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-blue-950/70 via-indigo-950/40 to-[#171b26] border border-blue-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">

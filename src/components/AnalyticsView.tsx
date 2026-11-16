@@ -29,6 +29,8 @@ import { certificationsData } from '../data/certificationsData';
 import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
 import { PageHeader } from './ui/PageHeader';
+import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage, formatLocalizedDate } from '../i18n';
 
 interface AnalyticsViewProps {
@@ -146,6 +148,8 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         }
       />
 
+      <ScreenGuideBanner screenKey="analytics" />
+
       {/* Rigueur Méthodologique / Pas de fausse garantie */}
       <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-slate-700 dark:text-slate-300 flex items-start gap-3">
         <Sparkles className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
@@ -156,7 +160,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
 
         {/* Target Selector Bar */}
         <div className="flex items-center gap-3 p-2 rounded-2xl bg-[#171b26] border border-[#262a35]">
-          <div className="text-xs text-slate-400 pl-2 font-mono">{t('progress:analytics.selectCert')}</div>
+          <div className="text-xs text-slate-400 pl-2 font-mono inline-flex items-center gap-1.5">
+            {t('progress:analytics.selectCert')}
+            <InfoTooltip
+              title={lang === 'en' ? 'Certification Analytics Filter' : 'Sélecteur d’Analytics par Certification'}
+              content={lang === 'en'
+                ? 'Switch certification to inspect its readiness index, SM-2 card retention buckets, and mock exam reports.'
+                : 'Changez de certification pour analyser son indice de préparation, la rétention SM-2 et vos rapports d’examens blancs.'}
+            />
+          </div>
           <select
             value={selectedTargetExam}
             onChange={(e) => handleTargetChange(e.target.value)}
@@ -186,6 +198,12 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
               <h2 className="text-base font-bold text-white font-headline">
                 {lang === 'en' ? 'Progress Architecture & User Persistence' : 'Architecture de Progression & Persistance Utilisateur'}
               </h2>
+              <InfoTooltip
+                title={lang === 'en' ? 'Readiness & SM-2 Buckets' : 'Préparation & Rétention SM-2'}
+                content={lang === 'en'
+                  ? 'Combines your mock exam scores, MCQ accuracy, and SM-2 card intervals (Mastered ≥ 7 days vs Review = 1 day) into an indicative readiness score.'
+                  : 'Agrège vos examens blancs, scores QCM et échéances SM-2 (Maîtrisées ≥ 7j vs À revoir = 1j) pour calculer un indice indicatif de préparation.'}
+              />
             </div>
             <p className="text-xs text-slate-400 mt-1">
               Structure de données Firestore temps réel : /users/{user?.uid ? user.uid.substring(0, 10) + '...' : 'invité'}

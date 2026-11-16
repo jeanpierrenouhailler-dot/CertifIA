@@ -53,6 +53,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { certificationsData } from '../data/certificationsData';
 import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 
 interface RecommendationViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -194,6 +195,8 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
           </button>
         </div>
       </div>
+
+      <ScreenGuideBanner screenKey="recommendation" />
 
       {/* Adopted Target Toast Notification */}
       {adoptedFeedback && (

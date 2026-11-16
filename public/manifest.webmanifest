@@ -2,7 +2,7 @@
   "id": "/",
   "name": "CertifIA • Plateforme Examens Cloud & IA",
   "short_name": "CertifIA",
-  "description": "Préparation certifiante intelligente pour examens Cloud et IA (Azure, AWS, Google Cloud, IBM watsonx) avec répétition espacée SM-2.",
+  "description": "Préparation certifiante intelligente pour examens Cloud et IA (Azure, AWS, Google Cloud, IBM watsonx, NVIDIA) avec répétition espacée SM-2.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -13,16 +13,28 @@
   "categories": ["education", "productivity", "utilities"],
   "icons": [
     {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "/icon.svg",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
     }
   ]
 }

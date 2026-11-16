@@ -29,6 +29,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { GdprHelpModal } from './GdprHelpModal';
+import { InfoTooltip } from './InfoTooltip';
+import { ScreenGuideBanner } from './ScreenGuideBanner';
 import type { AppScreen } from '../types';
 import { useTranslation } from '../i18n';
 
@@ -38,7 +40,8 @@ interface ProfileViewProps {
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
-  const { t } = useTranslation(['settings', 'common']);
+  const { t, i18n } = useTranslation(['settings', 'common']);
+  const isEn = i18n.language?.startsWith('en');
   const { 
     user, 
     userProfile, 
@@ -99,6 +102,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
 
   return (
     <div id="profile-view-container" className="flex-1 overflow-y-auto px-6 py-8 max-w-6xl mx-auto space-y-8">
+      <ScreenGuideBanner screenKey="profile" />
+
       {/* Banner / Header */}
       <div id="profile-hero-card" className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/20 p-6 md:p-8 shadow-xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
@@ -279,7 +284,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
               <Target className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">{t('settings:profile.targetExamTitle')}</h2>
+              <h2 className="text-lg font-semibold text-white inline-flex items-center gap-2">
+                {t('settings:profile.targetExamTitle')}
+                <InfoTooltip
+                  title={isEn ? 'Active Certification Goal' : 'Certification Objectif Active'}
+                  content={isEn
+                    ? 'Choosing a certification here customizes your Daily Session, Analytics dashboard, and AI Assistant topics.'
+                    : 'Sélectionner une certification ici adapte automatiquement votre Session du Jour, vos Analytics et le Tuteur IA.'}
+                />
+              </h2>
               <p className="text-xs text-slate-400">{t('settings:profile.targetExamSubtitle')}</p>
             </div>
           </div>
@@ -385,7 +398,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
         {/* Readiness Index */}
         <div id="profile-stat-readiness" className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
           <div className="flex items-center justify-between text-violet-400">
-            <span className="text-xs font-medium text-slate-400">Indice de Préparation</span>
+            <span className="text-xs font-medium text-slate-400 inline-flex items-center gap-1.5">
+              {isEn ? 'Readiness Index' : 'Indice de Préparation'}
+              <InfoTooltip
+                title={isEn ? 'Readiness Score Formula' : 'Calcul de l’Indice de Préparation'}
+                content={isEn
+                  ? 'Indicative readiness percentage combining your SM-2 flashcard retention rate, practice quiz scores, and mock exam results.'
+                  : 'Pourcentage indicatif combinant votre taux de rétention SM-2, vos résultats en QCM et vos examens blancs.'}
+              />
+            </span>
             <Award className="w-5 h-5" />
           </div>
           <div className="flex items-baseline gap-2">
