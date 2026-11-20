@@ -162,6 +162,12 @@ const CERTIFICATIONS_EN: Record<string, LocalizedCertInfo> = {
   }
 };
 
+const LEVEL_LABELS_EN: Record<Certification['level'], string> = {
+  fondamental: 'Foundational',
+  associate: 'Associate',
+  expert: 'Specialist',
+};
+
 /**
  * Returns certifications data localized to the active language.
  */
@@ -172,12 +178,17 @@ export function getLocalizedCertifications(lang: SupportedLanguage): Certificati
 
   return certificationsData.map((cert) => {
     const enInfo = CERTIFICATIONS_EN[cert.id];
+    const localizedLevel = cert.id === 'c1000177' ? 'Specialist Pro' : LEVEL_LABELS_EN[cert.level] || cert.levelLabel;
     if (!enInfo) {
-      return cert;
+      return {
+        ...cert,
+        levelLabel: localizedLevel,
+      };
     }
 
     return {
       ...cert,
+      levelLabel: localizedLevel,
       targetAudience: enInfo.targetAudience,
       modules: enInfo.modules,
       domains: cert.domains.map((dom, index) => {

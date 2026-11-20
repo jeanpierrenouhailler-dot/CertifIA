@@ -22,6 +22,10 @@ import {
   LucideIcon
 } from 'lucide-react';
 import { AppScreen } from '../types';
+import { CERTIFICATIONS_COUNT } from '../data/certificationsData';
+import { TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
+
+const formattedFlashcardsCount = TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR');
 
 export type NavCategoryId = 
   | 'accueil' 
@@ -78,7 +82,7 @@ export const NAV_CATEGORIES: Record<NavCategoryId, NavCategoryConfig> = {
     description: 'Catalogue officiel, comparateur et blueprints',
     primaryScreen: 'catalogue',
     icon: Compass,
-    badge: '18',
+    badge: String(CERTIFICATIONS_COUNT),
   },
   apprentissage: {
     id: 'apprentissage',
@@ -102,10 +106,10 @@ export const NAV_CATEGORIES: Record<NavCategoryId, NavCategoryConfig> = {
     id: 'assistant',
     label: 'Assistant IA',
     title: '5. Assistant IA',
-    description: 'Tuteur pédagogique interactif et contextuel',
+    description: 'Guide pédagogique et référence de révision',
     primaryScreen: 'assistant',
     icon: Bot,
-    badge: 'Tuteur',
+    badge: 'Guide',
   },
   plus: {
     id: 'plus',
@@ -126,7 +130,7 @@ export const NAV_ITEMS: NavItemConfig[] = [
     category: 'accueil',
     screen: 'today',
     icon: Home,
-    description: 'Cockpit du jour : 17 cartes SM-2, 8 notions fragiles, 12 QCM ciblés',
+    description: 'Cockpit du jour : file SM-2 adaptative, notions fragiles et QCM ciblés',
     shortcut: 'H',
     badge: 'Prioritaire',
     badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
@@ -151,9 +155,9 @@ export const NAV_ITEMS: NavItemConfig[] = [
     category: 'certifications',
     screen: 'catalogue',
     icon: Compass,
-    description: 'Explorer, filtrer et préparer 18 certifications officielles Cloud AI',
+    description: `Explorer, filtrer et préparer ${CERTIFICATIONS_COUNT} certifications Cloud AI`,
     shortcut: 'C',
-    badge: '18 Examens',
+    badge: `${CERTIFICATIONS_COUNT} Examens`,
     visibility: { desktop: true, mobileBar: true, mobileMore: true, search: true },
   },
   {
@@ -200,9 +204,9 @@ export const NAV_ITEMS: NavItemConfig[] = [
     category: 'apprentissage',
     screen: 'flashcards',
     icon: Layers,
-    description: '2 800 fiches mémo pilotées par l’algorithme SM-2 de répétition espacée',
+    description: `${formattedFlashcardsCount} fiches mémo pilotées par l’algorithme SM-2 de répétition espacée`,
     shortcut: 'F',
-    badge: '2 800',
+    badge: formattedFlashcardsCount,
     visibility: { desktop: true, mobileBar: false, mobileMore: true, search: true },
   },
   {

@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import { Certification, AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
-import { useTranslation, getCurrentLanguage } from '../i18n';
+import { useTranslation } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface CertificationsComparatorModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
   const { t, i18n } = useTranslation(['certifications', 'common', 'navigation']);
   const lang = (i18n.language === 'en' ? 'en' : 'fr');
   const allCerts = getLocalizedCertifications(lang);
+  const modalRef = useAccessibleModal({ isOpen, onClose });
 
   if (!isOpen) return null;
 
@@ -58,8 +60,15 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
     .filter(Boolean) as Certification[];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       <div 
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="comparator-modal-title"
         className="w-full max-w-5xl bg-white dark:bg-[#141824] border border-slate-200 dark:border-[#262a35] rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -70,7 +79,7 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
               <Scale className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-headline">
+              <h2 id="comparator-modal-title" className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-headline">
                 {t('certifications:comparator.title', 'Comparateur de Certifications IA')}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -116,7 +125,20 @@ export const CertificationsComparatorModal: React.FC<CertificationsComparatorMod
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           <div className={`grid grid-cols-1 ${comparedCerts.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4 sm:gap-6`}>
             {comparedCerts.map((cert) => {
-              const estPrice = cert.provider === 'azure' ? '$165 USD' : cert.provider === 'aws' ? (cert.level === 'fondamental' ? '$100 USD' : '$150 USD') : cert.provider === 'gcp' ? '$200 USD' : cert.provider === 'ibm' ? '$200 USD' : (lang === 'en' ? 'Free (Course) / $135 (Badge)' : 'Gratuit (Cours) / 135 $ (Badge)');
+              const estPrice =
+                cert.provider === 'azure'
+                  ? cert.level === 'fondamental'
+                    ? '$99 USD'
+                    : '$165 USD'
+                  : cert.provider === 'aws'
+                  ? cert.level === 'fondamental'
+                    ? '$100 USD'
+                    : cert.level === 'expert'
+                    ? '$300 USD'
+                    : '$150 USD'
+                  : cert.provider === 'gcp'
+                  ? '$200 USD'
+                  : '$200 USD';
 
               return (
                 <div

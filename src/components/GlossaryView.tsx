@@ -38,6 +38,7 @@ import { useTranslation } from 'react-i18next';
 import { SupportedLanguage } from '../i18n';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
+import { CERTIFICATIONS_COUNT } from '../data/certificationsData';
 
 interface GlossaryViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -64,13 +65,14 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Local storage for bookmarked terms
+  // Local storage for bookmarked terms (empty by default on a clean state)
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('certifia_glossary_bookmarks');
-      return saved ? JSON.parse(saved) : ['rag', 'lora', 'drift-detection'];
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
-      return ['rag', 'lora'];
+      return [];
     }
   });
 
@@ -196,14 +198,16 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                 {t('learning:glossary.badgeCrossCloud', 'Référentiel Transversal Multi-Cloud')}
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                {t('learning:glossary.badgeCertsCovered', '18 Certifications Couvertes')}
+                {t('learning:glossary.badgeCertsCovered', { count: CERTIFICATIONS_COUNT, defaultValue: `${CERTIFICATIONS_COUNT} Certifications Couvertes` })}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
               {t('learning:glossary.title', "Glossaire & Notions Clés de l'IA")}
               <InfoTooltip 
                 title={t('learning:glossary.title', "Glossaire & Notions Clés")}
-                content="Référentiel des concepts clés énoncés dans toutes les certifications (Azure, AWS, GCP, IBM, NVIDIA). Contient les définitions rapides A-Z, les pièges d'examen officiels et les fiches architecturales détaillées." 
+                content={currentLang === 'en'
+                  ? 'Reference index of core AI concepts tested across Azure, AWS, Google Cloud, and IBM certifications, plus GPU/MLOps infrastructure.'
+                  : "Référentiel des concepts clés énoncés dans les certifications (Azure, AWS, GCP, IBM) ainsi que les infrastructures GPU/MLOps."} 
               />
             </h1>
             <p className="text-slate-600 dark:text-slate-300 max-w-2xl text-sm sm:text-base leading-relaxed">
@@ -897,7 +901,7 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
               {/* Action Jumps (QCM & Flashcards) */}
               <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-xs text-slate-500 dark:text-slate-400">
-                  Prêt à tester vos connaissances sur ce concept ?
+                  {currentLang === 'en' ? 'Ready to test your knowledge on this concept?' : 'Prêt à tester vos connaissances sur ce concept ?'}
                 </div>
                 <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
@@ -905,14 +909,14 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
                     className="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 text-white hover:bg-purple-500 transition-all flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <Layers className="w-4 h-4" />
-                    <span>Réviser en Flashcard</span>
+                    <span>{currentLang === 'en' ? 'Review Flashcards' : 'Réviser en Flashcard'}</span>
                   </button>
                   <button
                     onClick={() => onNavigate('quiz')}
                     className="flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-500 transition-all flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <FileText className="w-4 h-4" />
-                    <span>S'entraîner en QCM</span>
+                    <span>{currentLang === 'en' ? 'Practice MCQs' : "S'entraîner en QCM"}</span>
                   </button>
                 </div>
               </div>

@@ -37,6 +37,7 @@ import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { NAV_CATEGORIES, NAV_ITEMS, NavCategoryId, NavItemConfig } from '../navigation/navigationConfig';
 import { LanguageSelector } from './LanguageSelector';
 import { useTranslation } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface CategorizedHamburgerMenuProps {
   isOpen: boolean;
@@ -70,6 +71,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
   const { isInstalled, promptInstall } = usePwa();
   const { versionInfo } = useSystemUpdate();
   const { startTour } = useOnboardingTour();
+  const drawerRef = useAccessibleModal({ isOpen, onClose });
 
   if (!isOpen) return null;
 
@@ -116,6 +118,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       aria-label={t('navigation:hamburger.aria', 'Menu principal catégorisé')}
     >
       <div 
+        ref={drawerRef}
         className="w-full max-w-md bg-white dark:bg-[#111520] h-full shadow-2xl flex flex-col border-r border-slate-200 dark:border-[#22283a] overflow-hidden animate-in slide-in-from-left duration-200"
         onClick={(e) => e.stopPropagation()}
       >

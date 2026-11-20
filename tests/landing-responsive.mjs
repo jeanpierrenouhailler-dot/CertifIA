@@ -1,10 +1,44 @@
-import { chromium } from '/usr/local/share/bun-global/node_modules/playwright/index.mjs';
+import { existsSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import assert from 'node:assert/strict';
 
-const BASE_URL = process.env.TEST_URL || 'http://localhost:3000/?view=landing';
+const ORIGIN = process.env.TEST_ORIGIN || 'http://127.0.0.1:3000';
+const BASE_URL = process.env.TEST_URL || `${ORIGIN}/?view=landing`;
+const APP_URL = `${ORIGIN}/?view=app`;
 const VIEWPORTS = [320, 360, 390, 430, 768, 1024, 1280, 1440, 1920];
 const THEMES = ['dark', 'light'];
 const LANGS = ['fr', 'en'];
+
+async function loadChromium() {
+  try {
+    const mod = await import('playwright');
+    return mod.chromium;
+  } catch {
+    const globalPath = '/usr/local/share/bun-global/node_modules/playwright/index.mjs';
+    if (existsSync(globalPath)) {
+      const mod = await import(pathToFileURL(globalPath).href);
+      return mod.chromium;
+    }
+    throw new Error('Playwright package could not be resolved locally or globally.');
+  }
+}
+
+async function launchBrowser() {
+  const chromium = await loadChromium();
+  const launchOpts = {
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  };
+  const fallbackShell = '/ms-playwright/chrome-headless-shell-linux64/chrome-headless-shell';
+  try {
+    return await chromium.launch(launchOpts);
+  } catch (err) {
+    if (existsSync(fallbackShell)) {
+      return await chromium.launch({ ...launchOpts, executablePath: fallbackShell });
+    }
+    throw err;
+  }
+}
 
 function rectsOverlap(a, b) {
   return !(
@@ -16,7 +50,7 @@ function rectsOverlap(a, b) {
 }
 
 async function setLanguageAndTheme(page, lang, theme) {
-  if (!page.url().startsWith('http://localhost:3000')) {
+  if (!page.url().startsWith(ORIGIN)) {
     await page.goto(BASE_URL, { waitUntil: 'load' });
   }
   await page.evaluate(
@@ -35,11 +69,7 @@ async function setLanguageAndTheme(page, lang, theme) {
 }
 
 async function run() {
-  const browser = await chromium.launch({
-    executablePath: '/ms-playwright/chrome-headless-shell-linux64/chrome-headless-shell',
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  const browser = await launchBrowser();
 
   const consoleErrors = [];
   const pageErrors = [];
@@ -361,11 +391,86 @@ async function run() {
     const appLoaded = await page.evaluate(() => !document.querySelector('a[href="#piliers"]'));
     assert.equal(appLoaded, true, 'Primary CTA did not navigate away from landing page into the app');
 
+    console.log('4. Testing App Clean Zero-State, Persistence Across Reload, Goal Update, Reset & Modal Accessibility...');
+    // Clear storage to guarantee brand-new user state and reload App
+    await page.evaluate(() => localStorage.clear());
+    await page.goto(APP_URL, { waitUntil: 'load' });
+    await page.evaluate(() => {
+      localStorage.setItem('certifai_language_preference_v1', 'fr');
+      localStorage.setItem('certifai_theme_v1', 'dark');
+    });
+    await page.reload({ waitUntil: 'load' });
+
+    // Accept mandatory legal onboarding modal
+    const legalDialog = page.locator('[role="dialog"][aria-modal="true"]');
+    await legalDialog.waitFor({ state: 'visible', timeout: 10000 });
+    await legalDialog.locator('input[type="checkbox"]').first().check();
+    await legalDialog.locator('button', { hasText: /Accéder|Enter Application|Valider/i }).last().click();
+    await legalDialog.waitFor({ state: 'hidden' });
+
+    // Verify clean zero-state metrics on TodayView
+    await page.waitForSelector('#today-main-container', { state: 'visible' });
+    const cleanText = await page.locator('#today-main-container').innerText();
+    assert.match(cleanText, /0 jours consécutifs/);
+    assert.match(cleanText, /0\s*%/);
+    assert.match(cleanText, /Aucune activité enregistrée/i);
+    assert.equal(await page.locator('aside').innerText().then((t) => t.includes('SRS 0')), true, 'Sidebar should start at SRS 0');
+
+    // Rate a flashcard in FlashcardsView -> verify persistence across reload
+    await page.locator('aside button', { hasText: /Fiches mémo|Flashcards/i }).first().click();
+    const browseAllBtn = page.locator('button', { hasText: /Parcourir les \d+ fiches|Browse all \d+ cards/i });
+    await browseAllBtn.waitFor({ state: 'visible', timeout: 10000 });
+    await browseAllBtn.click();
+    await page.waitForSelector('[data-tour="flashcards-engine"]', { state: 'visible', timeout: 10000 });
+    await page.keyboard.press('Space');
+    await page.locator('button', { hasText: /Facile \[4\]|Easy \[4\]/i }).click();
+    await page.waitForTimeout(200);
+
+    // Answer a quiz question in QuizView -> verify persistence across reload
+    await page.locator('aside button', { hasText: /Quiz & QCM|Quizzes & MCQs/i }).first().click();
+    await page.waitForSelector('[data-tour="quiz-container"]', { state: 'visible', timeout: 10000 });
+    await page.locator('[data-tour="quiz-container"] button').first().click();
+    await page.locator('[data-tour="quiz-container"] button', { hasText: /Valider la réponse|Submit Answer/i }).click();
+    await page.waitForTimeout(200);
+
+    // Update target certification in ProfileView -> verify persistence across reload
+    await page.locator('aside button', { hasText: /Mode invité|Guest mode|Apprenant IA/i }).click();
+    await page.waitForSelector('#profile-cert-option-gcpmle', { state: 'visible', timeout: 10000 });
+    await page.locator('#profile-cert-option-gcpmle').click();
+    await page.waitForTimeout(200);
+
+    // Reload page and confirm persistence of target cert, flashcard review, and quiz attempt
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForSelector('#today-main-container', { state: 'visible', timeout: 10000 });
+    const afterReloadText = await page.locator('#today-main-container').innerText();
+    assert.match(afterReloadText, /GCP-PMLE/, 'Target certification selection did not persist after reload');
+    assert.match(afterReloadText, /1 jours consécutifs/, 'Streak did not update to 1 day and persist after reload');
+    assert.doesNotMatch(afterReloadText, /Aucune activité enregistrée/i, 'Recent activity did not persist after reload');
+
+    // Verify Command Palette modal accessibility & Escape close
+    await page.keyboard.press('Control+k');
+    const cmdDialog = page.locator('[role="dialog"][aria-modal="true"]');
+    await cmdDialog.waitFor({ state: 'visible', timeout: 10000 });
+    await page.keyboard.press('Escape');
+    await cmdDialog.waitFor({ state: 'hidden', timeout: 10000 });
+
+    // Trigger Reset Progress in ProfileView and confirm return to 0
+    await page.locator('aside button', { hasText: /Mode invité|Guest mode|Apprenant IA/i }).click();
+    await page.waitForSelector('#profile-reset-progress-btn', { state: 'visible', timeout: 10000 });
+    await page.locator('#profile-reset-progress-btn').click();
+    await page.locator('#profile-reset-confirm-btn').click();
+    await page.waitForTimeout(250);
+    await page.locator('aside button', { hasText: /Aujourd’hui|Aujourd'hui|Today/i }).first().click();
+    await page.waitForSelector('#today-main-container', { state: 'visible', timeout: 10000 });
+    const resetText = await page.locator('#today-main-container').innerText();
+    assert.match(resetText, /0 jours consécutifs/, 'Streak did not reset to 0');
+    assert.match(resetText, /Aucune activité enregistrée/i, 'Recent activity did not reset');
+
     assert.equal(consoleErrors.length, 0, `Console errors detected: ${JSON.stringify(consoleErrors)}`);
     assert.equal(pageErrors.length, 0, `Uncaught page errors detected: ${JSON.stringify(pageErrors)}`);
     assert.equal(failedRequests.length, 0, `Failed HTTP requests detected: ${JSON.stringify(failedRequests)}`);
 
-    console.log('✅ All interactive feature checks, image checks, and 0-error assertions passed!');
+    console.log('✅ All landing, app persistence, zero-state, reset, and modal accessibility checks passed!');
   } catch (err) {
     try {
       const diag = await page.evaluate(() => {

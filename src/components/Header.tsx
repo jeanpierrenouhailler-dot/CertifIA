@@ -26,7 +26,7 @@ import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
 import { useOnboardingTour } from '../context/OnboardingTourContext';
-import { certificationsData } from '../data/certificationsData';
+import { getCertificationById } from '../data/certificationsData';
 import { getBreadcrumbForScreen } from '../navigation/navigationConfig';
 import { LanguageSelector } from './LanguageSelector';
 import { useTranslation } from '../i18n';
@@ -65,8 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
   const menuContainerRef = useRef<HTMLDivElement>(null);
 
   // Active target certification
-  const currentCert =
-    certificationsData.find((c) => c.id === (activeCertId || 'ai102')) || certificationsData[0];
+  const currentCert = getCertificationById(activeCertId);
 
   // Dynamic breadcrumb from centralized navigation config
   const breadcrumb = getBreadcrumbForScreen(currentScreen);

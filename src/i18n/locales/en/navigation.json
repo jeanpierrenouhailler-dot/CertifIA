@@ -47,7 +47,7 @@
     "today": {
       "label": "Today",
       "shortLabel": "Today",
-      "description": "Daily cockpit: 17 SM-2 cards, 8 weak topics, 12 targeted exam questions"
+      "description": "Daily cockpit: adaptive SM-2 queue, weak topics, and targeted MCQs"
     },
     "quickResume": {
       "label": "Resume Learning",
@@ -57,7 +57,7 @@
     "catalogue": {
       "label": "Certification Catalog",
       "shortLabel": "Catalog",
-      "description": "18 major AI certifications (Azure, AWS, GCP, IBM, NVIDIA)"
+      "description": "6 major AI certifications (Azure, AWS, GCP, IBM watsonx)"
     },
     "comparator": {
       "label": "Exam Comparator",
@@ -193,12 +193,12 @@
       "title": "Daily Cockpit (Today)",
       "summary": "This screen centralizes your daily study plan calculated automatically from your SM-2 forgetting curve and recent practice history.",
       "step1": "1. Select your target certification at the top to tailor today’s cards and questions.",
-      "step2": "2. Launch “Your Daily Session” (~22 min): 17 SM-2 flashcards, 8 fragile concepts, and 12 targeted MCQs.",
+      "step2": "2. Launch “Your Daily Session”: due SM-2 flashcards, fragile concepts, and targeted MCQs.",
       "step3": "3. Hover or click the (?) tooltips to inspect every metric or open the official exam blueprint."
     },
     "catalogue": {
-      "title": "18 Cloud & AI Certifications Catalog",
-      "summary": "Browse, filter, and compare 18 official certifications across Azure, AWS, Google Cloud, IBM, and NVIDIA to plan your learning track.",
+      "title": "6 Cloud & AI Certifications Catalog",
+      "summary": "Browse, filter, and compare 6 official certifications across Azure, AWS, Google Cloud, and IBM watsonx to plan your learning track.",
       "step1": "1. Filter by Cloud provider, certification level (Fundamental, Associate, Expert), or domain (GenAI, MLOps).",
       "step2": "2. Click “Compare” to evaluate exam duration, passing scores, and domain weights side by side.",
       "step3": "3. Open any certification’s Blueprint or AI Tutor to review its full official syllabus."

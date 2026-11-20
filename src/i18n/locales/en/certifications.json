@@ -1,12 +1,12 @@
 {
   "title": "AI Certification Catalog",
-  "subtitle": "Explore 18 official certifications in Artificial Intelligence and Cloud AI.",
+  "subtitle": "Explore 6 official Cloud and Artificial Intelligence certifications.",
   "filterAll": "All",
   "filterByProvider": "Organization / Provider",
   "filterByLevel": "Difficulty Level",
   "filterBySearch": "Search by keyword, exam code...",
   "comparatorTitle": "Certification Comparator",
-  "badgeCount": "18 Certifications 2025",
+  "badgeCount": "6 Certifications",
   "searchPlaceholder": "Filter by title, exam code (AI-102...), module...",
   "filters": {
     "allLevels": "All levels",
@@ -63,8 +63,7 @@
     "azure": "Microsoft Azure",
     "aws": "Amazon Web Services",
     "gcp": "Google Cloud",
-    "ibm": "IBM watsonx",
-    "nvidia": "NVIDIA DLI"
+    "ibm": "IBM watsonx"
   },
   "blueprint": {
     "skillsFramework": "Official skills framework and exam domain weightings",

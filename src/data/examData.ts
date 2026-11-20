@@ -76,23 +76,3 @@ export const examQuestionsBank: Record<number, ExamQuestionDetail> = {
     correctKey: 'A'
   }
 };
-
-// Generate the 65 exam items initial state
-export function getInitialExamGrid() {
-  const items: { number: number; status: 'answered' | 'flagged' | 'unvisited'; selectedOption?: 'A' | 'B' | 'C' | 'D' }[] = [];
-  
-  for (let i = 1; i <= 65; i++) {
-    if (i < 28) {
-      if (i === 7 || i === 14 || i === 22) {
-        items.push({ number: i, status: 'flagged', selectedOption: 'A' });
-      } else {
-        items.push({ number: i, status: 'answered', selectedOption: i % 2 === 0 ? 'B' : 'A' });
-      }
-    } else if (i === 28) {
-      items.push({ number: i, status: 'unvisited' });
-    } else {
-      items.push({ number: i, status: 'unvisited' });
-    }
-  }
-  return items;
-}

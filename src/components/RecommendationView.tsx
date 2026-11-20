@@ -51,7 +51,7 @@ import {
 } from '../lib/recommendationEngine';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { certificationsData } from '../data/certificationsData';
+import { certificationsData, CERTIFICATIONS_COUNT, normalizeCertId } from '../data/certificationsData';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
 
@@ -67,7 +67,17 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
   const { t, i18n } = useTranslation(['learning', 'certifications', 'common']);
   const lang = (i18n.language?.startsWith('en') ? 'en' : 'fr') as 'fr' | 'en';
   const { userProfile } = useAuth();
-  const { activeCertId, setActiveCertId, updateGoalTarget } = useProgress();
+  const { activeCertId, examAttempts, setActiveCertId, updateGoalTarget } = useProgress();
+
+  const completedCertIds = useMemo(() => {
+    const passed = new Set<string>();
+    for (const attempt of examAttempts) {
+      if (attempt.passed) {
+        passed.add(normalizeCertId(attempt.examCode));
+      }
+    }
+    return Array.from(passed);
+  }, [examAttempts]);
 
   const levelOptions = useMemo(() => getLocalizedLevelOptions(lang), [lang]);
   const roleOptions = useMemo(() => getLocalizedRoleOptions(lang), [lang]);
@@ -86,7 +96,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
     return {
       ...DEFAULT_USER_PROFILE,
       // If user profile has target exam, align primary goal
-      primaryGoal: userProfile?.targetExam === 'aifc01' ? 'ia_generative' : 'cloud_ai',
+      primaryGoal: normalizeCertId(userProfile?.targetExam || activeCertId) === 'aifc01' ? 'ia_generative' : 'cloud_ai',
     };
   });
 
@@ -97,8 +107,8 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
 
   // Compute generated pathways
   const pathways = useMemo(() => {
-    return generatePathways(profile, activeCertId, ['ai900'], lang);
-  }, [profile, activeCertId, lang]);
+    return generatePathways(profile, normalizeCertId(activeCertId), completedCertIds, lang);
+  }, [profile, activeCertId, completedCertIds, lang]);
 
   // Active pathway
   const activePathway = useMemo(() => {
@@ -914,7 +924,7 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
             className="w-full py-2.5 px-4 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-200 border border-[#262a35] text-xs font-mono font-medium transition-colors flex items-center justify-center gap-2"
           >
             <Compass className="w-3.5 h-3.5 text-blue-400" />
-            <span>{lang === 'en' ? 'Explore full catalog (18)' : 'Explorer tout le catalogue (18)'}</span>
+            <span>{lang === 'en' ? `Explore full catalog (${CERTIFICATIONS_COUNT})` : `Explorer tout le catalogue (${CERTIFICATIONS_COUNT})`}</span>
           </button>
 
           <button

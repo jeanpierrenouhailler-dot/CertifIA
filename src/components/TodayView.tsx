@@ -27,27 +27,22 @@ import {
 import { AppScreen, Flashcard, QuizQuestion } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { certificationsData } from '../data/certificationsData';
-import { quizQuestionsData } from '../data/quizData';
+import {
+  certificationsData,
+  getCertificationById,
+  normalizeCertId,
+} from '../data/certificationsData';
 import { getLocalizedQuizQuestions } from '../data/localizedQuizData';
-import { 
-  ai102FlashcardsData, 
-  c1000177FlashcardsData, 
-  aifc01FlashcardsData,
-  gcpmleFlashcardsData,
-  mlsc01FlashcardsData,
-  ai900FlashcardsData
-} from '../data/flashcardsData';
-import { 
-  computeDailyReviewQueue, 
-  getCardSRSMetrics, 
-  predictNextIntervals, 
-  formatSRSDisplay,
-  getTodayDateString 
+import { getFlashcardsForCert, TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
+import {
+  computeDailyReviewQueue,
+  getCardSRSMetrics,
+  predictNextIntervals,
 } from '../lib/srsAlgorithm';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
-import { useTranslation, getCurrentLanguage, formatLocalizedNumber, formatLocalizedDate } from '../i18n';
+import { useTranslation, formatLocalizedDate } from '../i18n';
 
 interface TodayViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -55,149 +50,131 @@ interface TodayViewProps {
 }
 
 export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprint }) => {
-  const { t, i18n } = useTranslation(['dashboard', 'progress', 'common', 'flashcards', 'certifications']);
+  const { t, i18n } = useTranslation(['dashboard', 'progress', 'common', 'flashcards', 'certifications', 'navigation']);
   const currentLang = (i18n.language === 'en' ? 'en' : 'fr');
   const { user, userProfile } = useAuth();
-  const { 
-    activeCertId, 
-    setActiveCertId, 
-    certProgress, 
-    reviews, 
+  const {
+    activeCertId,
+    setActiveCertId,
+    reviews,
     rateFlashcard,
-    bookmarkedCardIds,
-    toggleBookmarkCard,
+    quizAttempts,
+    recordQuizAttempt,
+    goalSettings,
+    globalMetrics,
+    getCertMetrics,
   } = useProgress();
 
-  // Active Target Exam (default to AI-102 or persisted targetExam)
-  const currentTargetCode = activeCertId || userProfile?.targetExam || 'ai102';
+  // Active Target Exam (canonicalized)
+  const currentTargetCode = normalizeCertId(activeCertId || userProfile?.targetExam || 'c1000177');
 
-  // Load active certification metadata
-  const currentCert = useMemo(() => {
-    return (
-      certificationsData.find((c) => c.id === currentTargetCode) ||
-      certificationsData.find((c) => c.id === 'ai102') ||
-      certificationsData[0]
-    );
-  }, [currentTargetCode]);
+  // Load active certification metadata & flashcards deck
+  const currentCert = useMemo(() => getCertificationById(currentTargetCode), [currentTargetCode]);
+  const activeDeck = useMemo(() => getFlashcardsForCert(currentTargetCode), [currentTargetCode]);
+  const certMetrics = useMemo(() => getCertMetrics(currentTargetCode), [getCertMetrics, currentTargetCode]);
 
-  // Load dataset according to active certification
-  const activeDeck = useMemo(() => {
-    if (currentTargetCode === 'c1000177') return c1000177FlashcardsData;
-    if (currentTargetCode === 'aifc01') return aifc01FlashcardsData;
-    if (currentTargetCode === 'gcpmle') return gcpmleFlashcardsData;
-    if (currentTargetCode === 'mlsc01') return mlsc01FlashcardsData;
-    if (currentTargetCode === 'ai900') return ai900FlashcardsData;
-    return ai102FlashcardsData;
-  }, [currentTargetCode]);
-
-  // 1. Compute the 17 SRS Due Cards for today
+  // 1. Compute real SRS Daily Review Queue (dueCards strictly contains reviewed cards due/overdue today)
   const dailyReviewQueue = useMemo(() => {
     return computeDailyReviewQueue(activeDeck, reviews, 17);
   }, [activeDeck, reviews]);
 
-  const dueCards17 = useMemo(() => {
-    return dailyReviewQueue.dueCards.slice(0, 17);
-  }, [dailyReviewQueue]);
+  const dueCards = useMemo(() => dailyReviewQueue.dueCards.slice(0, 17), [dailyReviewQueue]);
 
-  // 2. Identify 8 Notions Fragiles (difficulty >= 4, or rating === 'difficile'/'revoir', or lowest success rate)
-  const fragileNotions8 = useMemo(() => {
-    const fragileCandidates = activeDeck.filter((c) => {
-      const rev = reviews[c.id];
-      const m = getCardSRSMetrics(c.id, rev);
-      return m.difficulty >= 4 || rev?.rating === 'difficile' || rev?.rating === 'revoir';
-    });
+  // 2. Fragile Notions strictly from reviewed cards marked hard/revoir or low accuracy (0 when fresh)
+  const fragileNotions = useMemo(() => dailyReviewQueue.fragileCards.slice(0, 8), [dailyReviewQueue]);
 
-    if (fragileCandidates.length >= 8) {
-      return fragileCandidates.slice(0, 8);
-    }
+  // Starter discovery cards when no SRS cards are due yet
+  const discoveryCards = useMemo(() => {
+    if (dueCards.length > 0) return [];
+    return dailyReviewQueue.discoveryCards.slice(0, 10);
+  }, [dueCards.length, dailyReviewQueue]);
 
-    // Fill up to 8 with high-priority official topics if needed
-    const remaining = activeDeck.filter((c) => !fragileCandidates.some((fc) => fc.id === c.id));
-    return [...fragileCandidates, ...remaining.slice(0, Math.max(0, 8 - fragileCandidates.length))];
-  }, [activeDeck, reviews]);
+  const sessionFlashcards = useMemo(() => {
+    return dueCards.length > 0 ? dueCards : discoveryCards;
+  }, [dueCards, discoveryCards]);
 
-  // 3. Compose 12 Questions Non Maîtrisées
-  const unmasteredQuestions12 = useMemo(() => {
-    // Generate or select 12 target questions based on localized quiz database
+  // 3. Unmastered MCQ questions strictly from the real quiz pool (no duplicate padding)
+  const unmasteredQuestions = useMemo(() => {
     const pool = getLocalizedQuizQuestions(currentLang);
-    const questions: QuizQuestion[] = [];
-    for (let i = 0; i < 12; i++) {
-      const base = pool[i % pool.length];
-      questions.push({
-        ...base,
-        id: `today-q-${i + 1}-${base.id}`,
-        points: 25,
-      });
-    }
-    return questions;
-  }, [currentLang]);
+    return pool.filter((q) => !quizAttempts[q.id]?.isCorrect);
+  }, [currentLang, quizAttempts]);
 
-  // Progression percentage for the active certification
-  const currentProgressPct = useMemo(() => {
-    const p = certProgress[currentTargetCode];
-    if (p && p.progress !== undefined && p.progress > 0) {
-      return p.progress;
-    }
-    return 78; // baseline progression as requested
-  }, [certProgress, currentTargetCode]);
+  const currentProgressPct = certMetrics.progress;
+  const streakDays = globalMetrics.streakDays;
 
   // Session Runner State
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
-  const [selectedQuizOption, setSelectedQuizOption] = useState<string | null>(null);
+  const [selectedQuizOption, setSelectedQuizOption] = useState<'A' | 'B' | 'C' | 'D' | null>(null);
   const [isQuizValidated, setIsQuizValidated] = useState(false);
-  const [ratedInterval, setRatedInterval] = useState<string | null>(null);
+  const [, setRatedInterval] = useState<string | null>(null);
   const [sessionCompleted, setSessionCompleted] = useState(false);
+  const [sessionCardsRated, setSessionCardsRated] = useState(0);
+  const [sessionQuizzesAnswered, setSessionQuizzesAnswered] = useState(0);
 
-  // Total session items: 17 flashcards + 8 fragile notions + 12 questions = 37 items
-  const totalSessionSteps = dueCards17.length + fragileNotions8.length + unmasteredQuestions12.length;
+  const sessionModalRef = useAccessibleModal<HTMLDivElement>({
+    isOpen: isSessionActive && !sessionCompleted,
+    onClose: () => setIsSessionActive(false),
+  });
+
+  const celebrationModalRef = useAccessibleModal<HTMLDivElement>({
+    isOpen: sessionCompleted,
+    onClose: () => {
+      setSessionCompleted(false);
+      setIsSessionActive(false);
+    },
+  });
+
+  // Total session items based strictly on real available items
+  const totalSessionSteps = sessionFlashcards.length + fragileNotions.length + unmasteredQuestions.length;
+  const estimatedMinutes = totalSessionSteps > 0 ? Math.max(2, Math.round(totalSessionSteps * 0.6)) : 0;
 
   // Determine current active item in session
   const currentSessionItem = useMemo(() => {
     if (!isSessionActive) return null;
 
-    if (currentStepIndex < dueCards17.length) {
+    if (currentStepIndex < sessionFlashcards.length) {
       return {
         type: 'flashcard' as const,
-        phaseName: t('dashboard:phases.phase1'),
+        phaseName: dueCards.length > 0 ? t('dashboard:phases.phase1') : (currentLang === 'en' ? 'Phase 1 • Starter Discovery' : 'Phase 1 • Découverte Initiale'),
         phaseIndex: 1,
         stepNumber: currentStepIndex + 1,
-        totalInPhase: dueCards17.length,
-        item: dueCards17[currentStepIndex],
+        totalInPhase: sessionFlashcards.length,
+        item: sessionFlashcards[currentStepIndex],
       };
     }
 
-    const fragileIndex = currentStepIndex - dueCards17.length;
-    if (fragileIndex < fragileNotions8.length) {
+    const fragileIndex = currentStepIndex - sessionFlashcards.length;
+    if (fragileIndex < fragileNotions.length) {
       return {
         type: 'fragile' as const,
         phaseName: t('dashboard:phases.phase2'),
         phaseIndex: 2,
         stepNumber: fragileIndex + 1,
-        totalInPhase: fragileNotions8.length,
-        item: fragileNotions8[fragileIndex],
+        totalInPhase: fragileNotions.length,
+        item: fragileNotions[fragileIndex],
       };
     }
 
-    const questionIndex = currentStepIndex - dueCards17.length - fragileNotions8.length;
+    const questionIndex = currentStepIndex - sessionFlashcards.length - fragileNotions.length;
     return {
       type: 'question' as const,
       phaseName: t('dashboard:phases.phase3'),
       phaseIndex: 3,
       stepNumber: questionIndex + 1,
-      totalInPhase: unmasteredQuestions12.length,
-      item: unmasteredQuestions12[questionIndex],
+      totalInPhase: unmasteredQuestions.length,
+      item: unmasteredQuestions[questionIndex],
     };
-  }, [isSessionActive, currentStepIndex, dueCards17, fragileNotions8, unmasteredQuestions12, t]);
+  }, [isSessionActive, currentStepIndex, sessionFlashcards, dueCards.length, fragileNotions, unmasteredQuestions, t, currentLang]);
 
-  // Display name formatting
+  // Display name formatting (never hardcoded identity)
   const learnerName = useMemo(() => {
     if (user?.displayName) return user.displayName;
     if (userProfile?.displayName) return userProfile.displayName;
     if (user?.email) return user.email.split('@')[0];
-    return 'Jean-Pierre';
-  }, [user, userProfile]);
+    return currentLang === 'en' ? 'Learner' : 'Candidat CertifIA';
+  }, [user, userProfile, currentLang]);
 
   // Today formatted date (localized)
   const todayDateFormatted = useMemo(() => {
@@ -216,12 +193,18 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
 
   // Handle Starting Session
   const handleStartSession = () => {
+    if (totalSessionSteps === 0) {
+      onNavigate('flashcards');
+      return;
+    }
     setIsSessionActive(true);
     setCurrentStepIndex(0);
     setIsCardFlipped(false);
     setSelectedQuizOption(null);
     setIsQuizValidated(false);
     setSessionCompleted(false);
+    setSessionCardsRated(0);
+    setSessionQuizzesAnswered(0);
   };
 
   // Session Navigation
@@ -250,11 +233,12 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
     if (!currentSessionItem || (currentSessionItem.type !== 'flashcard' && currentSessionItem.type !== 'fragile')) return;
     const cardItem = currentSessionItem.item as Flashcard;
     setRatedInterval(label);
+    setSessionCardsRated((prev) => prev + 1);
     rateFlashcard(cardItem.id, currentTargetCode, ratingKey, days);
     setTimeout(() => {
       setRatedInterval(null);
       handleNextStep();
-    }, 350);
+    }, 250);
   };
 
   return (
@@ -283,7 +267,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
           <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#171b26] border border-[#262a35] text-xs font-mono">
             <Flame className="w-4 h-4 fill-amber-400 text-amber-400" />
             <span className="text-slate-300">{t('progress:currentStreak')} :</span>
-            <span className="font-bold text-amber-400">{userProfile?.streakDays ?? 14} {t('progress:days')}</span>
+            <span className="font-bold text-amber-400">{streakDays} {t('progress:days')}</span>
           </div>
 
           <div className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#171b26] border border-[#262a35] text-xs font-mono">
@@ -306,7 +290,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {certificationsData.slice(0, 5).map((cert) => {
+          {certificationsData.map((cert) => {
             const isSelected = cert.id === currentTargetCode;
             return (
               <button
@@ -352,14 +336,14 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 </div>
 
                 <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                  ~22 min
+                  {estimatedMinutes > 0 ? `~${estimatedMinutes} min` : (currentLang === 'en' ? 'Up to date' : 'À jour')}
                 </span>
               </div>
 
               {/* The 3 Core Ingredients */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                {/* 1. 17 Cartes à réviser */}
-                <div 
+                {/* 1. SRS Due Cards or Discovery Cards */}
+                <div
                   onClick={() => onNavigate('flashcards')}
                   className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-blue-500/40 transition-all cursor-pointer group/card flex flex-col justify-between relative"
                 >
@@ -371,24 +355,29 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                       </span>
                       <InfoTooltip
                         title={t('dashboard:tooltips.sm2Cards', 'Cartes SRS à réviser (SM-2)')}
-                        content={t('dashboard:tooltips.sm2CardsDesc', "Ces 17 cartes ont atteint leur seuil d'oubli critique calculé par l'algorithme SuperMemo-2 / FSRS. Les revoir aujourd'hui maximise votre rétention sans surcharger votre mémoire.")}
-                        example={currentLang === 'en' ? 'Card #127 scheduled for today with a 3-day interval.' : 'Carte #127 programmée pour aujourd\'hui avec intervalle de 3 jours.'}
+                        content={t('dashboard:tooltips.sm2CardsDesc', "Cartes dont la date d'échéance SM-2 est atteinte aujourd'hui. Lors d'une première visite, une sélection de découverte vous permet de démarrer votre jeu.")}
                       />
                     </div>
                   </div>
                   <div className="mt-3">
-                    <div className="text-2xl font-extrabold text-white font-mono">17</div>
+                    <div className="text-2xl font-extrabold text-white font-mono">
+                      {dueCards.length}
+                    </div>
                     <div className="text-xs font-semibold text-slate-200 mt-0.5">
                       {t('dashboard:cardsToReview', 'cartes à réviser')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      {t('dashboard:cardsToReviewDesc', "Au seuil d'oubli calculé")}
+                      {dueCards.length > 0
+                        ? t('dashboard:cardsToReviewDesc', "Au seuil d'oubli calculé")
+                        : (currentLang === 'en'
+                            ? `${discoveryCards.length} new starter cards ready`
+                            : `${discoveryCards.length} nouvelles cartes prêtes`)}
                     </div>
                   </div>
                 </div>
 
-                {/* 2. 8 Notions fragiles */}
-                <div 
+                {/* 2. Fragile Notions */}
+                <div
                   onClick={() => onNavigate('flashcards')}
                   className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-amber-500/40 transition-all cursor-pointer group/card flex flex-col justify-between relative"
                 >
@@ -400,24 +389,27 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                       </span>
                       <InfoTooltip
                         title={t('dashboard:tooltips.fragileConcepts', 'Notions Fragiles & Pièges')}
-                        content={t('dashboard:tooltips.fragileConceptsDesc', "Concepts à fort coefficient d'examen où vos réponses précédentes ont montré des hésitations, des erreurs répétées ou une difficulté supérieure à 3/5.")}
-                        example={currentLang === 'en' ? 'Difference between BM25 Hybrid Index and pure Vector Search.' : 'Différence entre Index Hybride BM25 et Recherche Vectorielle pure.'}
+                        content={t('dashboard:tooltips.fragileConceptsDesc', "Cartes déjà évaluées avec difficulté élevée ou à revoir rapidement selon vos réponses.")}
                       />
                     </div>
                   </div>
                   <div className="mt-3">
-                    <div className="text-2xl font-extrabold text-amber-400 font-mono">8</div>
+                    <div className="text-2xl font-extrabold text-amber-400 font-mono">
+                      {fragileNotions.length}
+                    </div>
                     <div className="text-xs font-semibold text-slate-200 mt-0.5">
                       {t('dashboard:fragileConcepts', 'notions fragiles')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      {t('dashboard:fragileConceptsDesc', "Hésitations & pièges d'examen")}
+                      {fragileNotions.length > 0
+                        ? t('dashboard:fragileConceptsDesc', "Hésitations & pièges d'examen")
+                        : (currentLang === 'en' ? 'None flagged yet' : 'Aucune notion fragile détectée')}
                     </div>
                   </div>
                 </div>
 
-                {/* 3. 12 Questions non maîtrisées */}
-                <div 
+                {/* 3. Unmastered MCQ Questions */}
+                <div
                   onClick={() => onNavigate('quiz')}
                   className="p-4 rounded-2xl bg-[#0a0e18]/80 border border-[#262a35] hover:border-rose-500/40 transition-all cursor-pointer group/card flex flex-col justify-between relative"
                 >
@@ -429,18 +421,21 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                       </span>
                       <InfoTooltip
                         title={t('dashboard:tooltips.targetedMcq', 'QCM d\'Architecture Ciblés')}
-                        content={t('dashboard:tooltips.targetedMcqDesc', "12 questions d'examen représentatives sélectionnées pour tester votre capacité à appliquer vos connaissances théoriques dans des cas réels d'entreprise.")}
-                        example={currentLang === 'en' ? 'Choosing between SageMaker JumpStart and Amazon Bedrock based on latency constraints.' : 'Choix entre SageMaker JumpStart et Amazon Bedrock selon les contraintes de latence.'}
+                        content={t('dashboard:tooltips.targetedMcqDesc', "Scénarios QCM de la banque active non encore validés ou à corriger.")}
                       />
                     </div>
                   </div>
                   <div className="mt-3">
-                    <div className="text-2xl font-extrabold text-rose-400 font-mono">12</div>
+                    <div className="text-2xl font-extrabold text-rose-400 font-mono">
+                      {unmasteredQuestions.length}
+                    </div>
                     <div className="text-xs font-semibold text-slate-200 mt-0.5">
                       {t('dashboard:unmasteredQuestions', 'questions non maîtrisées')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      {t('dashboard:unmasteredQuestionsDesc', "Cas pratiques d'architecture")}
+                      {unmasteredQuestions.length > 0
+                        ? t('dashboard:unmasteredQuestionsDesc', "Cas pratiques d'architecture")
+                        : (currentLang === 'en' ? 'All active MCQs mastered!' : 'Tous les QCM actifs validés !')}
                     </div>
                   </div>
                 </div>
@@ -466,26 +461,34 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
 
                 {/* Progress bar */}
                 <div className="w-full h-2.5 bg-[#0a0e18] rounded-full overflow-hidden border border-[#262a35]">
-                  <div 
+                  <div
                     className="h-full bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-400 rounded-full transition-all duration-700"
                     style={{ width: `${currentProgressPct}%` }}
                   />
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
-                  <span>{t('dashboard:examPassThreshold', 'Seuil de validation examen')} : 700 / 1000 pts ({currentCert.passScore || 70}%)</span>
-                  <span className="text-blue-300 font-bold">{t('dashboard:projectedGain', '+3% projeté après cette session')}</span>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-slate-400 pt-1">
+                  <span>
+                    {t('dashboard:examPassThreshold', 'Seuil de validation examen')} : {currentCert.passScore} / {currentCert.maxScore} pts ({Math.round((currentCert.passScore / currentCert.maxScore) * 100)}%)
+                  </span>
+                  <span className="text-blue-300 font-bold">
+                    {certMetrics.flashcards.reviewedCount} / {activeDeck.length} {currentLang === 'en' ? 'cards reviewed' : 'fiches révisées'}
+                  </span>
                 </div>
               </div>
 
-              {/* [ Reprendre mon apprentissage ] Main Action Button */}
+              {/* Main Action Button */}
               <button
                 id="btn-start-today-session"
                 onClick={handleStartSession}
                 className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-bold font-headline text-base shadow-xl shadow-blue-600/30 hover:shadow-blue-600/40 border border-blue-400/40 transition-all flex items-center justify-center gap-3 group/btn"
               >
                 <Play className="w-5 h-5 fill-white text-white group-hover/btn:scale-110 transition-transform" />
-                <span>{t('dashboard:resumeLearning', 'Reprendre mon apprentissage')}</span>
+                <span>
+                  {certMetrics.hasActivity
+                    ? t('dashboard:resumeLearning', 'Reprendre mon apprentissage')
+                    : (currentLang === 'en' ? 'Start my first study session' : 'Démarrer ma première session')}
+                </span>
                 <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -493,7 +496,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
 
           {/* Quick Access into Single Modes */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div 
+            <div
               onClick={() => onNavigate('flashcards')}
               className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] hover:border-blue-500/40 transition-all cursor-pointer flex items-center justify-between"
             >
@@ -506,7 +509,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                   {t('dashboard:quickAccess.srsSub', 'Fiches mémo')}
                 </div>
                 <div className="text-[11px] text-slate-400">
-                  {t('dashboard:quickAccess.srsDesc', '2 800 cartes avec SM-2')}
+                  {TOTAL_FLASHCARDS_COUNT.toLocaleString(currentLang === 'en' ? 'en-US' : 'fr-FR')} {currentLang === 'en' ? 'cards with SM-2' : 'cartes avec SM-2'}
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -605,7 +608,9 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 </div>
                 <div className="text-xs">
                   <div className="font-bold text-white font-mono">
-                    {t('dashboard:sessionDetails.step1Title', '17 Fiches SRS')}
+                    {dueCards.length > 0
+                      ? `${dueCards.length} ${currentLang === 'en' ? 'SRS Due Cards' : 'Fiches SRS dues'}`
+                      : `${discoveryCards.length} ${currentLang === 'en' ? 'Discovery Cards' : 'Fiches de découverte'}`}
                   </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
                     {t('dashboard:sessionDetails.step1Desc', 'Rappels espacés calculés aujourd\'hui ({{overdue}} en retard, {{due}} à échéance).', {
@@ -622,10 +627,12 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 </div>
                 <div className="text-xs">
                   <div className="font-bold text-white font-mono">
-                    {t('dashboard:sessionDetails.step2Title', '8 Notions Fragiles')}
+                    {fragileNotions.length} {currentLang === 'en' ? 'Fragile Notions' : 'Notions Fragiles'}
                   </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
-                    {t('dashboard:sessionDetails.step2Desc', 'Pièges d\'examen à haute pondération identifiés par CertifIA.')}
+                    {fragileNotions.length > 0
+                      ? t('dashboard:sessionDetails.step2Desc', 'Cartes notées difficiles lors de vos sessions précédentes.')
+                      : (currentLang === 'en' ? 'Cards rated Difficult or Review Again will appear here.' : 'Vos cartes notées Difficile ou À revoir apparaîtront ici.')}
                   </div>
                 </div>
               </div>
@@ -636,7 +643,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 </div>
                 <div className="text-xs">
                   <div className="font-bold text-white font-mono">
-                    {t('dashboard:sessionDetails.step3Title', '12 Questions QCM')}
+                    {unmasteredQuestions.length} {currentLang === 'en' ? 'MCQ Scenarios' : 'Questions QCM'}
                   </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
                     {t('dashboard:sessionDetails.step3Desc', 'Mise en situation d\'architecture avec explications officielles Microsoft / AWS / IBM.')}
@@ -672,15 +679,17 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
               <div className="flex items-center justify-between">
                 <span className="text-slate-400 font-mono">{t('dashboard:targetGoal.dateLabel', 'Date cible :')}</span>
                 <span className="font-bold text-indigo-300 font-mono">
-                  {userProfile?.targetDate || t('dashboard:targetGoal.defaultDate', '24 Novembre 2026')}
+                  {goalSettings.targetDate
+                    ? formatLocalizedDate(goalSettings.targetDate, { day: 'numeric', month: 'short', year: 'numeric' }, currentLang)
+                    : (currentLang === 'en' ? 'Not set' : 'Non définie')}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-400 font-mono">{t('dashboard:targetGoal.weeklyLabel', 'Objectif hebdo :')}</span>
                 <span className="font-bold text-emerald-400 font-mono">
                   {t('dashboard:targetGoal.reviewedCount', '{{done}} / {{total}} révisées', {
-                    done: userProfile?.weeklyTarget || 85,
-                    total: 100
+                    done: certMetrics.flashcards.reviewedCount,
+                    total: goalSettings.weeklyTarget
                   })}
                 </span>
               </div>
@@ -697,7 +706,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
             )}
           </div>
 
-          {/* Activités Récentes */}
+          {/* Activités Récentes (Strictly real recorded activity) */}
           <div className="p-6 rounded-3xl bg-[#171b26] border border-[#262a35] space-y-4">
             <div className="flex items-center justify-between text-xs pb-3 border-b border-[#262a35]">
               <span className="font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -705,37 +714,51 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 {t('dashboard:recentActivities.title', 'Activités Récentes')}
               </span>
               <span className="text-[10px] font-mono text-slate-400">
-                {t('dashboard:recentActivities.last24h', 'Dernières 24h')}
+                {globalMetrics.recentActivities.length > 0
+                  ? `${globalMetrics.recentActivities.length} ${currentLang === 'en' ? 'events' : 'actions'}`
+                  : (currentLang === 'en' ? 'No activity' : 'Aucune activité')}
               </span>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex items-start justify-between p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]">
-                <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-200">
-                    {t('dashboard:recentActivities.item1Title', 'Session SRS Matinale')}
-                  </div>
-                  <div className="text-[11px] text-slate-400">
-                    {t('dashboard:recentActivities.item1Desc', '14 fiches révisées avec succès')}
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                  +100%
-                </span>
+            {globalMetrics.recentActivities.length === 0 ? (
+              <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] text-xs text-slate-400 leading-relaxed">
+                {currentLang === 'en'
+                  ? 'No recorded activity yet. Review a flashcard, answer an MCQ, or run a mock exam to build your real history.'
+                  : 'Aucune activité enregistrée pour le moment. Révisez une carte, validez un QCM ou lancez un examen blanc pour alimenter votre historique réel.'}
               </div>
+            ) : (
+              <div className="space-y-2.5 text-xs">
+                {globalMetrics.recentActivities.slice(0, 4).map((act) => {
+                  const badgeClass =
+                    act.statusColor === 'emerald'
+                      ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+                      : act.statusColor === 'amber'
+                      ? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
+                      : act.statusColor === 'rose'
+                      ? 'text-rose-400 bg-rose-500/10 border-rose-500/20'
+                      : 'text-blue-400 bg-blue-500/10 border-blue-500/20';
 
-              <div className="flex items-start justify-between p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]">
-                <div className="space-y-0.5">
-                  <div className="font-semibold text-slate-200">QCM RAG & Vector Search</div>
-                  <div className="text-[11px] text-slate-400">
-                    {t('dashboard:recentActivities.item2Desc', '6/7 bonnes réponses obtenues')}
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
-                  85.7%
-                </span>
+                  return (
+                    <div
+                      key={act.id}
+                      className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]"
+                    >
+                      <div className="space-y-0.5 min-w-0">
+                        <div className="font-semibold text-slate-200 truncate">
+                          {currentLang === 'en' ? act.titleEn : act.titleFr}
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          {currentLang === 'en' ? act.detailEn : act.detailFr}
+                        </div>
+                      </div>
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border shrink-0 ${badgeClass}`}>
+                        {act.certCode}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Prochaines Étapes Recommandées */}
@@ -751,7 +774,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
             </div>
 
             <div className="space-y-2.5 text-xs">
-              <div 
+              <div
                 onClick={handleStartSession}
                 className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/25 hover:border-blue-500/50 cursor-pointer transition-all flex items-center justify-between"
               >
@@ -760,37 +783,43 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                     {t('dashboard:nextSteps.step1Title', '1. Terminer la session du jour')}
                   </div>
                   <div className="text-[11px] text-slate-400">
-                    {t('dashboard:nextSteps.step1Desc', '17 cartes pour sécuriser le seuil SM-2')}
+                    {dueCards.length > 0
+                      ? `${dueCards.length} ${currentLang === 'en' ? 'cards due for SM-2 recall' : 'cartes dues au seuil SM-2'}`
+                      : `${discoveryCards.length} ${currentLang === 'en' ? 'starter cards ready in deck' : 'cartes prêtes à découvrir'}`}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-blue-400 shrink-0" />
               </div>
 
-              <div 
+              <div
                 onClick={() => onNavigate('quiz')}
                 className="p-3 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-slate-500 cursor-pointer transition-all flex items-center justify-between"
               >
                 <div>
                   <div className="font-bold text-slate-200">
-                    {t('dashboard:nextSteps.step2Title', '2. Renforcer les pièges RAG')}
+                    {t('dashboard:nextSteps.step2Title', '2. Pratiquer les QCM d’architecture')}
                   </div>
                   <div className="text-[11px] text-slate-400">
-                    {t('dashboard:nextSteps.step2Desc', 'Vérifier les filtres Custom Blocklists')}
+                    {unmasteredQuestions.length > 0
+                      ? `${unmasteredQuestions.length} ${currentLang === 'en' ? 'scenarios remaining' : 'scénarios restants à valider'}`
+                      : (currentLang === 'en' ? 'Review mastered scenarios' : 'Revoir les scénarios validés')}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
               </div>
 
-              <div 
+              <div
                 onClick={() => onNavigate('exam')}
                 className="p-3 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-slate-500 cursor-pointer transition-all flex items-center justify-between"
               >
                 <div>
                   <div className="font-bold text-slate-200">
-                    {t('dashboard:nextSteps.step3Title', '3. Examen blanc complet')}
+                    {t('dashboard:nextSteps.step3Title', '3. Examen blanc chronométré')}
                   </div>
                   <div className="text-[11px] text-slate-400">
-                    {t('dashboard:nextSteps.step3Desc', 'Valider 700/1000 en 90 minutes')}
+                    {currentLang === 'en'
+                      ? `Target passing score: ${currentCert.passScore}/${currentCert.maxScore}`
+                      : `Seuil officiel visé : ${currentCert.passScore}/${currentCert.maxScore} pts`}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
@@ -802,12 +831,23 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
 
       {/* 4. Active Full-Screen / Modal Session Runner */}
       {isSessionActive && currentSessionItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#171b26] border border-[#262a35] rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[95vh] overflow-y-auto flex flex-col justify-between">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsSessionActive(false);
+          }}
+        >
+          <div
+            ref={sessionModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="today-session-runner-title"
+            className="bg-[#171b26] border border-[#262a35] rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[95vh] overflow-y-auto flex flex-col justify-between"
+          >
             {/* Session Top Bar */}
             <div className="flex items-center justify-between border-b border-[#262a35] pb-4">
               <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                <span id="today-session-runner-title" className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-blue-500/10 text-blue-300 border border-blue-500/20">
                   {currentSessionItem.phaseName}
                 </span>
                 <span className="text-xs font-mono text-slate-400">
@@ -840,8 +880,14 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
               <div className="space-y-6 my-2">
                 {(() => {
                   const fc = currentSessionItem.item as Flashcard;
-                  const metrics = getCardSRSMetrics(fc.id, reviews[fc.id], currentStepIndex);
-                  const display = formatSRSDisplay(metrics, fc.promptNumber || `#${currentStepIndex + 1}`);
+                  const metrics = getCardSRSMetrics(fc.id, reviews[fc.id]);
+                  const display = {
+                    cardNumber: currentLang === 'en' ? `Card ${fc.promptNumber || `#${currentStepIndex + 1}`}` : `Carte ${fc.promptNumber || `#${currentStepIndex + 1}`}`,
+                    diffLabel: `${Math.max(1, Math.min(5, Math.round(metrics.difficulty)))}/5`,
+                    nextReviewLabel: metrics.nextReviewDate ? metrics.nextReviewDate : (currentLang === 'en' ? 'New' : 'Nouvelle'),
+                    repCount: metrics.repetitions,
+                    successLabel: metrics.totalReviews > 0 ? `${metrics.successRate}%` : '—',
+                  };
                   const predicted = predictNextIntervals(metrics);
 
                   return (
@@ -1039,7 +1085,20 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                         {!isQuizValidated ? (
                           <button
                             disabled={!selectedQuizOption}
-                            onClick={() => setIsQuizValidated(true)}
+                            onClick={() => {
+                              if (!selectedQuizOption) return;
+                              setIsQuizValidated(true);
+                              setSessionQuizzesAnswered((prev) => prev + 1);
+                              recordQuizAttempt({
+                                questionId: q.id,
+                                certId: currentTargetCode,
+                                certCode: currentCert.code,
+                                domain: q.architectureBadge?.title || currentCert.code,
+                                selectedKey: selectedQuizOption,
+                                correctKey: q.correctKey,
+                                isCorrect: selectedQuizOption === q.correctKey,
+                              });
+                            }}
                             className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-mono text-xs font-bold transition-all"
                           >
                             Valider la réponse
@@ -1092,8 +1151,22 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
 
       {/* 5. Session Completed Celebration Modal */}
       {sessionCompleted && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-[#171b26] border border-emerald-500/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-center">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSessionCompleted(false);
+              setIsSessionActive(false);
+            }
+          }}
+        >
+          <div
+            ref={celebrationModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="today-session-completed-title"
+            className="bg-[#171b26] border border-emerald-500/40 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-center"
+          >
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400 shadow-lg shadow-emerald-500/20">
               <CheckCircle2 className="w-8 h-8" />
             </div>
@@ -1102,7 +1175,7 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
               <span className="text-[11px] font-mono font-bold text-emerald-400 uppercase tracking-wider">
                 {t('dashboard:runner.sessionCompletedTitle')}
               </span>
-              <h3 className="text-2xl font-extrabold text-white font-headline">
+              <h3 id="today-session-completed-title" className="text-2xl font-extrabold text-white font-headline">
                 {t('dashboard:runner.sessionCompletedTitle')}
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
@@ -1110,19 +1183,21 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
               </p>
             </div>
 
-            {/* Rewards */}
+            {/* Real Calculated Session Summary */}
             <div className="p-4 rounded-2xl bg-[#0f131d] border border-[#262a35] grid grid-cols-3 gap-2 text-xs font-mono">
               <div>
                 <div className="text-[10px] text-slate-400">{t('dashboard:progress')}</div>
-                <div className="text-base font-bold text-emerald-400 mt-0.5">81 % (+3%)</div>
+                <div className="text-base font-bold text-emerald-400 mt-0.5">{currentProgressPct} %</div>
               </div>
               <div>
                 <div className="text-[10px] text-slate-400">{t('progress:currentStreak')}</div>
-                <div className="text-base font-bold text-amber-400 mt-0.5">15 {t('progress:days')} 🔥</div>
+                <div className="text-base font-bold text-amber-400 mt-0.5">{streakDays} {t('progress:days')} 🔥</div>
               </div>
               <div>
-                <div className="text-[10px] text-slate-400">XP CertifIA</div>
-                <div className="text-base font-bold text-blue-400 mt-0.5">+350 XP</div>
+                <div className="text-[10px] text-slate-400">{currentLang === 'en' ? 'Completed' : 'Validés'}</div>
+                <div className="text-base font-bold text-blue-400 mt-0.5">
+                  {sessionCardsRated + sessionQuizzesAnswered}
+                </div>
               </div>
             </div>
 

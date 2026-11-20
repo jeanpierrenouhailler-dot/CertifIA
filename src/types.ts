@@ -46,7 +46,7 @@ export interface PathwayLevel {
   levelTitle: string; // e.g. "Niveau 1 : AI Fundamentals", "Niveau 2 : Generative AI"
   stageCategory: 'fundamentals' | 'genai' | 'cloud_ai' | 'ml_mlops';
   subtitle: string;
-  certId: string; // e.g. 'ai900', 'aifc01', 'ai102', 'gcpmle', 'watsonx', 'mlsc01'
+  certId: string; // e.g. 'ai900', 'aifc01', 'ai102', 'gcpmle', 'c1000177', 'mlsc01'
   certCode: string;
   certTitle: string;
   provider: 'azure' | 'aws' | 'gcp' | 'ibm' | 'nvidia';
@@ -128,6 +128,17 @@ export interface FlashcardReviewRecord {
   reviewedAt: string;
 }
 
+export interface QuizAttemptRecord {
+  questionId: string;
+  certId: string;
+  certCode: string;
+  domain: string;
+  selectedKey: 'A' | 'B' | 'C' | 'D';
+  correctKey: 'A' | 'B' | 'C' | 'D';
+  isCorrect: boolean;
+  answeredAt: string;
+}
+
 export interface ExamAttemptRecord {
   id: string;
   userId: string;
@@ -139,6 +150,9 @@ export interface ExamAttemptRecord {
   passed: boolean;
   duration: string;
   weakPoint: string;
+  questionsAnswered?: number;
+  questionsTotal?: number;
+  correctCount?: number;
   domainScoresSummary?: string;
   createdAt: string;
 }

@@ -1,24 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Clock, 
-  Pause, 
-  Play, 
-  Bookmark, 
-  ArrowLeft, 
-  ArrowRight, 
-  CheckCircle2, 
-  AlertTriangle, 
-  ShieldAlert, 
-  Flag, 
-  FileCheck, 
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import {
+  Clock,
+  Pause,
+  Play,
+  ArrowLeft,
+  ArrowRight,
+  AlertTriangle,
+  ShieldAlert,
+  Flag,
+  FileCheck,
   X,
-  Sparkles,
-  Info
+  Info,
 } from 'lucide-react';
 import { AppScreen } from '../types';
-import { getInitialExamGrid } from '../data/examData';
 import { getLocalizedExamQuestionsBank } from '../data/localizedExamData';
 import { useProgress } from '../context/ProgressContext';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage } from '../i18n';
@@ -27,17 +24,113 @@ interface ExamViewProps {
   onNavigate: (screen: AppScreen) => void;
 }
 
+interface ExamGridItem {
+  number: number;
+  bankKey: number;
+  status: 'answered' | 'flagged' | 'unvisited';
+  selectedOption?: 'A' | 'B' | 'C' | 'D';
+}
+
+const TOTAL_DURATION_SECONDS = 15 * 60; // 15 min proportionate to real 4-scenario AIF-C01 bank
+
 export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
   const { t } = useTranslation(['examinations', 'common']);
   const lang = getCurrentLanguage();
+  const isEn = lang === 'en';
   const examBank = getLocalizedExamQuestionsBank(lang);
   const { recordExamAttempt } = useProgress();
-  const [currentQNum, setCurrentQNum] = useState(28);
-  const [gridItems, setGridItems] = useState(getInitialExamGrid);
-  const [timeLeftSeconds, setTimeLeftSeconds] = useState(4468); // 01:14:28
+
+  const orderedQuestions = useMemo(
+    () => Object.values(examBank).sort((a, b) => a.number - b.number),
+    [examBank]
+  );
+
+  const totalQuestions = orderedQuestions.length;
+
+  const [currentQNum, setCurrentQNum] = useState(1);
+  const [gridItems, setGridItems] = useState<ExamGridItem[]>(() =>
+    orderedQuestions.map((q, idx) => ({
+      number: idx + 1,
+      bankKey: q.number,
+      status: 'unvisited',
+    }))
+  );
+  const [timeLeftSeconds, setTimeLeftSeconds] = useState(TOTAL_DURATION_SECONDS);
   const [isPaused, setIsPaused] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isExamCompleted, setIsExamCompleted] = useState(false);
+
+  const pauseModalRef = useAccessibleModal<HTMLDivElement>({
+    isOpen: isPaused,
+    onClose: () => setIsPaused(false),
+  });
+
+  const submitModalRef = useAccessibleModal<HTMLDivElement>({
+    isOpen: isSubmitModalOpen,
+    onClose: () => setIsSubmitModalOpen(false),
+  });
+
+  const finalizeAndSubmitExam = useCallback(async () => {
+    setIsSubmitModalOpen(false);
+    setIsExamCompleted(true);
+
+    let correctCount = 0;
+    let answered = 0;
+    const domainStats: Record<string, { correct: number; total: number }> = {};
+
+    gridItems.forEach((item, idx) => {
+      const q = orderedQuestions[idx];
+      if (!q) return;
+      if (!domainStats[q.domain]) {
+        domainStats[q.domain] = { correct: 0, total: 0 };
+      }
+      domainStats[q.domain].total += 1;
+
+      if (item.selectedOption) {
+        answered += 1;
+        if (item.selectedOption === q.correctKey) {
+          correctCount += 1;
+          domainStats[q.domain].correct += 1;
+        }
+      }
+    });
+
+    const scaledScore = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 1000) : 0;
+    const passed = scaledScore >= 700;
+    const elapsedSeconds = Math.max(1, TOTAL_DURATION_SECONDS - timeLeftSeconds);
+    const durationStr = `${Math.floor(elapsedSeconds / 60)}m ${(elapsedSeconds % 60)
+      .toString()
+      .padStart(2, '0')}s`;
+
+    const domainPercentages: Record<string, number> = {};
+    let weakestDomain = isEn ? 'None (100% score)' : 'Aucun (score 100 %)';
+    let lowestPct = 101;
+
+    Object.entries(domainStats).forEach(([domainName, stats]) => {
+      const pct = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+      domainPercentages[domainName] = pct;
+      if (pct < lowestPct) {
+        lowestPct = pct;
+        weakestDomain = domainName;
+      }
+    });
+
+    await recordExamAttempt({
+      examCode: 'AIF-C01',
+      examTitle: 'AWS Certified AI Practitioner',
+      score: scaledScore,
+      maxScore: 1000,
+      passed,
+      duration: durationStr,
+      weakPoint: lowestPct === 100 ? (isEn ? 'None — all domains validated' : 'Aucun — tous domaines validés') : weakestDomain,
+      domainScoresSummary: JSON.stringify(domainPercentages),
+      questionsAnswered: answered,
+      questionsTotal: totalQuestions,
+      correctCount,
+    });
+
+    onNavigate('analytics');
+  }, [gridItems, orderedQuestions, totalQuestions, timeLeftSeconds, isEn, recordExamAttempt, onNavigate]);
 
   // Countdown timer
   useEffect(() => {
@@ -46,29 +139,45 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
       setTimeLeftSeconds((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          setIsExamCompleted(true);
+          void finalizeAndSubmitExam();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isPaused, isExamCompleted]);
+  }, [isPaused, isExamCompleted, finalizeAndSubmitExam]);
 
   const formatTimer = (totalSeconds: number) => {
     const hrs = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
     const secs = totalSeconds % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs
+      .toString()
+      .padStart(2, '0')}`;
   };
 
-  const currentItem = gridItems.find((item) => item.number === currentQNum) || gridItems[27];
-  const questionDetail = examBank[currentQNum] || examBank[28];
+  const currentIdx = Math.max(0, Math.min(totalQuestions - 1, currentQNum - 1));
+  const currentItem = gridItems[currentIdx] || gridItems[0];
+  const questionDetail = orderedQuestions[currentIdx] || orderedQuestions[0];
 
-  const answeredCount = gridItems.filter((i) => i.status === 'answered' || (i.status === 'flagged' && i.selectedOption)).length;
+  const answeredCount = gridItems.filter(
+    (i) => i.status === 'answered' || (i.status === 'flagged' && Boolean(i.selectedOption))
+  ).length;
   const flaggedCount = gridItems.filter((i) => i.status === 'flagged').length;
-  const unvisitedCount = gridItems.filter((i) => i.status === 'unvisited').length;
-  const progressPercent = Math.round((answeredCount / gridItems.length) * 100);
+  const unvisitedCount = gridItems.filter((i) => !i.selectedOption).length;
+  const progressPercent = totalQuestions > 0 ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+
+  const elapsedSeconds = Math.max(0, TOTAL_DURATION_SECONDS - timeLeftSeconds);
+  const avgSecPerAnswered = answeredCount > 0 ? Math.round(elapsedSeconds / answeredCount) : null;
+  const avgPaceLabel =
+    avgSecPerAnswered !== null
+      ? `${Math.floor(avgSecPerAnswered / 60)}m ${(avgSecPerAnswered % 60).toString().padStart(2, '0')}s`
+      : '—';
+  const targetSecPerQuestion = totalQuestions > 0 ? Math.round(TOTAL_DURATION_SECONDS / totalQuestions) : 90;
+  const targetPaceLabel = `${Math.floor(targetSecPerQuestion / 60)}m ${(targetSecPerQuestion % 60)
+    .toString()
+    .padStart(2, '0')}s / q`;
 
   const handleSelectOption = (key: 'A' | 'B' | 'C' | 'D') => {
     setGridItems((prev) =>
@@ -100,7 +209,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
   };
 
   const handleNext = () => {
-    if (currentQNum < 65) {
+    if (currentQNum < totalQuestions) {
       setCurrentQNum((prev) => prev + 1);
     }
   };
@@ -111,32 +220,33 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
     }
   };
 
+  const firstFlaggedItem = gridItems.find((i) => i.status === 'flagged');
+  const firstUnansweredItem = gridItems.find((i) => !i.selectedOption);
+
   const handleJumpToFirstFlagged = () => {
-    const firstFlagged = gridItems.find((i) => i.status === 'flagged');
-    if (firstFlagged) {
-      setCurrentQNum(firstFlagged.number);
+    if (firstFlaggedItem) {
+      setCurrentQNum(firstFlaggedItem.number);
     }
   };
 
   const handleJumpToFirstUnvisited = () => {
-    const firstUnvisited = gridItems.find((i) => i.status === 'unvisited');
-    if (firstUnvisited) {
-      setCurrentQNum(firstUnvisited.number);
+    if (firstUnansweredItem) {
+      setCurrentQNum(firstUnansweredItem.number);
     }
   };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
-      {/* Top Banner: Mode Examen Blanc Surveillé */}
+      {/* Top Banner */}
       <div className="p-4 rounded-2xl bg-gradient-to-r from-[#171b26] via-[#121520] to-[#0a0e18] border border-[#262a35] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
             <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                AIF-C01 • v2024.3
+                AIF-C01 • {totalQuestions} {isEn ? 'scenarios' : 'scénarios'}
               </span>
               <span className="text-xs text-emerald-400 font-mono flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
@@ -151,22 +261,22 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
 
         {/* Timer & Controls */}
         <div className="flex items-center gap-3">
-          {/* Digital Timer */}
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0a0e18] border border-blue-500/30 text-white font-mono shadow-inner">
             <Clock className="w-4 h-4 text-blue-400" />
             <span className="text-sm sm:text-base font-bold tracking-wider">
               {formatTimer(timeLeftSeconds)}
             </span>
             <InfoTooltip
-              title={lang === 'en' ? 'Official Exam Timer & Passing Threshold' : 'Chronomètre & Seuil 700/1 000'}
-              content={lang === 'en'
-                ? 'Simulates strict testing-center timing across 65 questions. A scaled score of 700 / 1,000 is required to pass.'
-                : 'Simule la contrainte temporelle officielle sur 65 questions. Un score pondéré de 700 / 1 000 est exigé pour réussir.'}
+              title={isEn ? 'Exam Timer & Passing Threshold' : 'Chronomètre & Seuil 700/1 000'}
+              content={
+                isEn
+                  ? `Timed simulation across ${totalQuestions} curated scenarios. A scaled score of 700 / 1,000 is required to pass.`
+                  : `Simulation chronométrée sur ${totalQuestions} scénarios réels. Un score pondéré de 700 / 1 000 est exigé pour réussir.`
+              }
               position="bottom"
             />
           </div>
 
-          {/* Pause Button */}
           <button
             onClick={() => setIsPaused(true)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#171b26] text-slate-300 hover:text-white border border-[#262a35] text-xs font-semibold transition-colors"
@@ -175,7 +285,6 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
             <span className="hidden sm:inline">{t('examinations:controls.pause')}</span>
           </button>
 
-          {/* Terminer l'Examen */}
           <button
             onClick={() => setIsSubmitModalOpen(true)}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/20 transition-all"
@@ -191,8 +300,8 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
       {/* Telemetry Strip */}
       <div className="p-4 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
-          <div className="flex items-center gap-3 font-semibold text-white">
-            <span>{t('examinations:controls.questionProgress', { current: currentQNum, total: 65 })}</span>
+          <div className="flex flex-wrap items-center gap-3 font-semibold text-white">
+            <span>{t('examinations:controls.questionProgress', { current: currentQNum, total: totalQuestions })}</span>
             <span className="text-slate-400 font-normal">|</span>
             <span className="text-emerald-400 font-mono">{t('examinations:controls.answered', { count: answeredCount })}</span>
             <span className="text-purple-400 font-mono">{t('examinations:controls.marked', { count: flaggedCount })}</span>
@@ -212,40 +321,37 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
 
       {/* Main 2-Column Interface */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Active Question & Radio Options (8 cols) */}
+        {/* Left Column */}
         <div className="lg:col-span-8 space-y-6">
           <div data-tour="exam-banner" className="p-6 sm:p-8 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-xl space-y-6">
-            {/* Meta Row */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-mono font-semibold text-blue-300 px-2.5 py-1 rounded bg-blue-500/10 border border-blue-500/20">
                 {questionDetail.domain}
               </span>
 
-              {/* Flag Toggle Button */}
               <button
                 onClick={handleToggleFlag}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 ${
                   currentItem.status === 'flagged'
                     ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-sm'
                     : 'bg-[#0f131d] text-slate-400 hover:text-white border border-[#262a35]'
                 }`}
               >
                 <Flag className={`w-3.5 h-3.5 ${currentItem.status === 'flagged' ? 'fill-purple-400 text-purple-400' : ''}`} />
-                <span>{currentItem.status === 'flagged' ? t('examinations:controls.flaggedForReview') : t('examinations:controls.flagForReview')}</span>
+                <span>
+                  {currentItem.status === 'flagged'
+                    ? t('examinations:controls.flaggedForReview')
+                    : t('examinations:controls.flagForReview')}
+                </span>
               </button>
             </div>
 
-            {/* Scenario */}
-            <p className="text-sm text-slate-200 leading-relaxed">
-              {questionDetail.scenario}
-            </p>
+            <p className="text-sm text-slate-200 leading-relaxed">{questionDetail.scenario}</p>
 
-            {/* Prompt */}
             <div className="p-4 rounded-xl bg-[#0f131d] border-l-4 border-blue-500 text-sm font-semibold text-white">
               {questionDetail.question}
             </div>
 
-            {/* Radio Choices */}
             <div className="space-y-3 pt-2">
               {questionDetail.options.map((opt) => {
                 const isSelected = currentItem.selectedOption === opt.key;
@@ -276,15 +382,11 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
               })}
             </div>
 
-            {/* Official Scoring Note */}
             <div className="p-3 rounded-xl bg-[#0f131d]/80 border border-[#262a35] flex items-center gap-2 text-xs text-slate-400">
               <Info className="w-4 h-4 text-blue-400 shrink-0" />
-              <span>
-                {t('examinations:runner.scoringNote')}
-              </span>
+              <span>{t('examinations:runner.scoringNote')}</span>
             </div>
 
-            {/* Navigation Buttons */}
             <div className="flex items-center justify-between pt-4 border-t border-[#262a35]">
               <button
                 onClick={handlePrev}
@@ -292,61 +394,68 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#0f131d] border border-[#262a35] disabled:opacity-30 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>{t('examinations:runner.prevButton', { num: currentQNum - 1 })}</span>
+                <span>{t('examinations:runner.prevButton', { num: Math.max(1, currentQNum - 1) })}</span>
               </button>
 
               <span className="text-xs font-mono text-slate-400">
-                {t('examinations:runner.questionIndicator', { current: currentQNum, total: 65 })}
+                {t('examinations:runner.questionIndicator', { current: currentQNum, total: totalQuestions })}
               </span>
 
               <button
                 onClick={handleNext}
-                disabled={currentQNum >= 65}
+                disabled={currentQNum >= totalQuestions}
                 className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-30 transition-colors shadow-md shadow-blue-600/20"
               >
-                <span>{t('examinations:runner.nextButton', { num: currentQNum + 1 })}</span>
+                <span>{t('examinations:runner.nextButton', { num: Math.min(totalQuestions, currentQNum + 1) })}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right Column: 65-Questions Grid & Pace Telemetry (4 cols) */}
+        {/* Right Column */}
         <div className="lg:col-span-4 space-y-6">
-          {/* 65 Questions Grid */}
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-mono font-semibold uppercase tracking-wider text-slate-300 inline-flex items-center gap-1.5">
                 {t('examinations:runner.examGrid')}
                 <InfoTooltip
-                  title={lang === 'en' ? 'Question Status Grid' : 'Grille de navigation 65 questions'}
-                  content={lang === 'en'
-                    ? 'Green = answered, Purple = flagged for later review, Blue = active question. Click any number to jump immediately.'
-                    : 'Vert = répondu, Violet = marqué pour révision ultérieure, Bleu = question en cours. Cliquez sur un numéro pour y accéder.'}
+                  title={isEn ? 'Question Status Grid' : 'Grille de navigation'}
+                  content={
+                    isEn
+                      ? 'Green = answered, Purple = flagged for later review, Blue = active question. Click any number to jump immediately.'
+                      : 'Vert = répondu, Violet = marqué pour révision ultérieure, Bleu = question en cours. Cliquez sur un numéro pour y accéder.'
+                  }
                   position="left"
                 />
               </span>
-              <span className="text-slate-400 font-mono text-[11px]">{t('examinations:runner.totalQuestions', { count: 65 })}</span>
+              <span className="text-slate-400 font-mono text-[11px]">
+                {t('examinations:runner.totalQuestions', { count: totalQuestions })}
+              </span>
             </div>
 
-            {/* Quick jump filter buttons */}
             <div className="flex items-center gap-2">
               <button
                 onClick={handleJumpToFirstFlagged}
-                className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 border border-purple-500/20 transition-colors"
+                disabled={!firstFlaggedItem}
+                className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 disabled:opacity-40 border border-purple-500/20 transition-colors"
               >
-                {t('examinations:runner.jumpToFlagged', { num: 7 })}
+                {firstFlaggedItem
+                  ? t('examinations:runner.jumpToFlagged', { num: firstFlaggedItem.number })
+                  : (isEn ? 'No flagged item' : 'Aucun marquage')}
               </button>
               <button
                 onClick={handleJumpToFirstUnvisited}
-                className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-[#0f131d] text-slate-300 hover:text-white border border-[#262a35] transition-colors"
+                disabled={!firstUnansweredItem}
+                className="flex-1 py-1.5 px-2 rounded-lg text-[11px] font-medium bg-[#0f131d] text-slate-300 hover:text-white disabled:opacity-40 border border-[#262a35] transition-colors"
               >
-                {t('examinations:runner.jumpToUnanswered', { num: 28 })}
+                {firstUnansweredItem
+                  ? t('examinations:runner.jumpToUnanswered', { num: firstUnansweredItem.number })
+                  : (isEn ? 'All answered' : 'Tout répondu')}
               </button>
             </div>
 
-            {/* The 65 cells Grid */}
-            <div className="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-5 gap-1.5 max-h-80 overflow-y-auto pr-1">
+            <div className="grid grid-cols-4 gap-2">
               {gridItems.map((item) => {
                 const isActive = item.number === currentQNum;
                 let cellClass = 'bg-[#0f131d] text-slate-400 border-[#262a35] hover:border-slate-500';
@@ -363,7 +472,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                   <button
                     key={item.number}
                     onClick={() => setCurrentQNum(item.number)}
-                    className={`h-8 rounded-lg border text-xs font-mono font-semibold flex items-center justify-center transition-all ${cellClass}`}
+                    className={`h-9 rounded-lg border text-xs font-mono font-semibold flex items-center justify-center transition-all ${cellClass}`}
                   >
                     {item.number}
                   </button>
@@ -371,41 +480,40 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
               })}
             </div>
 
-            {/* Legend */}
             <div className="pt-3 border-t border-[#262a35] grid grid-cols-3 gap-1 text-[10px] font-mono text-slate-400 text-center">
               <span className="flex items-center gap-1 justify-center">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                Répondu
+                {isEn ? 'Answered' : 'Répondu'}
               </span>
               <span className="flex items-center gap-1 justify-center">
                 <span className="w-2 h-2 rounded-full bg-purple-400" />
-                Marqué
+                {isEn ? 'Flagged' : 'Marqué'}
               </span>
               <span className="flex items-center gap-1 justify-center">
                 <span className="w-2 h-2 rounded-full bg-[#313540]" />
-                Non visité
+                {isEn ? 'Pending' : 'En attente'}
               </span>
             </div>
           </div>
 
-          {/* Pace & Time Telemetry Card */}
+          {/* Real Pace Telemetry Card */}
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3">
             <div className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-300">
-              Télémétrie d'Allure
+              {isEn ? 'Live Pace Telemetry' : "Télémétrie d'Allure"}
             </div>
 
             <div className="space-y-2.5 text-xs">
               <div className="flex justify-between items-center p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]">
-                <span className="text-slate-400">Temps moyen par question</span>
-                <span className="font-mono font-bold text-white">1m 18s</span>
+                <span className="text-slate-400">{isEn ? 'Avg time / answered' : 'Temps moyen / réponse'}</span>
+                <span className="font-mono font-bold text-white">{avgPaceLabel}</span>
               </div>
               <div className="flex justify-between items-center p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]">
-                <span className="text-slate-400">Cadence nominale requise</span>
-                <span className="font-mono font-bold text-slate-300">1m 18s / q</span>
+                <span className="text-slate-400">{isEn ? 'Target pace' : 'Cadence nominale'}</span>
+                <span className="font-mono font-bold text-slate-300">{targetPaceLabel}</span>
               </div>
               <div className="flex justify-between items-center p-2.5 rounded-xl bg-[#0f131d] border border-[#262a35]">
-                <span className="text-slate-400">Marge projetée restante</span>
-                <span className="font-mono font-bold text-emerald-400">+12 min</span>
+                <span className="text-slate-400">{isEn ? 'Remaining budget' : 'Temps restant'}</span>
+                <span className="font-mono font-bold text-emerald-400">{formatTimer(timeLeftSeconds)}</span>
               </div>
             </div>
           </div>
@@ -414,21 +522,34 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
 
       {/* Pause Modal Overlay */}
       {isPaused && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-[#171b26] border border-[#262a35] rounded-3xl p-8 text-center space-y-6 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsPaused(false);
+          }}
+        >
+          <div
+            ref={pauseModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exam-pause-title"
+            className="w-full max-w-md bg-[#171b26] border border-[#262a35] rounded-3xl p-8 text-center space-y-6 shadow-2xl"
+          >
             <div className="w-16 h-16 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 mx-auto flex items-center justify-center">
               <Pause className="w-8 h-8" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white font-headline">
-                Examen en Pause
+              <h2 id="exam-pause-title" className="text-xl font-bold text-white font-headline">
+                {isEn ? 'Exam Paused' : 'Examen en Pause'}
               </h2>
               <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                Le compte à rebours est suspendu. Vous pouvez vous hydrater ou souffler avant de reprendre votre session.
+                {isEn
+                  ? 'The countdown timer is suspended. Resume whenever you are ready.'
+                  : 'Le compte à rebours est suspendu. Vous pouvez reprendre votre session à tout moment.'}
               </p>
             </div>
             <div className="p-3.5 rounded-xl bg-[#0a0e18] border border-[#262a35] font-mono text-sm text-blue-400">
-              Temps restant : {formatTimer(timeLeftSeconds)}
+              {isEn ? 'Remaining time' : 'Temps restant'} : {formatTimer(timeLeftSeconds)}
             </div>
             <button
               onClick={() => setIsPaused(false)}
@@ -443,15 +564,26 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
 
       {/* Submission Confirmation Modal */}
       {isSubmitModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-[#171b26] border border-[#262a35] rounded-3xl p-8 space-y-6 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsSubmitModalOpen(false);
+          }}
+        >
+          <div
+            ref={submitModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exam-submit-title"
+            className="w-full max-w-lg bg-[#171b26] border border-[#262a35] rounded-3xl p-8 space-y-6 shadow-2xl"
+          >
             <div className="flex items-center justify-between pb-4 border-b border-[#262a35]">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
                   <FileCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white font-headline">
+                  <h3 id="exam-submit-title" className="text-lg font-bold text-white font-headline">
                     {t('examinations:controls.confirmModalTitle')}
                   </h3>
                   <p className="text-xs text-slate-400">
@@ -468,11 +600,12 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
               </button>
             </div>
 
-            {/* Breakdown summary */}
             <div className="space-y-3">
               <div className="flex justify-between p-3 rounded-xl bg-[#0f131d] text-xs">
                 <span className="text-slate-300">{t('examinations:controls.questionsAnswered')}</span>
-                <span className="font-mono font-bold text-emerald-400">{answeredCount} / 65</span>
+                <span className="font-mono font-bold text-emerald-400">
+                  {answeredCount} / {totalQuestions}
+                </span>
               </div>
               <div className="flex justify-between p-3 rounded-xl bg-[#0f131d] text-xs">
                 <span className="text-slate-300">{t('examinations:controls.questionsFlagged')}</span>
@@ -487,13 +620,10 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
             {unvisitedCount > 0 && (
               <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>
-                  {t('examinations:controls.unansweredWarning', { count: unvisitedCount })}
-                </span>
+                <span>{t('examinations:controls.unansweredWarning', { count: unvisitedCount })}</span>
               </div>
             )}
 
-            {/* Action buttons */}
             <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={() => setIsSubmitModalOpen(false)}
@@ -502,36 +632,7 @@ export const ExamView: React.FC<ExamViewProps> = ({ onNavigate }) => {
                 {t('examinations:controls.returnToExam')}
               </button>
               <button
-                onClick={async () => {
-                  setIsSubmitModalOpen(false);
-                  setIsExamCompleted(true);
-                  
-                  // Calculate dynamic score based on answered questions
-                  const answeredRatio = Math.max(0.1, answeredCount / 65);
-                  const scaledScore = Math.min(1000, Math.round(answeredRatio * 820 + 120));
-                  const passed = scaledScore >= 700;
-                  const elapsedSeconds = Math.max(60, 5400 - timeLeftSeconds);
-                  const durationStr = `${Math.floor(elapsedSeconds / 60)}m ${(elapsedSeconds % 60).toString().padStart(2, '0')}s`;
-
-                  await recordExamAttempt({
-                    examCode: 'AIF-C01',
-                    examTitle: 'AWS Certified AI Practitioner',
-                    score: scaledScore,
-                    maxScore: 1000,
-                    passed,
-                    duration: durationStr,
-                    weakPoint: 'Amazon Bedrock Guardrails & Knowledge Bases',
-                    domainScoresSummary: JSON.stringify({
-                      '1. Fondamentaux IA/ML': Math.round(scaledScore * 0.09),
-                      '2. Principes GenAI': Math.round(scaledScore * 0.08),
-                      '3. Amazon Bedrock & RAG': Math.round(scaledScore * 0.07),
-                      '4. IA Responsable & Biais': Math.round(scaledScore * 0.085),
-                      '5. Sécurité KMS': Math.round(scaledScore * 0.09),
-                    }),
-                  });
-
-                  onNavigate('analytics');
-                }}
+                onClick={() => void finalizeAndSubmitExam()}
                 className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-lg shadow-blue-600/25 transition-all"
               >
                 {t('examinations:controls.submitAndResults')}

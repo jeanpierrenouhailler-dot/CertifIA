@@ -24,6 +24,8 @@ import {
   UserLanguage, 
   UserCareerGoal 
 } from '../types';
+import { normalizeCertId } from '../data/certificationsData';
+import { getDeckSize, TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
 
 export const LEVEL_OPTIONS: { id: UserLevel; label: string; desc: string; icon: string }[] = [
   {
@@ -450,10 +452,12 @@ const TIME_MULTIPLIERS: Record<UserWeeklyTime, number> = {
  */
 export function generatePathways(
   profile: UserRecommendationProfile = DEFAULT_USER_PROFILE,
-  activeCertId: string = 'ai102',
-  userCompletedCerts: string[] = ['ai900'],
+  activeCertId: string = 'c1000177',
+  userCompletedCerts: string[] = [],
   lang: 'fr' | 'en' = 'fr'
 ): PathwayPlan[] {
+  const canonicalActiveCertId = normalizeCertId(activeCertId);
+  const normalizedCompleted = userCompletedCerts.map((id) => normalizeCertId(id));
   const isEn = lang === 'en';
   const timeMult = TIME_MULTIPLIERS[profile.weeklyTime] || 1.0;
 
@@ -522,7 +526,7 @@ export function generatePathways(
   let lvl2Weeks = Math.max(3, Math.round(4 * timeMult));
 
   if (lvl1CertId === 'aifc01' || profile.role === 'consultant') {
-    lvl2CertId = 'watsonx';
+    lvl2CertId = 'c1000177';
     lvl2CertCode = 'C1000-177';
     lvl2CertTitle = 'IBM watsonx.ai Specialist';
     lvl2Provider = 'ibm';
@@ -558,7 +562,7 @@ export function generatePathways(
     lvl4Skills = ['SageMaker Distributed Training', 'Feature Store MLOps', 'Algorithmes Intégrés', 'Déploiement Endpoints A/B'];
     lvl4Weeks = Math.max(6, Math.round(8 * timeMult));
   } else if (profile.role === 'consultant' || profile.role === 'chef_de_projet') {
-    lvl4CertId = 'watsonx';
+    lvl4CertId = 'c1000177';
     lvl4CertCode = 'C1000-177';
     lvl4CertTitle = 'IBM watsonx.ai Specialist';
     lvl4Provider = 'ibm';
@@ -569,8 +573,9 @@ export function generatePathways(
 
   // Determine status for Level 1-4 based on userCompletedCerts & activeCertId
   const getStatus = (certId: string, levelNum: number): 'completed' | 'in_progress' | 'next' | 'locked' => {
-    if (userCompletedCerts.includes(certId)) return 'completed';
-    if (activeCertId === certId) return 'in_progress';
+    const canonical = normalizeCertId(certId);
+    if (normalizedCompleted.includes(canonical)) return 'completed';
+    if (canonicalActiveCertId === canonical) return 'in_progress';
     if (levelNum === 1 || levelNum === 2) return 'next';
     return 'locked';
   };
@@ -647,9 +652,9 @@ export function generatePathways(
       estimatedHours: lvl3Weeks * (profile.weeklyTime === 'express' ? 3 : profile.weeklyTime === 'intensif' ? 12 : 6),
       difficulty: isEn ? 'Advanced' : 'Avancé',
       status: getStatus(lvl3CertId, 3),
-      cardsCount: 500,
+      cardsCount: getDeckSize(lvl3CertId),
       questionsCount: 50,
-      examPassScore: isEn ? '700 / 1000 pts (Current: 78%)' : '700 / 1000 pts (Actuel: 78%)',
+      examPassScore: '700 / 1000 pts',
       rationale: isEn
         ? 'Market benchmark credential for cloud AI developers and architects in enterprise ecosystems.'
         : "La certification de référence du marché pour les développeurs et architectes IA en environnement cloud.",
@@ -672,7 +677,7 @@ export function generatePathways(
       estimatedHours: lvl4Weeks * (profile.weeklyTime === 'express' ? 3 : profile.weeklyTime === 'intensif' ? 12 : 6),
       difficulty: 'Expert',
       status: getStatus(lvl4CertId, 4),
-      cardsCount: lvl4CertId === 'gcpmle' ? 500 : lvl4CertId === 'watsonx' ? 400 : 400,
+      cardsCount: getDeckSize(lvl4CertId),
       questionsCount: 65,
       examPassScore: '750 / 1000 pts',
       rationale: isEn
@@ -710,13 +715,13 @@ export function generatePathways(
     highlights: isEn ? [
       'Smooth pedagogical roadmap with zero cognitive friction',
       'Covers top global ecosystems: Azure, AWS, and Google Cloud / IBM',
-      'Immediate access to 1900+ flashcards and 250+ CertifIA exam questions',
-      'Targeted benchmark to pass the 72% success threshold',
+      `Immediate access to ${TOTAL_FLASHCARDS_COUNT.toLocaleString('en-US')} flashcards and scenario-based MCQs`,
+      'Targeted benchmark to reach the official passing threshold',
     ] : [
       'Progression pédagogique sans rupture cognitive',
-      'Couvre les 3 géants mondiaux : Azure, AWS et Google Cloud / IBM',
-      'Accès immédiat aux 1900+ fiches mémo et 250+ QCM CertifIA',
-      'Validation du score de passage moyen de 72%',
+      'Couvre les géants mondiaux : Azure, AWS et Google Cloud / IBM',
+      `Accès immédiat aux ${TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')} fiches mémo et QCM scénarisés`,
+      'Suivi calibré sur le score de passage officiel de chaque examen',
     ],
     levels: p1Levels,
   };
@@ -782,7 +787,7 @@ export function generatePathways(
       subtitle: isEn
         ? 'EU AI Act compliance, auditability, and prompt tuning'
         : 'Conformité AI Act européen, auditabilité et prompt tuning',
-      certId: 'watsonx',
+      certId: 'c1000177',
       certCode: 'C1000-177',
       certTitle: 'IBM watsonx.ai Specialist',
       provider: 'ibm',
@@ -791,8 +796,8 @@ export function generatePathways(
       estimatedWeeks: Math.max(3, Math.round(4 * timeMult)),
       estimatedHours: 32,
       difficulty: isEn ? 'Intermediate' : 'Intermédiaire',
-      status: getStatus('watsonx', 3),
-      cardsCount: 400,
+      status: getStatus('c1000177', 3),
+      cardsCount: getDeckSize('c1000177'),
       questionsCount: 64,
       examPassScore: '620 / 1000 pts',
       rationale: isEn

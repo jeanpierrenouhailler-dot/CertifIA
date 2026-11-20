@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Command, Keyboard } from 'lucide-react';
 import { useTranslation } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface ShortcutsModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface ShortcutsModalProps {
 export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose }) => {
   const { t, i18n } = useTranslation(['settings', 'common']);
   const isEn = i18n.language === 'en';
+  const modalRef = useAccessibleModal({ isOpen, onClose });
 
   if (!isOpen) return null;
 
@@ -24,8 +26,15 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
       <div 
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="shortcuts-modal-title"
         className="w-full max-w-lg bg-[#171b26] border border-[#262a35] rounded-2xl shadow-2xl p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
@@ -35,7 +44,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose 
               <Keyboard className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-white font-headline text-base">
+              <h3 id="shortcuts-modal-title" className="font-semibold text-white font-headline text-base">
                 {t('settings:shortcuts.title', 'Raccourcis Clavier CertifIA')}
               </h3>
               <p className="text-xs text-slate-400">

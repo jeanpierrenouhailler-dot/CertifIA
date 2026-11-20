@@ -13,7 +13,8 @@
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable-emerald.svg?style=for-the-badge&logo=pwa)](public/manifest.webmanifest)
 [![SM-2 Algorithm](https://img.shields.io/badge/Algorithm-SM--2%20%2F%20FSRS-purple.svg?style=for-the-badge)](src/lib/srsAlgorithm.ts)
 [![Theme](https://img.shields.io/badge/Theme-Dark%20%7C%20Light-amber.svg?style=for-the-badge)](src/context/ThemeContext.tsx)
-[![Coverage](https://img.shields.io/badge/Certifications-18%20Exams-indigo.svg?style=for-the-badge)](src/data/certificationsData.ts)
+[![Coverage](https://img.shields.io/badge/Certifications-6%20Exams-indigo.svg?style=for-the-badge)](src/data/certificationsData.ts)
+[![Flashcards](https://img.shields.io/badge/Flashcards-2%20800%20Cards-blue.svg?style=for-the-badge)](src/data/flashcardsData.ts)
 
 </div>
 
@@ -66,13 +67,13 @@
   <img src="assets/screenshots/certifia-cockpit-today.png" alt="Cockpit Quotidien CertifIA v2.9.0" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
-* **Session Quotidienne Sur-Mesure (~22 min)** : Chaque matin, l'algorithme CertifIA analyse vos révisions passées pour composer votre session optimale :
-  * 🧠 **17 fiches à réviser** au seuil d'oubli calculé par l'algorithme SuperMemo-2 (SM-2) / FSRS.
-  * ⚠️ **8 notions fragiles** (pièges à haute pondération identifiés par l'algorithme).
-  * ❓ **12 questions QCM d'architecture** non maîtrisées avec mise en situation.
-* **Trajectoire Examen 700 pts** : Jauge en temps réel vers le seuil officiel d'admission (700 / 1 000 points) et gain projeté (+3%).
+* **Session Quotidienne Dynamique** : Calculée en temps réel à partir de votre historique réel dans `src/lib/metricsEngine.ts` et `src/lib/srsAlgorithm.ts` (démarre strictement à `0` pour un nouvel apprenant) :
+  * 🧠 **File de révision SM-2 / FSRS** : Fiches dues à échéance (`nextReviewDate <= today`) complétées par des cartes de découverte.
+  * ⚠️ **Notions fragiles** : Cartes identifiées dynamiquement selon vos évaluations réelles (*À revoir* / *Difficile*, taux de réussite < 70 %).
+  * ❓ **Questions QCM non maîtrisées** : Filtrées dynamiquement d'après vos tentatives enregistrées.
+* **Trajectoire Examen & Progression** : Jauge temps réel calculée depuis vos scores d'examens blancs, quiz et rétention SRS (dépourvue de toute valeur fictive).
 * **Accès Rapide aux 3 Piliers d'Étude** : Mémorisation SRS (2 800 cartes), Encyclopédie IA (Glossaire) et Simulation Réelle (90 min).
-* **Détail de Session & Objectif Cible** : Compte à rebours des 37 étapes quotidiennes, date cible d'examen et objectif hebdomadaire synchronisé.
+* **Détail de Session & Objectif Cible** : Date cible d'examen et suivi hebdomadaire synchronisés en LocalStorage et Cloud Firestore.
 
 ---
 
@@ -104,19 +105,18 @@
 
 ---
 
-### 4. 🧭 Catalogue Officiel des 18 Certifications Cloud & IA
+### 4. 🧭 Catalogue Officiel des 6 Certifications Cloud & IA
 
 <div align="center">
-  <img src="assets/screenshots/certifia-catalogue-view.svg" alt="Catalogue des 18 Certifications Cloud & IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
+  <img src="assets/screenshots/certifia-catalogue-view.svg" alt="Catalogue des 6 Certifications Cloud & IA" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
-* **Couverture Exhaustive Multi-Fournisseurs** :
-  * 🔷 **Microsoft Azure** : AI-102 (Engineer Associate), AI-900 (Fundamentals), DP-100 (Data Scientist), AZ-140, etc.
-  * 🟧 **Amazon Web Services (AWS)** : AIF-C01 (AI Practitioner), MLS-C01 (Machine Learning Specialty), Bedrock & SageMaker.
-  * 🟥 **Google Cloud Platform (GCP)** : Professional Machine Learning Engineer (PMLE), Cloud AI Associate.
-  * 🟦 **IBM** : C1000-177 (watsonx.ai Technical Specialist), watsonx.governance, watsonx.data.
-  * 🟩 **NVIDIA** : Generative AI LLMs Associate (TensorRT-LLM, NeMo, Triton Inference Server).
-* **Filtres Avancés & Fiches Blueprints** : Recherche instantanée par code, niveau (Fondamental, Associate, Expert) et accès au comparateur côte à côte.
+* **Couverture Multi-Fournisseurs (2 800 fiches réparties sur 27 domaines officiels)** :
+  * 🔷 **Microsoft Azure** : `AI-102` (Azure AI Engineer Associate — 500 fiches), `AI-900` (Azure AI Fundamentals — 500 fiches).
+  * 🟧 **Amazon Web Services (AWS)** : `AIF-C01` (Certified AI Practitioner — 500 fiches), `MLS-C01` (Machine Learning Specialty — 400 fiches).
+  * 🟥 **Google Cloud Platform (GCP)** : `GCP-PMLE` (Professional Machine Learning Engineer — 500 fiches).
+  * 🟦 **IBM** : `C1000-177` (IBM watsonx.ai Technical Specialist — 400 fiches).
+* **Filtres Avancés & Fiches Blueprints** : Recherche instantanée par code, niveau (Fondamental, Associate, Specialty, Professional) et accès au comparateur côte à côte.
 
 ---
 
@@ -182,13 +182,13 @@
   <img src="assets/screenshots/certifia-analytics-dashboard.svg" alt="Tableau de Bord & Télémétrie Cognitive" width="100%" style="border-radius: 16px; border: 1px solid #262c3e; box-shadow: 0 12px 36px rgba(0,0,0,0.5);" />
 </div>
 
-* **4 KPIs Cardinaux de Préparation** :
-  * 🎯 **Indice de Préparation Globale (74%)** : Prêt J-6 avec dépassement du seuil de validation.
-  * 📈 **Score Moyen aux Examens (765 / 1000)** : Marge de sécurité de +65 points sur le cutoff éliminatoire.
-  * 🔢 **Volume Traité (482 questions)** : Précision globale de 78.4% sur toutes certifications.
-  * 🔥 **Série & Constance (14 jours)** : Suivi de la régularité sans interruption.
-* **Matrice de Maîtrise par Domaine** : Visualisation granulaire des forces et faiblesses pour prioriser les ultimes révisions.
-* **Courbe Mathématique de Rétention Ebbinghaus vs SM-2** : Preuve scientifique de l'efficacité du rappel espacé (+84% de rétention vs 15% pour le bachotage passif).
+* **4 KPIs Cardinaux Calculés en Temps Réel (`src/lib/metricsEngine.ts`)** :
+  * 🎯 **Indice de Préparation Globale** : Moyenne pondérée dynamique (Examens 45 %, Quiz 25 %, Rétention SRS 30 %), strictement à `0 %` sans activité.
+  * 📈 **Score Moyen aux Examens** : Calculé depuis les tentatives réelles enregistrées dans `examAttempts` face au cutoff officiel (`700` ou `750 / 1000`).
+  * 🔢 **Volume Traité & Précision** : Compteur réel de QCM et questions d'examens résolus et taux d'exactitude mesuré.
+  * 🔥 **Série & Constance** : Calculée par jours calendaires locaux consécutifs (`computeStreakDays`), réinitialisable à `0`.
+* **Matrice de Maîtrise par Domaine** : Visualisation granulaire calculée à partir des révisions par domaine de chaque certification.
+* **Trajectoire Dynamique & Courbe Ebbinghaus vs SM-2** : Graphique de progression généré exclusivement à partir de vos examens blancs complétés (état vide explicite avant la première simulation).
 
 ---
 
@@ -233,11 +233,11 @@ CertifIA garantit une expérience utilisateur **100% bilingue sans aucun texte r
 
 | Pilier | Écran Principal | Fonctionnalités Clés |
 | :--- | :--- | :--- |
-| **1. 🏠 ACCUEIL** | `TodayView.tsx` | Cockpit quotidien, 17 cartes SM-2 dues, 8 notions fragiles, 12 QCM ciblés, bouton reprise immédiate, bannière parcours 4 niveaux. |
-| **2. 🧭 CERTIFICATIONS** | `CatalogueView.tsx` | 18 certifications officielles (Azure, AWS, GCP, IBM, NVIDIA), filtres par fournisseur, fiches blueprints, comparateur côte à côte. |
-| **3. 🎓 APPRENTISSAGE** | `QuizView.tsx`, `FlashcardsView.tsx`, `ExamView.tsx`, `GlossaryView.tsx` | Hub pédagogique complet : QCM scénarisés, 2 800 fiches mémo SM-2, examens chronométrés 90 min, encyclopédie IA A-Z. |
-| **4. 📊 PROGRESSION** | `AnalyticsView.tsx` | Télémétrie cognitive, matrice de maîtrise des domaines, courbe de rétention d'Ebbinghaus, historique des tentatives. |
-| **5. 🤖 ASSISTANT IA** | `AIAssistantView.tsx`, `AIAssistantDrawer.tsx` | Tuteur pédagogique socratique contextuel, explication pas-à-pas des architectures cloud, pièges d'examen officiels. |
+| **1. 🏠 ACCUEIL** | `TodayView.tsx` | Cockpit quotidien alimenté par `metricsEngine.ts`, file SRS SM-2 réelle, notions fragiles dynamiques, bouton reprise immédiate, bannière parcours 4 niveaux. |
+| **2. 🧭 CERTIFICATIONS** | `CatalogueView.tsx` | 6 certifications officielles (Azure, AWS, GCP, IBM), filtres par fournisseur, fiches blueprints dynamiques, comparateur côte à côte. |
+| **3. 🎓 APPRENTISSAGE** | `QuizView.tsx`, `FlashcardsView.tsx`, `ExamView.tsx`, `GlossaryView.tsx` | Hub pédagogique complet : QCM scénarisés persistés, 2 800 fiches mémo SM-2, examens blancs chronométrés, encyclopédie IA A-Z. |
+| **4. 📊 PROGRESSION** | `AnalyticsView.tsx` | Télémétrie cognitive réelle (départ à `0`), matrice de maîtrise des domaines, courbe de trajectoire dynamique, historique et export RGPD. |
+| **5. 🤖 ASSISTANT IA** | `AIAssistantView.tsx`, `AIAssistantDrawer.tsx` | Guide hors-ligne & Tuteur socratique contextuel basé sur les blueprints officiels et vos métriques SRS en direct. |
 
 ---
 
@@ -271,10 +271,17 @@ npm install
 # Lancement en développement (Port 3000)
 npm run dev
 
-# Vérification de la parité bilingue
+# Vérification de la parité bilingue (FR/EN)
 npx tsx src/i18n/verifyI18nParity.ts
 
-# Compilation et vérification TypeScript
+# Tests unitaires (moteur de métriques, SM-2, normalisation catalogue)
+npm test
+
+# Tests E2E & responsive (Playwright sur 320px–1920px + persistance & accessibilité)
+npm run test:e2e
+
+# Vérification TypeScript et compilation production
+npm run lint
 npm run build
 ```
 
@@ -283,4 +290,4 @@ npm run build
 ## ⚖️ Mentions Légales & Avertissement
 
 > **Clause d'exonération de responsabilité :**  
-> L'éditeur et les créateurs de **CertifIA** ne sont en aucun cas responsables des données, informations, questions, propositions de réponses, explications, simulations ou synthèses fournies dans l'application, lesquelles restent purement indicatives. CertifIA est un projet indépendant d'entraînement cognitif personnel et n'est affilié à aucun des organismes certificateurs mentionnés (Microsoft, AWS, Google Cloud, IBM, NVIDIA).
+> L'éditeur et les créateurs de **CertifIA** ne sont en aucun cas responsables des données, informations, questions, propositions de réponses, explications, simulations ou synthèses fournies dans l'application, lesquelles restent purement indicatives. CertifIA est un projet indépendant d'entraînement cognitif personnel et n'est affilié à aucun des organismes certificateurs mentionnés (Microsoft, AWS, Google Cloud, IBM).

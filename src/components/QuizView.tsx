@@ -21,8 +21,10 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { QuizQuestion, AppScreen } from '../types';
-import { quizMatrixItems } from '../data/quizData';
 import { getLocalizedQuizQuestions } from '../data/localizedQuizData';
+import { getCertificationById } from '../data/certificationsData';
+import { useProgress } from '../context/ProgressContext';
+import { computeQuizMetrics } from '../lib/metricsEngine';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage } from '../i18n';
@@ -36,12 +38,20 @@ interface QuizViewProps {
 export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint, onOpenAIAssistant }) => {
   const { t } = useTranslation(['quizzes', 'common']);
   const lang = getCurrentLanguage();
+  const isEn = lang === 'en';
   const questions = getLocalizedQuizQuestions(lang);
-  const [activeQuestionIndex, setActiveQuestionIndex] = useState(1); // Index 1 is Q7 in our set
-  const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D' | null>('A');
-  const [isAnswerRevealed, setIsAnswerRevealed] = useState(true);
-  const [isFlagged, setIsFlagged] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState(872); // 14:32
+  const { activeCertId, quizAttempts, recordQuizAttempt } = useProgress();
+  const activeCert = getCertificationById(activeCertId);
+
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const firstQ = questions[0];
+  const initialAttempt = firstQ ? quizAttempts[firstQ.id] : undefined;
+  const [selectedOption, setSelectedOption] = useState<'A' | 'B' | 'C' | 'D' | null>(
+    initialAttempt ? initialAttempt.selectedKey : null
+  );
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState(Boolean(initialAttempt));
+  const [flaggedIds, setFlaggedIds] = useState<Set<string>>(new Set());
+  const [timerSeconds, setTimerSeconds] = useState(0);
   const [isDiagramExpanded, setIsDiagramExpanded] = useState(false);
 
   // Live timer tick
@@ -58,30 +68,63 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentQ: QuizQuestion = questions[activeQuestionIndex] || questions[1];
+  const currentQ: QuizQuestion = questions[activeQuestionIndex] || questions[0];
+  const isFlagged = flaggedIds.has(currentQ.id);
+  const quizMetrics = computeQuizMetrics(questions, quizAttempts);
+  const completionPct = questions.length > 0 ? Math.round((quizMetrics.solvedCount / questions.length) * 100) : 0;
+
+  const jumpToQuestion = (idx: number) => {
+    const clamped = Math.max(0, Math.min(questions.length - 1, idx));
+    const targetQ = questions[clamped];
+    const saved = targetQ ? quizAttempts[targetQ.id] : undefined;
+    setActiveQuestionIndex(clamped);
+    setSelectedOption(saved ? saved.selectedKey : null);
+    setIsAnswerRevealed(Boolean(saved));
+  };
 
   const handleSelectOption = (key: 'A' | 'B' | 'C' | 'D') => {
+    if (isAnswerRevealed) return;
     setSelectedOption(key);
   };
 
   const handleValidate = () => {
+    if (!selectedOption) return;
     setIsAnswerRevealed(true);
+    recordQuizAttempt({
+      questionId: currentQ.id,
+      certId: activeCert.id,
+      certCode: activeCert.code,
+      domain: currentQ.architectureBadge?.title || currentQ.code,
+      selectedKey: selectedOption,
+      correctKey: currentQ.correctKey,
+      isCorrect: selectedOption === currentQ.correctKey,
+    });
+  };
+
+  const handleRetryCurrent = () => {
+    setSelectedOption(null);
+    setIsAnswerRevealed(false);
   };
 
   const handleNext = () => {
     if (activeQuestionIndex < questions.length - 1) {
-      setActiveQuestionIndex((prev) => prev + 1);
-      setSelectedOption(null);
-      setIsAnswerRevealed(false);
+      jumpToQuestion(activeQuestionIndex + 1);
     }
   };
 
   const handlePrev = () => {
     if (activeQuestionIndex > 0) {
-      setActiveQuestionIndex((prev) => prev - 1);
-      setSelectedOption('A');
-      setIsAnswerRevealed(true);
+      jumpToQuestion(activeQuestionIndex - 1);
     }
+  };
+
+  const handleToggleFlag = () => {
+    setFlaggedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(currentQ.id)) next.delete(currentQ.id);
+      else next.add(currentQ.id);
+      return next;
+    });
   };
 
   return (
@@ -114,23 +157,27 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             <span>{formatTimer(timerSeconds)}</span>
           </div>
 
-          {/* Current Session Score */}
+          {/* Current Session Score (Strictly computed from persisted attempts) */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#171b26] border border-[#262a35] text-xs font-mono">
             <Award className="w-3.5 h-3.5 text-emerald-400" />
             <span className="text-slate-300">{t('quizzes:scoreLabel')}</span>
-            <span className="text-emerald-400 font-bold">6/7 (85.7%)</span>
+            <span className="text-emerald-400 font-bold">
+              {quizMetrics.solvedCount > 0
+                ? `${quizMetrics.correctCount}/${quizMetrics.solvedCount} (${quizMetrics.accuracyPct}%)`
+                : '0/0'}
+            </span>
             <InfoTooltip
-              title={lang === 'en' ? 'Scenario Practice Scoring' : 'Score d’entraînement QCM'}
-              content={lang === 'en'
-                ? 'Tracks your accuracy during this scenario drill. Aim for 70%+ consistently before attempting timed mock exams.'
-                : 'Mesure votre précision en entraînement guidé. Visez un maintien au-dessus de 70 % avant de lancer un examen blanc chronométré.'}
+              title={isEn ? 'Scenario Practice Scoring' : 'Score d’entraînement QCM'}
+              content={isEn
+                ? 'Tracks your real accuracy across validated scenario questions. Aim for 70%+ consistently before attempting timed mock exams.'
+                : 'Mesure votre précision réelle sur les scénarios validés. Visez un maintien au-dessus de 70 % avant de lancer un examen blanc chronométré.'}
               position="bottom"
             />
           </div>
 
           {/* Flag button */}
           <button
-            onClick={() => setIsFlagged(!isFlagged)}
+            onClick={handleToggleFlag}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
               isFlagged
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
@@ -149,26 +196,26 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
       <div className="p-4 rounded-2xl bg-[#171b26] border border-[#262a35]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 mb-2">
           <span className="font-semibold text-white">
-            {t('quizzes:questionHeader', { current: currentQ.code === 'Q-7294' ? '7' : activeQuestionIndex + 1, total: 20 })}
+            {t('quizzes:questionHeader', { current: activeQuestionIndex + 1, total: questions.length })}
           </span>
           <div className="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
             <span className="inline-flex items-center gap-1.5">
               {t('quizzes:requiredThreshold')}
               <InfoTooltip
-                title={lang === 'en' ? 'Official 700/1000 Standard' : 'Seuil officiel 700/1 000'}
-                content={lang === 'en'
+                title={isEn ? 'Official 700/1000 Standard' : 'Seuil officiel 700/1 000'}
+                content={isEn
                   ? 'Most Cloud AI exams (Azure AI-102, AWS AIF-C01) require at least 700/1000 scaled points. Inspect distractors below each answer to avoid common traps.'
                   : 'La majorité des certifications Cloud IA (Azure AI-102, AWS AIF-C01) exigent un score pondéré minimum de 700/1 000. Analysez chaque piège après validation.'}
                 position="bottom"
               />
             </span>
-            <span className="text-blue-400 font-bold">{t('quizzes:progressPct', { pct: 35 })}</span>
+            <span className="text-blue-400 font-bold">{t('quizzes:progressPct', { pct: completionPct })}</span>
           </div>
         </div>
         <div className="w-full h-2 bg-[#0a0e18] rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-blue-500 to-emerald-400 rounded-full transition-all duration-500"
-            style={{ width: '35%' }}
+            style={{ width: `${completionPct}%` }}
           />
         </div>
       </div>
@@ -275,8 +322,8 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
               })}
             </div>
 
-            {/* Action buttons if not revealed */}
-            {!isAnswerRevealed && (
+            {/* Action buttons */}
+            {!isAnswerRevealed ? (
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={handleValidate}
@@ -284,6 +331,16 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
                   className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-blue-600/20 transition-all"
                 >
                   {t('quizzes:validateButton')}
+                </button>
+              </div>
+            ) : (
+              <div className="mt-5 flex justify-end">
+                <button
+                  onClick={handleRetryCurrent}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0f131d] hover:bg-[#1c2438] border border-[#262a35] text-slate-300 hover:text-white text-xs font-semibold transition-all"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>{isEn ? 'Re-try this question' : 'Refaire cette question'}</span>
                 </button>
               </div>
             )}
@@ -398,11 +455,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
                 onClick={() => {
                   if (onOpenAIAssistant) {
                     onOpenAIAssistant({
-                      certId: 'ai102',
-                      certCode: 'AI-102',
-                      topic: 'Indexation Hybride & RAG Semantic Ranker',
+                      certId: activeCert.id,
+                      certCode: activeCert.code,
+                      topic: currentQ.architectureBadge?.title || currentQ.code,
                       questionText: currentQ.question,
-                      userSelection: selectedOption || 'A',
+                      userSelection: selectedOption || '—',
                     });
                   } else {
                     onNavigate('assistant');
@@ -508,8 +565,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
                 <text x="275" y="120" fill="#a78bfa" fontSize="7" textAnchor="middle">GPT-4o RAG Prompt</text>
 
                 {/* Output tag */}
-                <rect x="100" y="145" width="120" height="22" rx="4" fill="#0f172a" stroke="#334155" strokeWidth="1" />
-                <text x="160" y="159" fill="#94a3b8" fontSize="8" textAnchor="middle" fontFamily="monospace">Latence Moyenne : 240 ms</text>
+                <rect x="90" y="145" width="140" height="22" rx="4" fill="#0f172a" stroke="#334155" strokeWidth="1" />
+                <text x="160" y="159" fill="#94a3b8" fontSize="8" textAnchor="middle" fontFamily="monospace">
+                  {isEn ? 'Reference RAG Pipeline' : 'Schéma RAG de référence'}
+                </text>
               </svg>
             </div>
             <p className="text-[11px] text-slate-400">
@@ -517,96 +576,80 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             </p>
           </div>
 
-          {/* Domain Skills Gauges */}
+          {/* Real Scenario Telemetry by Domain */}
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3.5">
             <div className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-300">
               {t('quizzes:skillsByDomain')}
             </div>
             <div className="space-y-2.5">
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">{t('quizzes:domainGenAI')}</span>
-                  <span className="font-mono text-emerald-400 font-semibold">85%</span>
-                </div>
-                <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-400 rounded-full" style={{ width: '85%' }} />
-                </div>
-              </div>
+              {questions.map((qItem, idx) => {
+                const attempt = quizAttempts[qItem.id];
+                const pct = attempt ? (attempt.isCorrect ? 100 : 0) : 0;
+                const statusLabel = attempt
+                  ? attempt.isCorrect
+                    ? (isEn ? 'Validated' : 'Validé')
+                    : (isEn ? 'Incorrect' : 'À revoir')
+                  : (isEn ? 'Pending' : 'Non évalué');
+                const labelColor = attempt
+                  ? attempt.isCorrect
+                    ? 'text-emerald-400'
+                    : 'text-rose-400'
+                  : 'text-slate-400';
+                const barColor = attempt
+                  ? attempt.isCorrect
+                    ? 'bg-emerald-400'
+                    : 'bg-rose-400'
+                  : 'bg-slate-700';
 
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">{t('quizzes:domainVision')}</span>
-                  <span className="font-mono text-rose-400 font-semibold">54%</span>
-                </div>
-                <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
-                  <div className="h-full bg-rose-400 rounded-full" style={{ width: '54%' }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">{t('quizzes:domainNLP')}</span>
-                  <span className="font-mono text-blue-400 font-semibold">72%</span>
-                </div>
-                <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-400 rounded-full" style={{ width: '72%' }} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-xs mb-1">
-                  <span className="text-slate-300">{t('quizzes:domainResponsible')}</span>
-                  <span className="font-mono text-amber-400 font-semibold">62%</span>
-                </div>
-                <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
-                  <div className="h-full bg-amber-400 rounded-full" style={{ width: '62%' }} />
-                </div>
-              </div>
+                return (
+                  <div key={qItem.id}>
+                    <div className="flex justify-between text-xs mb-1 gap-2">
+                      <span className="text-slate-300 truncate">
+                        Q{idx + 1} · {qItem.architectureBadge?.title || qItem.code}
+                      </span>
+                      <span className={`font-mono font-semibold shrink-0 ${labelColor}`}>
+                        {statusLabel}
+                      </span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#0a0e18] rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all duration-300 ${barColor}`} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Grille de Navigation (20 Questions Matrix) */}
+          {/* Real Questions Navigation Matrix (strictly questions.length items) */}
           <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] space-y-3">
             <div className="flex items-center justify-between text-xs">
               <span className="font-mono font-semibold uppercase tracking-wider text-slate-300">
                 {t('quizzes:navigationGrid')}
               </span>
-              <span className="text-slate-400 font-mono text-[11px]">{t('quizzes:totalQuestionsCount', { count: 20 })}</span>
+              <span className="text-slate-400 font-mono text-[11px]">{t('quizzes:totalQuestionsCount', { count: questions.length })}</span>
             </div>
 
-            <div className="grid grid-cols-5 gap-2">
-              {quizMatrixItems.map((item) => {
+            <div className="grid grid-cols-4 gap-2">
+              {questions.map((qItem, idx) => {
+                const attempt = quizAttempts[qItem.id];
+                const isActive = idx === activeQuestionIndex;
                 let btnStyle = 'bg-[#0f131d] text-slate-400 border-[#262a35] hover:border-slate-500';
-                
-                if (item.status === 'correct') {
-                  btnStyle = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
-                } else if (item.status === 'incorrect') {
-                  btnStyle = 'bg-rose-500/15 text-rose-300 border-rose-500/30';
-                } else if (item.status === 'active') {
+
+                if (isActive) {
                   btnStyle = 'bg-blue-600 text-white font-bold border-blue-400 ring-2 ring-blue-500/40 shadow-md shadow-blue-600/30';
+                } else if (attempt?.isCorrect) {
+                  btnStyle = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+                } else if (attempt && !attempt.isCorrect) {
+                  btnStyle = 'bg-rose-500/15 text-rose-300 border-rose-500/30';
                 }
 
                 return (
                   <button
-                    key={item.num}
-                    onClick={() => {
-                      if (item.num === 7) {
-                        setActiveQuestionIndex(1);
-                        setIsAnswerRevealed(true);
-                        setSelectedOption('A');
-                      } else if (item.num === 1) {
-                        setActiveQuestionIndex(0);
-                        setIsAnswerRevealed(true);
-                        setSelectedOption('A');
-                      } else if (item.num === 8) {
-                        setActiveQuestionIndex(2);
-                        setIsAnswerRevealed(true);
-                        setSelectedOption('A');
-                      }
-                    }}
+                    key={qItem.id}
+                    onClick={() => jumpToQuestion(idx)}
                     className={`h-9 rounded-xl border text-xs font-mono font-semibold flex items-center justify-center transition-all ${btnStyle}`}
                   >
-                    {item.num}
+                    {idx + 1}
                   </button>
                 );
               })}
@@ -616,15 +659,15 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
             <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-[#262a35]">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                {t('quizzes:legendCorrect', { count: 5 })}
+                {t('quizzes:legendCorrect', { count: quizMetrics.correctCount })}
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-rose-400" />
-                {t('quizzes:legendIncorrect', { count: 1 })}
+                {t('quizzes:legendIncorrect', { count: quizMetrics.incorrectCount })}
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-blue-500" />
-                {t('quizzes:legendActive', { num: 7 })}
+                {t('quizzes:legendActive', { num: activeQuestionIndex + 1 })}
               </span>
             </div>
           </div>

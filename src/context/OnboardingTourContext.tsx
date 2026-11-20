@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { AppScreen } from '../types';
+import { CERTIFICATIONS_COUNT } from '../data/certificationsData';
+import { TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
 
 export interface TourStep {
   id: string;
@@ -25,10 +27,10 @@ export const TOUR_STEPS: TourStep[] = [
     badgeEn: '01/10 • Daily Cockpit',
     titleFr: 'Cockpit du Jour & Algorithme CertifIA',
     titleEn: 'Daily Cockpit & CertifIA Algorithm',
-    descriptionFr: 'Chaque matin, l’algorithme CertifIA analyse vos révisions passées et compose une session quotidienne calibrée : fiches SRS prioritaires, notions fragiles identifiées et QCM ciblés pour sécuriser votre score sans surcharge.',
-    descriptionEn: 'Each morning, the CertifIA algorithm analyzes your past reviews and generates a calibrated session: priority SRS flashcards, fragile concepts, and targeted MCQs to secure your score without cognitive overload.',
-    tipFr: 'Complétez votre session quotidienne (environ 20 min) pour entretenir votre série et ancrer les concepts au seuil d’oubli optimal.',
-    tipEn: 'Complete your daily session (~20 min) to maintain your streak and anchor concepts at the optimal retention threshold.',
+    descriptionFr: 'Chaque jour, le moteur CertifIA analyse vos révisions passées et compose une session calibrée : fiches SRS prioritaires, notions fragiles identifiées et QCM ciblés pour sécuriser votre score sans surcharge.',
+    descriptionEn: 'Each day, the CertifIA engine analyzes your past reviews and generates a calibrated session: priority SRS flashcards, fragile concepts, and targeted MCQs to secure your score without cognitive overload.',
+    tipFr: 'Complétez votre session quotidienne pour entretenir votre série et ancrer les concepts au seuil d’oubli optimal.',
+    tipEn: 'Complete your daily session to maintain your streak and anchor concepts at the optimal retention threshold.',
     placement: 'bottom',
   },
   {
@@ -65,12 +67,12 @@ export const TOUR_STEPS: TourStep[] = [
     targetSelector: '[data-tour="catalogue-filters"]',
     badgeFr: '04/10 • Catalogue',
     badgeEn: '04/10 • Catalog',
-    titleFr: 'Catalogue des 18 Certifications Cloud IA',
-    titleEn: 'Official 18 Cloud AI Certifications Catalog',
-    descriptionFr: 'Explorez 18 certifications officielles réparties entre Microsoft Azure, AWS, Google Cloud, IBM et NVIDIA. Filtrez par niveau (Fondamental, Associate, Expert) ou comparez-les face-à-face.',
-    descriptionEn: 'Explore 18 official certifications across Microsoft Azure, AWS, Google Cloud, IBM, and NVIDIA. Filter by level (Foundational, Associate, Expert) or compare them side-by-side.',
-    tipFr: 'Utilisez le Comparateur pour identifier les compétences transférables entre Azure, AWS et Google Cloud.',
-    tipEn: 'Use the Comparator to identify transferable skills between Azure, AWS, and Google Cloud.',
+    titleFr: `Catalogue des ${CERTIFICATIONS_COUNT} Certifications Cloud IA`,
+    titleEn: `Official ${CERTIFICATIONS_COUNT} Cloud AI Certifications Catalog`,
+    descriptionFr: `Explorez ${CERTIFICATIONS_COUNT} certifications officielles réparties entre Microsoft Azure, AWS, Google Cloud et IBM watsonx. Filtrez par niveau (Fondamental, Associate, Spécialiste) ou comparez-les face-à-face.`,
+    descriptionEn: `Explore ${CERTIFICATIONS_COUNT} official certifications across Microsoft Azure, AWS, Google Cloud, and IBM watsonx. Filter by level (Foundational, Associate, Specialist) or compare them side-by-side.`,
+    tipFr: 'Utilisez le Comparateur pour identifier les compétences transférables entre Azure, AWS, Google Cloud et IBM.',
+    tipEn: 'Use the Comparator to identify transferable skills between Azure, AWS, Google Cloud, and IBM.',
     placement: 'bottom',
   },
   {
@@ -109,8 +111,8 @@ export const TOUR_STEPS: TourStep[] = [
     badgeEn: '07/10 • Spaced Memorization',
     titleFr: 'Fiches Mémo & Répétition Espacée SM-2',
     titleEn: 'Flashcards & SM-2 Spaced Repetition',
-    descriptionFr: 'Plus de 2 800 fiches mémo classées par domaines d’examen. L’algorithme SM-2 calcule l’intervalle idéal de rappel (J+1, J+3, J+7, J+14) pour garantir l’ancrage mnésique à long terme.',
-    descriptionEn: 'Over 2,800 flashcards categorized by exam domains. The SM-2 algorithm calculates the ideal review interval (Day 1, 3, 7, 14) for guaranteed long-term retention.',
+    descriptionFr: `${TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')} fiches mémo classées par domaines d’examen. L’algorithme SM-2 calcule l’intervalle idéal de rappel (J+1, J+3, J+7, J+14) pour garantir l’ancrage mnésique à long terme.`,
+    descriptionEn: `${TOTAL_FLASHCARDS_COUNT.toLocaleString('en-US')} flashcards categorized by exam domains. The SM-2 algorithm calculates the ideal review interval (Day 1, 3, 7, 14) for guaranteed long-term retention.`,
     tipFr: 'Évaluez sincèrement votre facilité de rappel : l’algorithme ajuste la difficulté pour vous éviter tout bachotage superflu.',
     tipEn: 'Rate your recall honestly: the algorithm adjusts difficulty to eliminate unnecessary cramming.',
     placement: 'bottom',

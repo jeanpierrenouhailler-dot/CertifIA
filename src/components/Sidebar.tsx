@@ -31,7 +31,9 @@ import { useGuide } from '../context/GuideContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useProgress } from '../context/ProgressContext';
 import { useOnboardingTour } from '../context/OnboardingTourContext';
-import { NAV_CATEGORIES } from '../navigation/navigationConfig';
+import { CERTIFICATIONS_COUNT, normalizeCertId } from '../data/certificationsData';
+import { TOTAL_FLASHCARDS_COUNT, getFlashcardsForCert } from '../data/flashcardsData';
+import { computeDailyReviewQueue } from '../lib/srsAlgorithm';
 import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
@@ -69,13 +71,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { isInstalled, promptInstall } = usePwa();
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { versionInfo } = useSystemUpdate();
-  const { certProgress, activeCertId } = useProgress();
+  const { certProgress, activeCertId, reviews } = useProgress();
   const { startTour } = useOnboardingTour();
   const { t } = useTranslation(['navigation', 'common', 'settings']);
 
-  const activeProgressPct = (activeCertId && certProgress[activeCertId]?.progress) 
-    ?? certProgress['ai102']?.progress 
-    ?? 74;
+  const canonicalCertId = normalizeCertId(activeCertId);
+  const activeProgressPct = certProgress[canonicalCertId]?.progress ?? 0;
+  const dueSrsCount = computeDailyReviewQueue(getFlashcardsForCert(canonicalCertId), reviews).totalDue;
+  const formattedTotalFlashcards = TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR');
 
   const [localCollapsed, setLocalCollapsed] = useState(false);
   const isCollapsed = controlledCollapsed !== undefined ? controlledCollapsed : localCollapsed;
@@ -186,7 +189,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
                     currentScreen === 'today' ? 'bg-white/20 text-white' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                   }`}>
-                    SRS 17
+                    SRS {dueSrsCount}
                   </span>
                 </div>
               )}
@@ -223,7 +226,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
                     currentScreen === 'catalogue' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-[#202533] text-slate-500 dark:text-slate-400'
                   }`}>
-                    18
+                    {CERTIFICATIONS_COUNT}
                   </span>
                 </div>
               )}
@@ -320,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div className="flex items-center justify-between w-full truncate">
                     <span className="truncate">{t('navigation:items.flashcards.shortLabel', 'Flashcards et SRS')}</span>
                     <span className="text-[10px] font-mono text-slate-400">
-                      2 800
+                      {formattedTotalFlashcards}
                     </span>
                   </div>
                 )}
@@ -341,7 +344,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!isCollapsed && (
                   <div className="flex items-center justify-between w-full truncate">
                     <span className="truncate">{t('navigation:items.distribution.shortLabel', 'Répartition des fiches')}</span>
-                    <span className="text-[9px] font-mono text-slate-400">2 800</span>
+                    <span className="text-[9px] font-mono text-slate-400">{formattedTotalFlashcards}</span>
                   </div>
                 )}
               </button>

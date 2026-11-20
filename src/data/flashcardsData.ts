@@ -458,3 +458,27 @@ export const ai102FlashcardsData: Flashcard[] = [
 
 // Export par défaut
 export const flashcardsData: Flashcard[] = c1000177FlashcardsData;
+
+export const DECK_FLASHCARDS_MAP: Record<string, Flashcard[]> = {
+  c1000177: c1000177FlashcardsData,
+  gcpmle: gcpmleFlashcardsData,
+  aifc01: aifc01FlashcardsData,
+  mlsc01: mlsc01FlashcardsData,
+  ai900: ai900FlashcardsData,
+  ai102: ai102FlashcardsData,
+};
+
+export function getFlashcardsForCert(certId?: string | null): Flashcard[] {
+  const key = (certId || 'c1000177').trim().toLowerCase();
+  if (key === 'watsonx' || key === 'c1000-177') return c1000177FlashcardsData;
+  return DECK_FLASHCARDS_MAP[key] || c1000177FlashcardsData;
+}
+
+export function getDeckSize(certId?: string | null): number {
+  return getFlashcardsForCert(certId).length;
+}
+
+export const TOTAL_FLASHCARDS_COUNT: number = Object.values(DECK_FLASHCARDS_MAP).reduce(
+  (acc, deck) => acc + deck.length,
+  0
+);

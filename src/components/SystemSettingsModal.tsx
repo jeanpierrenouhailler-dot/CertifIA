@@ -20,6 +20,7 @@ import { usePwa } from '../context/PwaContext';
 import { useTheme } from '../context/ThemeContext';
 import { LanguageSelector } from './LanguageSelector';
 import { useTranslation } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface SystemSettingsModalProps {
   isOpen: boolean;
@@ -50,12 +51,23 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
   const { t, i18n } = useTranslation(['settings', 'common']);
   const isEn = i18n.language === 'en';
   const [activeTab, setActiveTab] = useState<'system' | 'changelog' | 'cache'>('system');
+  const modalRef = useAccessibleModal({ isOpen, onClose });
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-[#151a26] text-slate-800 dark:text-slate-100 rounded-3xl border border-slate-200 dark:border-blue-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="system-settings-title"
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl bg-white dark:bg-[#151a26] text-slate-800 dark:text-slate-100 rounded-3xl border border-slate-200 dark:border-blue-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+      >
         
         {/* Header Ribbon */}
         <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-[#262a35] flex items-center justify-between gap-4 bg-slate-50 dark:bg-[#0f131d]/60">
@@ -72,7 +84,7 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
                   {versionInfo.version}
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-bold font-headline text-slate-900 dark:text-white mt-0.5">
+              <h2 id="system-settings-title" className="text-lg sm:text-xl font-bold font-headline text-slate-900 dark:text-white mt-0.5">
                 {t('settings:systemSection.modalTitle')}
               </h2>
             </div>

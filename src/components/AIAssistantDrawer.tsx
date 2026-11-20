@@ -15,8 +15,12 @@ import {
   Check
 } from 'lucide-react';
 import { AppScreen } from '../types';
-import { certificationsData } from '../data/certificationsData';
+import { certificationsData, normalizeCertId } from '../data/certificationsData';
 import { useTranslation, getCurrentLanguage, formatLocalizedTime } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
+import { useProgress } from '../context/ProgressContext';
+import { computeDailyReviewQueue } from '../lib/srsAlgorithm';
+import { getFlashcardsForCert } from '../data/flashcardsData';
 
 export interface AIAssistantContext {
   certId?: string;
@@ -54,6 +58,10 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   const [inputPrompt, setInputPrompt] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useAccessibleModal({ isOpen, onClose });
+  const { reviews, activeCertId } = useProgress();
+  const targetCert = normalizeCertId(context?.certId || activeCertId);
+  const liveDueCount = computeDailyReviewQueue(getFlashcardsForCert(targetCert), reviews).totalDue;
 
   const initialContextPrompt = context?.topic 
     ? `Accompagnement pédagogique pour la notion : ${context.topic}${context.certCode ? ` (${context.certCode})` : ''}`
@@ -184,15 +192,15 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
             ];
       } else if (query.includes('srs') || query.includes('sm-2') || query.includes('repetition')) {
         replyText = isEn
-          ? `### SM-2 SRS Algorithm & Spaced Repetition 🧠\n\nCertifIA utilizes the Ebbinghaus forgetting curve:\n1. **Ease Factor**: Starts at 2.5 and dynamically adapts to your recall speed and accuracy.\n2. **Progressive Intervals**: 1 day ➔ 3 days ➔ 7 days ➔ 14 days ➔ 30 days.\n3. **Targeting Due Flashcards**: Each morning, the algorithm identifies the exact concepts on the verge of memory decay. 10 minutes of targeted review boosts long-term exam retention by over 80%!`
-          : `### Algorithme SRS SM-2 & Répétition Espacée 🧠\n\nLe système de CertifIA s'appuie sur la courbe de l'oubli d'Ebbinghaus :\n1. **Facteur de facilité (Ease Factor)** : commence à 2.5 et s'ajuste selon votre vitesse et taux de réussite.\n2. **Intervalles progressifs** : 1 jour ➔ 3 jours ➔ 7 jours ➔ 14 jours ➔ 30 jours.\n3. **Ciblage des cartes dues** : Chaque matin, l'algorithme sélectionne les 17 notions dont la mémoire est sur le point de fléchir. Réviser 10 min par jour à ce moment précis augmente la rétention de 80 % !`;
+          ? `### SM-2 SRS Algorithm & Spaced Repetition 🧠\n\nCertifIA utilizes the Ebbinghaus forgetting curve:\n1. **Ease Factor**: Starts at 2.5 and dynamically adapts to your recall speed and accuracy.\n2. **Progressive Intervals**: 1 day ➔ 3 days ➔ 7 days ➔ 14 days ➔ 30 days.\n3. **Targeting Due Flashcards**: Currently you have **${liveDueCount}** card(s) due in your queue for ${targetCert.toUpperCase()}.`
+          : `### Algorithme SRS SM-2 & Répétition Espacée 🧠\n\nLe système de CertifIA s'appuie sur la courbe de l'oubli d'Ebbinghaus :\n1. **Facteur de facilité (Ease Factor)** : commence à 2.5 et s'ajuste selon votre vitesse et taux de réussite.\n2. **Intervalles progressifs** : 1 jour ➔ 3 jours ➔ 7 jours ➔ 14 jours ➔ 30 jours.\n3. **Ciblage des cartes dues** : Vous avez actuellement **${liveDueCount}** carte(s) à échéance pour ${targetCert.toUpperCase()}.`;
         nextSuggestions = isEn
           ? [
-              'View my 17 cards due today',
+              `View my ${liveDueCount} cards due today`,
               'How are weak concepts calculated?',
             ]
           : [
-              'Voir mes 17 cartes dues aujourd’hui',
+              `Voir mes ${liveDueCount} cartes dues aujourd’hui`,
               'Comment sont calculées les notions fragiles ?',
             ];
       } else if (query.includes('piege') || query.includes('piège') || query.includes('trap') || query.includes('ai-102') || query.includes('tip')) {
@@ -241,7 +249,12 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 overflow-hidden animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="ai-assistant-drawer-title"
+    >
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
@@ -250,6 +263,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
         <div 
+          ref={drawerRef}
           className="w-screen max-w-lg bg-white dark:bg-[#141824] border-l border-slate-200 dark:border-[#262a35] shadow-2xl flex flex-col justify-between"
           onClick={(e) => e.stopPropagation()}
         >
@@ -261,11 +275,11 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white font-headline">
-                    {getCurrentLanguage() === 'en' ? 'AI Pedagogical Assistant' : 'Assistant Pédagogique IA'}
+                  <h3 id="ai-assistant-drawer-title" className="text-sm sm:text-base font-bold text-slate-900 dark:text-white font-headline">
+                    {getCurrentLanguage() === 'en' ? 'Pedagogical Blueprint Guide' : 'Guide Pédagogique Blueprints'}
                   </h3>
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-500/15 text-blue-600 dark:text-blue-300 font-semibold border border-blue-500/30">
-                    CertifIA Tutor
+                    {getCurrentLanguage() === 'en' ? 'Offline Base' : 'Base Hors-Ligne'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -312,6 +326,7 @@ export const AIAssistantDrawer: React.FC<AIAssistantDrawerProps> = ({
               </button>
               <button
                 onClick={onClose}
+                aria-label={getCurrentLanguage() === 'en' ? 'Close' : 'Fermer'}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#262a35] transition-colors"
               >
                 <X className="w-5 h-5" />

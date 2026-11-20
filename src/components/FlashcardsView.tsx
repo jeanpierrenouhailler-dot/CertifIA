@@ -55,6 +55,10 @@ import {
 
 import { FlashcardCertId } from './FlashcardsDistributionModal';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
+import { normalizeCertId, getCertificationById } from '../data/certificationsData';
+import { TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
 
 interface FlashcardsViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -67,11 +71,15 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
   initialCert,
   onOpenDistributionModal
 }) => {
-  const { t } = useTranslation(['flashcards', 'common']);
+  const { t, i18n } = useTranslation(['flashcards', 'common']);
+  const isEn = i18n.language?.startsWith('en');
+  const { user, isFirebaseConnected } = useAuth();
   const {
     reviews,
     bookmarkedCardIds,
     lastCardIndices,
+    activeCertId,
+    globalMetrics,
     rateFlashcard,
     toggleBookmarkCard,
     saveLastCardIndex,
@@ -79,27 +87,37 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
     isSyncing,
   } = useProgress();
 
-  // Certification selection: default to initialCert or C1000-177 (IBM Certified Specialist - watsonx.ai)
-  const [selectedCert, setSelectedCert] = useState<FlashcardCertId>(() => initialCert || 'c1000177');
+  // Certification selection: default to initialCert or canonical activeCertId
+  const [selectedCert, setSelectedCert] = useState<FlashcardCertId>(
+    () => normalizeCertId(initialCert || activeCertId) as FlashcardCertId
+  );
   const [selectedDomain, setSelectedDomain] = useState<string>('all');
   const [masteryFilter, setMasteryFilter] = useState<'today' | 'all' | 'maitrise' | 'revoir' | 'difficile' | 'unreviewed'>('today');
   const [searchQuery, setSearchQuery] = useState('');
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
   const [isAlgorithmModalOpen, setIsAlgorithmModalOpen] = useState(false);
 
+  const algorithmModalRef = useAccessibleModal({
+    isOpen: isAlgorithmModalOpen,
+    onClose: () => setIsAlgorithmModalOpen(false),
+  });
+
+  const activeCertMeta = useMemo(() => getCertificationById(selectedCert), [selectedCert]);
+
   // Sync with initialCert if it changes from parent
   useEffect(() => {
     if (initialCert) {
-      setSelectedCert(initialCert);
+      const normalized = normalizeCertId(initialCert) as FlashcardCertId;
+      setSelectedCert(normalized);
       setSelectedDomain('all');
-      setCurrentCardIndex(lastCardIndices[initialCert] || 0);
+      setCurrentCardIndex(lastCardIndices[normalized] || 0);
       setIsFlipped(false);
     }
   }, [initialCert]);
   
   // Initialize currentCardIndex from persisted lastCardIndices
   const [currentCardIndex, setCurrentCardIndex] = useState<number>(() => {
-    return lastCardIndices[initialCert || 'c1000177'] || 0;
+    return lastCardIndices[normalizeCertId(initialCert || activeCertId)] || 0;
   });
 
   const [isFlipped, setIsFlipped] = useState(false);
@@ -187,15 +205,15 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
     }
   }, [filteredCards.length, currentCardIndex]);
 
-  const card = filteredCards[currentCardIndex] || activeDataset[0];
+  const card = filteredCards.length > 0 ? (filteredCards[currentCardIndex] || filteredCards[0]) : undefined;
   const isCurrentBookmarked = card ? bookmarkedCardIds.has(card.id) : false;
   const currentCardReview = card ? reviews[card.id] : undefined;
 
   // Real-time SM-2 metrics for the active card
   const currentMetrics = useMemo(() => {
-    if (!card) return getCardSRSMetrics('default', undefined, 0);
-    return getCardSRSMetrics(card.id, reviews[card.id], currentCardIndex);
-  }, [card, reviews, currentCardIndex]);
+    if (!card) return getCardSRSMetrics('default', undefined);
+    return getCardSRSMetrics(card.id, reviews[card.id]);
+  }, [card, reviews]);
 
   // Formatted labels for card header
   const srsDisplay = useMemo(() => {
@@ -372,17 +390,28 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs font-mono text-blue-300">
             <Database className="w-3.5 h-3.5 text-blue-400" />
-            <span>{isSyncing ? "Synchronisation Firestore..." : "Persistance Firestore active"}</span>
+            <span>
+              {isSyncing
+                ? (isEn ? 'Syncing Firestore...' : 'Synchronisation Firestore...')
+                : user && isFirebaseConnected
+                ? (isEn ? 'Firestore Sync Active' : 'Persistance Firestore active')
+                : (isEn ? 'Local Storage Mode' : 'Mode local (LocalStorage)')}
+            </span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#171b26] border border-[#262a35] text-xs font-mono text-slate-300">
-            <span>Position deck :</span>
+            <span>{isEn ? 'Deck position:' : 'Position deck :'}</span>
             <span className="font-bold text-amber-400">
-              {currentCardIndex + 1} / {filteredCards.length}
+              {filteredCards.length === 0 ? '0 / 0' : `${currentCardIndex + 1} / ${filteredCards.length}`}
             </span>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#171b26] border border-[#262a35] text-xs font-mono text-amber-400">
             <Flame className="w-3.5 h-3.5 fill-amber-400" />
-            <span>14 jours de série</span>
+            <span>
+              {globalMetrics.streakDays}{' '}
+              {isEn
+                ? (globalMetrics.streakDays === 1 ? 'day streak' : 'day streak')
+                : (globalMetrics.streakDays <= 1 ? 'jour de série' : 'jours de série')}
+            </span>
           </div>
         </div>
       </div>
@@ -469,10 +498,10 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
             <button
               onClick={onOpenDistributionModal}
               className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1 transition-colors sm:ml-2"
-              title="Consulter l'inventaire officiel et la répartition des 2 800 cartes par certification"
+              title={`Consulter l'inventaire officiel et la répartition des ${TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')} cartes par certification`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>Répartition (2 800)</span>
+              <span>Répartition ({TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')})</span>
             </button>
           )}
         </div>
@@ -1109,23 +1138,53 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
         {/* Right Stage: 3D Flip Flashcard & SM-2 Rating Dock (8 cols) */}
         <div className="lg:col-span-8 flex flex-col justify-between space-y-6">
           {/* Main Flashcard Container */}
-          {filteredCards.length === 0 ? (
+          {!card ? (
             <div className="min-h-[400px] rounded-3xl bg-[#171b26] border border-[#262a35] p-8 flex flex-col items-center justify-center text-center space-y-3">
               <Bookmark className="w-10 h-10 text-slate-600" />
-              <h3 className="text-lg font-bold text-white">{t('flashcards:stage.noMatchTitle')}</h3>
+              <h3 className="text-lg font-bold text-white">
+                {masteryFilter === 'today' && dailyQueue.totalDue === 0
+                  ? (isEn ? 'No cards due today' : "Aucune carte due aujourd'hui")
+                  : t('flashcards:stage.noMatchTitle')}
+              </h3>
               <p className="text-xs text-slate-400 max-w-sm">
-                {t('flashcards:stage.noMatchDesc')}
+                {masteryFilter === 'today' && dailyQueue.totalDue === 0
+                  ? (isEn
+                      ? `Browse the ${activeDataset.length} cards in ${activeCertMeta?.code || selectedCert.toUpperCase()} to start building your SM-2 review schedule.`
+                      : `Parcourez les ${activeDataset.length} fiches ${activeCertMeta?.code || selectedCert.toUpperCase()} pour démarrer votre suivi SM-2.`)
+                  : t('flashcards:stage.noMatchDesc')}
               </p>
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setBookmarkedOnly(false);
-                  setSelectedDomain('all');
-                }}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold"
-              >
-                {t('flashcards:stage.resetFilters')}
-              </button>
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                {masteryFilter === 'today' && (
+                  <button
+                    onClick={() => {
+                      setMasteryFilter('all');
+                      setSelectedDomain('all');
+                      setSearchQuery('');
+                      setBookmarkedOnly(false);
+                      setCurrentCardIndex(0);
+                      setIsFlipped(false);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold"
+                  >
+                    {isEn
+                      ? `Browse all ${activeDataset.length} cards`
+                      : `Parcourir les ${activeDataset.length} fiches`}
+                  </button>
+                )}
+                {(searchQuery || bookmarkedOnly || selectedDomain !== 'all' || masteryFilter !== 'today') && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setBookmarkedOnly(false);
+                      setSelectedDomain('all');
+                      setMasteryFilter('all');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-[#0f131d] hover:bg-[#262a35] text-slate-200 border border-[#262a35] text-xs font-semibold"
+                  >
+                    {t('flashcards:stage.resetFilters')}
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <div
@@ -1308,7 +1367,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                   <div className="space-y-5 animate-in fade-in duration-200">
                     <div>
                       <span className="text-[10px] font-mono uppercase text-emerald-400 font-bold tracking-wider">
-                        Solution &amp; Concept Officiel IBM watsonx / OpenShift
+                        {isEn
+                          ? `Official Concept & Solution — ${activeCertMeta?.code || selectedCert.toUpperCase()}`
+                          : `Solution & Concept Officiel — ${activeCertMeta?.code || selectedCert.toUpperCase()}`}
                       </span>
                       <h3 className="text-base sm:text-xl font-bold text-white font-headline mt-0.5">
                         {card.solutionHeading}
@@ -1333,7 +1394,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                     {/* Golden Rules */}
                     <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 space-y-1.5">
                       <div className="text-[11px] font-mono font-semibold uppercase text-blue-300">
-                        Règles d'Or Spécialiste IBM watsonx :
+                        {isEn
+                          ? `Golden Exam Rules (${activeCertMeta?.code || selectedCert.toUpperCase()}):`
+                          : `Règles d'Or (${activeCertMeta?.code || selectedCert.toUpperCase()}) :`}
                       </div>
                       {card.goldenRules.map((rule, idx) => (
                         <div key={idx} className="text-xs text-slate-300 leading-relaxed">
@@ -1395,8 +1458,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <button
+                disabled={!card}
                 onClick={() => handleRate('revoir', predictedIntervals.revoir.days, `${predictedIntervals.revoir.days}j (À revoir)`)}
-                className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold text-center transition-all group"
+                className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 disabled:opacity-40 disabled:cursor-not-allowed text-rose-300 text-xs font-semibold text-center transition-all group"
               >
                 <div className="font-mono text-sm font-bold text-rose-400">{t('flashcards:rating.againBtn', 'À revoir [1]')}</div>
                 <div className="text-[11px] text-rose-300/90 font-mono mt-0.5 font-bold">
@@ -1406,8 +1470,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               </button>
 
               <button
+                disabled={!card}
                 onClick={() => handleRate('difficile', predictedIntervals.difficile.days, `${predictedIntervals.difficile.days}j (Difficile)`)}
-                className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold text-center transition-all group"
+                className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 disabled:opacity-40 disabled:cursor-not-allowed text-amber-300 text-xs font-semibold text-center transition-all group"
               >
                 <div className="font-mono text-sm font-bold text-amber-400">{t('flashcards:rating.hardBtn', 'Difficile [2]')}</div>
                 <div className="text-[11px] text-amber-300/90 font-mono mt-0.5 font-bold">
@@ -1417,8 +1482,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               </button>
 
               <button
+                disabled={!card}
                 onClick={() => handleRate('moyen', predictedIntervals.moyen.days, `${predictedIntervals.moyen.days}j (Bien)`)}
-                className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 text-blue-300 text-xs font-semibold text-center transition-all group"
+                className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 hover:bg-blue-500/20 disabled:opacity-40 disabled:cursor-not-allowed text-blue-300 text-xs font-semibold text-center transition-all group"
               >
                 <div className="font-mono text-sm font-bold text-blue-400">{t('flashcards:rating.goodBtn', 'Bien [3]')}</div>
                 <div className="text-[11px] text-blue-300/90 font-mono mt-0.5 font-bold">
@@ -1428,8 +1494,9 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
               </button>
 
               <button
+                disabled={!card}
                 onClick={() => handleRate('facile', predictedIntervals.facile.days, `${predictedIntervals.facile.days}j (Facile)`)}
-                className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold text-center transition-all group"
+                className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed text-emerald-300 text-xs font-semibold text-center transition-all group"
               >
                 <div className="font-mono text-sm font-bold text-emerald-400">{t('flashcards:rating.easyBtn', 'Facile [4]')}</div>
                 <div className="text-[11px] text-emerald-300/90 font-mono mt-0.5 font-bold">
@@ -1482,10 +1549,21 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
 
       {/* SM-2 / FSRS Algorithmic Explainer Modal */}
       {isAlgorithmModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-[#171b26] border border-[#262a35] rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="srs-algo-modal-title"
+          onClick={() => setIsAlgorithmModalOpen(false)}
+        >
+          <div
+            ref={algorithmModalRef}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#171b26] border border-[#262a35] rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+          >
             <button
               onClick={() => setIsAlgorithmModalOpen(false)}
+              aria-label={t('common:close', 'Fermer')}
               className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white bg-[#0f131d] border border-[#262a35] transition-colors"
             >
               <X className="w-5 h-5" />
@@ -1496,7 +1574,7 @@ export const FlashcardsView: React.FC<FlashcardsViewProps> = ({
                 <Brain className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white font-headline">
+                <h3 id="srs-algo-modal-title" className="text-lg font-bold text-white font-headline">
                   {t('flashcards:algorithmModal.title')}
                 </h3>
                 <p className="text-xs text-slate-400 font-mono">

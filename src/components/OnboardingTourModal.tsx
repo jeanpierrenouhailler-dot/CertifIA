@@ -165,6 +165,9 @@ export const OnboardingTourModal: React.FC = () => {
       <div className="fixed inset-x-0 bottom-4 sm:bottom-8 z-[102] flex justify-center px-3 sm:px-4 pointer-events-none">
         <div
           ref={tourCardRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={title}
           className="w-full max-w-2xl bg-white dark:bg-[#121624] text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-blue-500/30 rounded-3xl shadow-2xl shadow-black/40 overflow-hidden pointer-events-auto transition-all animate-in fade-in slide-in-from-bottom-4 duration-200 flex flex-col"
         >
           {/* Auto-Play Top Progress Bar */}

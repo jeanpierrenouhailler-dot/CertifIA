@@ -2,6 +2,9 @@ import React from 'react';
 import { X, ExternalLink, ArrowRight, BookOpen } from 'lucide-react';
 import { Certification } from '../types';
 import { useTranslation } from '../i18n';
+import { useProgress } from '../context/ProgressContext';
+import { normalizeCertId } from '../data/certificationsData';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface BlueprintDrawerProps {
   certification: Certification | null;
@@ -16,9 +19,16 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
   onClose,
   onStartTraining,
 }) => {
-  const { t } = useTranslation(['certifications', 'common']);
+  const { t } = useTranslation(['certifications', 'common', 'dashboard']);
+  const { getCertMetrics } = useProgress();
+  const drawerRef = useAccessibleModal({
+    isOpen: isOpen && !!certification,
+    onClose,
+  });
 
   if (!isOpen || !certification) return null;
+
+  const certMetrics = getCertMetrics(normalizeCertId(certification.id));
 
   // Colors for donut segments
   const sliceColors = ['#4d8eff', '#4edea3', '#a078ff', '#ffb4ab', '#60a5fa', '#f59e0b'];
@@ -38,6 +48,10 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
         <div 
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="blueprint-drawer-title"
           className="w-screen max-w-xl bg-[#171b26] border-l border-[#262a35] shadow-2xl flex flex-col justify-between overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
@@ -64,7 +78,7 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
               </button>
             </div>
 
-            <h2 className="text-xl font-bold text-white font-headline">
+            <h2 id="blueprint-drawer-title" className="text-xl font-bold text-white font-headline">
               {certification.title}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
@@ -153,12 +167,15 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
                   {t('certifications:comparator.domainWeights', 'Pondération Détaillée des Domaines')}
                 </h3>
                 <span className="text-xs text-slate-300 font-mono">
-                  {t('dashboard:progress')} : {certification.userProgress}%
+                  {t('dashboard:progress')} : {certMetrics.readinessIndex}%
                 </span>
               </div>
 
               <div className="space-y-3">
-                {certification.domains.map((domain, idx) => (
+                {certification.domains.map((domain, idx) => {
+                  const domMetric = certMetrics.domains[idx];
+                  const masteryPct = domMetric ? domMetric.mastery : 0;
+                  return (
                   <div
                     key={idx}
                     className="p-4 rounded-xl bg-[#0f131d]/80 border border-[#262a35] hover:border-[#313540] transition-colors"
@@ -188,22 +205,23 @@ export const BlueprintDrawer: React.FC<BlueprintDrawerProps> = ({
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
-                            width: `${domain.mastery}%`,
+                            width: `${masteryPct}%`,
                             backgroundColor:
-                              domain.mastery >= 75
+                              masteryPct >= 75
                                 ? '#4edea3'
-                                : domain.mastery >= 50
+                                : masteryPct >= 50
                                 ? '#adc6ff'
                                 : '#ffb4ab',
                           }}
                         />
                       </div>
                       <span className="text-[11px] font-mono font-semibold text-slate-400 shrink-0">
-                        {domain.mastery}%
+                        {masteryPct}%
                       </span>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

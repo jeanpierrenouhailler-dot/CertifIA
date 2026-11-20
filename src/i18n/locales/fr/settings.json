@@ -28,7 +28,7 @@
     "tabChangelog": "Nouveautés ({{version}})",
     "tabCache": "Préférences & Cache",
     "officialVersion": "Version officielle {{version}} ({{channel}})",
-    "syncedWithServers": "Synchronisé avec les serveurs",
+    "syncedWithServers": "Vérification PWA locale active",
     "versionControl": "Contrôle des Versions Applicatives",
     "versionControlDesc": "Exécutez une vérification manuelle ou forcez la réinitialisation complète des assets applicatifs.",
     "checkingUpdates": "Vérification en cours...",
@@ -156,7 +156,7 @@
     "subtitle": "Sources officielles, indépendance et non-responsabilité des données",
     "tabLegal": "Mentions Légales & Décharge",
     "tabGuide": "Guide Pédagogique Novice",
-    "disclaimerText": "CertifIA est une plateforme d'entraînement et d'acculturation indépendante. L'éditeur et le concepteur ne sont en aucun cas responsables des données, informations, questions, réponses ou simulations fournies dans l'application, qui demeurent purement indicatives. CertifIA n'est affiliée ni approuvée par Microsoft, Amazon Web Services, Google Cloud, IBM ou NVIDIA, et l'éditeur décline toute responsabilité quant aux résultats obtenus aux examens officiels.",
+    "disclaimerText": "CertifIA est une plateforme d'entraînement et d'acculturation indépendante. L'éditeur et le concepteur ne sont en aucun cas responsables des données, informations, questions, réponses ou simulations fournies dans l'application, qui demeurent purement indicatives. CertifIA n'est affiliée ni approuvée par Microsoft, Amazon Web Services, Google Cloud ou IBM, et l'éditeur décline toute responsabilité quant aux résultats obtenus aux examens officiels.",
     "accept": "J'ai lu et j'accepte le cadre pédagogique",
     "continue": "Accéder à l'application"
   },

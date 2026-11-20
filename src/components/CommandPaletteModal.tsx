@@ -19,8 +19,11 @@ import {
 import { AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
 import { getLocalizedGlossaryEntries, LocalizedGlossaryEntry } from '../data/localizedGlossaryData';
+import { CERTIFICATIONS_COUNT } from '../data/certificationsData';
+import { TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
 import { useOnboardingTour } from '../context/OnboardingTourContext';
-import { useTranslation, getCurrentLanguage } from '../i18n';
+import { useTranslation } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface CommandPaletteModalProps {
   isOpen: boolean;
@@ -46,6 +49,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useAccessibleModal({ isOpen, onClose, initialFocusRef: inputRef });
   const { t, i18n } = useTranslation(['navigation', 'common']);
   const { startTour } = useOnboardingTour();
   const lang = (i18n.language === 'en' ? 'en' : 'fr');
@@ -54,9 +58,6 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     if (isOpen) {
       setQuery('');
       setSelectedIndex(0);
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
     }
   }, [isOpen]);
 
@@ -93,7 +94,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     {
       id: 'act-catalogue',
       type: 'action',
-      title: t('navigation:items.catalogue.label', 'Catalogue des 18 certifications IA'),
+      title: t('navigation:items.catalogue.label', `Catalogue des ${CERTIFICATIONS_COUNT} certifications IA`),
       category: t('navigation:categories.certifications', 'Certifications'),
       icon: Compass,
       onSelect: () => {
@@ -137,7 +138,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     {
       id: 'act-flashcards',
       type: 'action',
-      title: t('navigation:items.flashcards.label', 'Fiches Mémo & Répétition Espacée (2 800 cartes)'),
+      title: t('navigation:items.flashcards.label', `Fiches Mémo & Répétition Espacée (${TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')} cartes)`),
       category: t('navigation:categories.apprentissage', 'Apprentissage'),
       icon: Layers,
       onSelect: () => {
@@ -148,7 +149,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     {
       id: 'act-distribution',
       type: 'action',
-      title: t('navigation:items.distribution.label', 'Inventaire & Répartition des 2 800 Flashcards'),
+      title: t('navigation:items.distribution.label', `Inventaire & Répartition des ${TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')} Flashcards`),
       category: t('navigation:categories.apprentissage', 'Apprentissage'),
       icon: Layers,
       onSelect: () => {
@@ -289,8 +290,15 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 p-3 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 p-3 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150"
+      onClick={onClose}
+    >
       <div 
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('navigation:search.placeholder')}
         className="w-full max-w-2xl bg-white dark:bg-[#141824] border border-slate-200 dark:border-[#262a35] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}

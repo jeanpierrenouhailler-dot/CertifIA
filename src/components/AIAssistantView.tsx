@@ -17,10 +17,11 @@ import {
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { PageHeader } from './ui/PageHeader';
-import { certificationsData } from '../data/certificationsData';
+import { certificationsData, normalizeCertId } from '../data/certificationsData';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
 import { useTranslation, getCurrentLanguage } from '../i18n';
+import { useProgress } from '../context/ProgressContext';
 
 interface AIAssistantViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -31,12 +32,14 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
   onNavigate,
   onOpenBlueprint,
 }) => {
-  const [selectedCert, setSelectedCert] = useState('ai102');
+  const { activeCertId, getCertMetrics } = useProgress();
+  const [selectedCert, setSelectedCert] = useState(() => normalizeCertId(activeCertId));
   const [selectedTopic, setSelectedTopic] = useState('RAG & Recherche Hybride');
   const [queryInput, setQueryInput] = useState('');
   const [activeTab, setActiveTab] = useState<'concepts' | 'traps' | 'mnemonics' | 'custom'>('concepts');
   const { t } = useTranslation(['assistant', 'common']);
   const isEn = getCurrentLanguage() === 'en';
+  const activeCertMetrics = getCertMetrics(selectedCert);
 
   const topicsByCertFr: Record<string, string[]> = {
     ai102: [
@@ -72,6 +75,12 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
       'watsonx.governance Factsheets & Lignées de données',
       'watsonx.data Lakehouse & Apache Iceberg',
       'Détection des Hallucinations & Biais IBM',
+    ],
+    mlsc01: [
+      'Ingénierie des données S3, Glue & Kinesis',
+      'Amazon SageMaker Clarify & Détection des biais',
+      'Hyperparamètres XGBoost, DeepAR & RCF',
+      'Endpoints Multi-Modèles & Model Monitor',
     ],
   };
 
@@ -110,20 +119,26 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
       'watsonx.data Lakehouse & Apache Iceberg',
       'IBM Hallucination & Toxicity Detection',
     ],
+    mlsc01: [
+      'S3, Glue & Kinesis Data Engineering',
+      'Amazon SageMaker Clarify & Bias Detection',
+      'XGBoost, DeepAR & RCF Hyperparameters',
+      'Multi-Model Endpoints & Model Monitor',
+    ],
   };
 
   const topicsByCert = isEn ? topicsByCertEn : topicsByCertFr;
-  const currentTopics = topicsByCert[selectedCert] || topicsByCert.ai102;
+  const currentTopics = topicsByCert[selectedCert] || topicsByCert[normalizeCertId(activeCertId)] || topicsByCert.c1000177;
   const currentCertData = certificationsData.find((c) => c.id === selectedCert) || certificationsData[0];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
       <PageHeader
-        title={isEn ? "AI Pedagogical Assistant" : "Assistant Pédagogique IA"}
+        title={isEn ? "Pedagogical Blueprint Assistant" : "Assistant Pédagogique & Blueprints"}
         subtitle={isEn 
-          ? "Intelligent tutor calibrated on official Cloud AI blueprints to accelerate retention and conquer exam traps." 
-          : "Tuteur intelligent calibré sur les référentiels officiels Cloud AI pour accélérer votre assimilation et déjouer les pièges d’examen."}
-        badge={isEn ? "AI Guidance" : "Accompagnement IA"}
+          ? "Offline study guide calibrated on official Cloud AI blueprints to review key concepts, traps, and mnemonics." 
+          : "Guide d'étude structuré hors-ligne, calibré sur les référentiels officiels Cloud AI pour réviser notions clés et pièges d'examen."}
+        badge={isEn ? "Offline Blueprint Guide" : "Référentiel Hors-Ligne"}
         breadcrumbs={[
           { label: isEn ? 'Home' : 'Accueil', onClick: () => onNavigate('today') },
           { label: isEn ? 'AI Assistant' : 'Assistant IA', active: true },
@@ -181,7 +196,7 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {certificationsData.slice(0, 5).map((cert) => (
+          {certificationsData.map((cert) => (
             <button
               key={cert.id}
               onClick={() => {
@@ -237,7 +252,6 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
           </div>
 
           {/* Quick Study Methodology Card */}
-          {/* Quick Study Methodology Card */}
           <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-600/10 via-indigo-600/5 to-transparent border border-blue-500/20 space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 font-mono uppercase">
               <Sparkles className="w-4 h-4" />
@@ -247,8 +261,10 @@ export const AIAssistantView: React.FC<AIAssistantViewProps> = ({
               {t('assistant:methodologyDesc')}
             </p>
             <div className="pt-2 flex items-center justify-between text-xs font-semibold">
-              <span className="text-slate-500 dark:text-slate-400">{t('assistant:avgRetention')}</span>
-              <span className="text-emerald-500 font-mono">+84 %</span>
+              <span className="text-slate-500 dark:text-slate-400">
+                {isEn ? `Your ${currentCertData.code} mastery` : `Maîtrise ${currentCertData.code}`}
+              </span>
+              <span className="text-emerald-500 font-mono">{activeCertMetrics.readinessIndex}%</span>
             </div>
           </div>
         </div>

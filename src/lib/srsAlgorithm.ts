@@ -1,15 +1,15 @@
 /**
- * SM-2 / FSRS (Spaced Repetition System) Engine for CertifAI
+ * SM-2 / FSRS (Spaced Repetition System) Engine for CertifIA
  *
  * Implements SuperMemo SM-2 with FSRS-inspired retrievability & difficulty modeling:
  * - Dynamic interval calculations based on recall quality
  * - Adaptive Ease Factor (EF)
  * - Difficulty scaling (1 to 5)
  * - Success rate tracking (% based on recall history)
- * - Automatic daily queue scheduling ("Aujourd'hui, voici les X cartes que tu dois absolument revoir")
+ * - Deterministic daily queue scheduling (separates genuinely due SRS cards from discovery cards)
  */
 
-import { Flashcard, FlashcardReviewRecord } from '../types';
+import type { Flashcard, FlashcardReviewRecord } from '../types';
 import { getCurrentLanguage } from '../i18n';
 
 export type SRSGrade = 'revoir' | 'difficile' | 'moyen' | 'facile';
@@ -24,7 +24,7 @@ export interface CardSRSMetrics {
   successReviews: number;
   successRate: number; // 0 to 100
   lastReviewedAt: string | null;
-  nextReviewDate: string | null; // YYYY-MM-DD
+  nextReviewDate: string | null; // YYYY-MM-DD (local time)
   isDueToday: boolean;
   isOverdue: boolean;
   daysUntilDue: number;
@@ -38,10 +38,9 @@ export interface NextIntervalPredictions {
 }
 
 /**
- * Returns today's date formatted as YYYY-MM-DD in local time
+ * Formats a Date object as YYYY-MM-DD in local time.
  */
-export function getTodayDateString(): string {
-  const d = new Date();
+export function formatLocalDateKey(d: Date = new Date()): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
@@ -49,32 +48,51 @@ export function getTodayDateString(): string {
 }
 
 /**
+ * Parses YYYY-MM-DD (or ISO string) into local midnight epoch ms to avoid UTC off-by-one shifts.
+ */
+export function parseLocalDateMs(dateStr: string): number {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateStr);
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]) - 1;
+    const day = Number(match[3]);
+    return new Date(year, month, day).getTime();
+  }
+  const d = new Date(dateStr);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
+/**
+ * Returns today's date formatted as YYYY-MM-DD in local time
+ */
+export function getTodayDateString(referenceDate: Date = new Date()): string {
+  return formatLocalDateKey(referenceDate);
+}
+
+/**
  * Extract or compute SRS metrics for a given card review record
  */
 export function getCardSRSMetrics(
-  cardId: string, 
-  review?: FlashcardReviewRecord, 
-  indexHint: number = 0
+  cardId: string,
+  review?: FlashcardReviewRecord,
+  referenceDate: Date = new Date()
 ): CardSRSMetrics {
-  const todayStr = getTodayDateString();
-  const today = new Date(todayStr).getTime();
+  const todayStr = getTodayDateString(referenceDate);
+  const todayMs = parseLocalDateMs(todayStr);
 
   if (!review) {
-    // Unreviewed / New card defaults
-    // Provide slight deterministic variance based on index so the UI feels authentic
-    const defaultDiff = 3;
     return {
       cardId,
       repetitions: 0,
       intervalDays: 0,
       easeFactor: 2.5,
-      difficulty: defaultDiff,
+      difficulty: 3,
       totalReviews: 0,
       successReviews: 0,
       successRate: 0,
       lastReviewedAt: null,
-      nextReviewDate: todayStr,
-      isDueToday: true,
+      nextReviewDate: null,
+      isDueToday: false,
       isOverdue: false,
       daysUntilDue: 0,
     };
@@ -96,16 +114,16 @@ export function getCardSRSMetrics(
   if (!nextReviewDate && review.reviewedAt) {
     const revDate = new Date(review.reviewedAt);
     revDate.setDate(revDate.getDate() + intervalDays);
-    nextReviewDate = revDate.toISOString().split('T')[0];
+    nextReviewDate = formatLocalDateKey(revDate);
   }
 
-  let isDueToday = true;
+  let isDueToday = false;
   let isOverdue = false;
   let daysUntilDue = 0;
 
   if (nextReviewDate) {
-    const targetTime = new Date(nextReviewDate).getTime();
-    const diffDays = Math.round((targetTime - today) / (1000 * 60 * 60 * 24));
+    const targetMs = parseLocalDateMs(nextReviewDate);
+    const diffDays = Math.round((targetMs - todayMs) / (1000 * 60 * 60 * 24));
     daysUntilDue = diffDays;
     isDueToday = diffDays <= 0;
     isOverdue = diffDays < 0;
@@ -134,10 +152,8 @@ export function getCardSRSMetrics(
 export function predictNextIntervals(metrics: CardSRSMetrics): NextIntervalPredictions {
   const { repetitions, intervalDays, easeFactor } = metrics;
 
-  // 1. Revoir (Again - fail)
   const revoirDays = 1;
 
-  // 2. Difficile (Hard - recall with difficulty)
   let diffDays: number;
   if (repetitions === 0) {
     diffDays = 1;
@@ -147,7 +163,6 @@ export function predictNextIntervals(metrics: CardSRSMetrics): NextIntervalPredi
     diffDays = Math.max(2, Math.round(intervalDays * 1.2));
   }
 
-  // 3. Moyen / Bien (Good - standard SM-2)
   let moyenDays: number;
   if (repetitions === 0) {
     moyenDays = 1;
@@ -157,7 +172,6 @@ export function predictNextIntervals(metrics: CardSRSMetrics): NextIntervalPredi
     moyenDays = Math.max(3, Math.round(intervalDays * easeFactor));
   }
 
-  // 4. Facile (Easy - rapid mastery)
   let facileDays: number;
   if (repetitions === 0) {
     facileDays = 3;
@@ -180,7 +194,8 @@ export function predictNextIntervals(metrics: CardSRSMetrics): NextIntervalPredi
  */
 export function calculateNextSRSState(
   currentMetrics: CardSRSMetrics,
-  rating: SRSGrade
+  rating: SRSGrade,
+  referenceDate: Date = new Date()
 ): {
   intervalDays: number;
   repetitions: number;
@@ -190,16 +205,12 @@ export function calculateNextSRSState(
   successReviews: number;
   nextReviewDate: string;
 } {
-  const now = new Date();
   const isSuccess = rating !== 'revoir';
   const newTotalReviews = currentMetrics.totalReviews + 1;
   const newSuccessReviews = currentMetrics.successReviews + (isSuccess ? 1 : 0);
 
-  // Quality score (SM-2 standard 0-5 scale):
-  // revoir: 1, difficile: 3, moyen: 4, facile: 5
   const quality = rating === 'revoir' ? 1 : rating === 'difficile' ? 3 : rating === 'moyen' ? 4 : 5;
 
-  // Ease factor update formula: EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
   let ef = currentMetrics.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
   ef = Math.max(1.3, Math.min(3.2, ef));
   ef = Math.round(ef * 100) / 100;
@@ -221,21 +232,18 @@ export function calculateNextSRSState(
     else if (repetitions === 2) intervalDays = 3;
     else intervalDays = Math.max(3, Math.round(currentMetrics.intervalDays * ef));
   } else {
-    // Facile
     repetitions += 1;
     if (repetitions === 1) intervalDays = 3;
     else if (repetitions === 2) intervalDays = 6;
     else intervalDays = Math.max(7, Math.round(currentMetrics.intervalDays * ef * 1.35));
   }
 
-  // Difficulty adjustment (1 to 5)
   let difficulty = currentMetrics.difficulty;
   if (rating === 'revoir') {
     difficulty = Math.min(5, difficulty + 1);
   } else if (rating === 'difficile') {
     difficulty = Math.min(5, Math.max(1, difficulty + 0.5));
   } else if (rating === 'moyen') {
-    // slowly decays towards 3
     if (difficulty > 3) difficulty = Math.max(3, difficulty - 0.2);
     else if (difficulty < 3) difficulty = Math.min(3, difficulty + 0.2);
   } else if (rating === 'facile') {
@@ -243,10 +251,8 @@ export function calculateNextSRSState(
   }
   difficulty = Math.round(difficulty * 10) / 10;
 
-  // Next review date
-  const nextDate = new Date(now);
-  nextDate.setDate(nextDate.getDate() + intervalDays);
-  const nextReviewDate = nextDate.toISOString().split('T')[0];
+  const nextDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate() + intervalDays);
+  const nextReviewDate = formatLocalDateKey(nextDate);
 
   return {
     intervalDays,
@@ -260,29 +266,20 @@ export function calculateNextSRSState(
 }
 
 /**
- * Human readable formatting for flashcard card header:
- *
- * Carte #127
- * Dernière révision : aujourd'hui (ou il y a 3 jours / jamais)
- * Difficulté : 3/5
- * Prochaine révision : dans 3 jours (ou aujourd'hui)
- * Nombre de répétitions : 4
- * Taux de réussite : 75 %
+ * Human readable formatting for flashcard card header
  */
 export function formatSRSDisplay(metrics: CardSRSMetrics, promptNumberFallback: string, langOverride?: 'fr' | 'en') {
   const lang = langOverride || getCurrentLanguage();
   const isEn = lang === 'en';
   const cardNum = promptNumberFallback.replace(/[^0-9]/g, '') || '1';
 
-  // Dernière révision
   let lastReviewLabel = isEn ? 'Never reviewed' : 'Jamais révisée';
   if (metrics.lastReviewedAt) {
-    const revTime = new Date(metrics.lastReviewedAt).getTime();
-    const nowTime = Date.now();
-    const diffHours = Math.round((nowTime - revTime) / (1000 * 60 * 60));
-    const diffDays = Math.round((nowTime - revTime) / (1000 * 60 * 60 * 24));
+    const revDateKey = formatLocalDateKey(new Date(metrics.lastReviewedAt));
+    const todayKey = getTodayDateString();
+    const diffDays = Math.round((parseLocalDateMs(todayKey) - parseLocalDateMs(revDateKey)) / (1000 * 60 * 60 * 24));
 
-    if (diffHours < 24) {
+    if (diffDays <= 0) {
       lastReviewLabel = isEn ? 'today' : "aujourd'hui";
     } else if (diffDays === 1) {
       lastReviewLabel = isEn ? 'yesterday' : 'hier';
@@ -291,32 +288,30 @@ export function formatSRSDisplay(metrics: CardSRSMetrics, promptNumberFallback: 
     }
   }
 
-  // Difficulté (e.g. 3/5)
   const diffScore = Math.max(1, Math.min(5, Math.round(metrics.difficulty)));
   const diffLabel = `${diffScore}/5`;
 
-  // Prochaine révision
-  let nextReviewLabel = isEn ? 'today' : "aujourd'hui";
-  if (metrics.daysUntilDue <= 0) {
-    if (metrics.daysUntilDue < 0) {
-      nextReviewLabel = isEn 
-        ? `today (${Math.abs(metrics.daysUntilDue)}d overdue)`
-        : `aujourd'hui (retard ${Math.abs(metrics.daysUntilDue)}j)`;
+  let nextReviewLabel = isEn ? 'Not scheduled' : 'Non planifiée';
+  if (metrics.nextReviewDate) {
+    if (metrics.daysUntilDue <= 0) {
+      if (metrics.daysUntilDue < 0) {
+        nextReviewLabel = isEn
+          ? `today (${Math.abs(metrics.daysUntilDue)}d overdue)`
+          : `aujourd'hui (retard ${Math.abs(metrics.daysUntilDue)}j)`;
+      } else {
+        nextReviewLabel = isEn ? 'today' : "aujourd'hui";
+      }
+    } else if (metrics.daysUntilDue === 1) {
+      nextReviewLabel = isEn ? 'in 1 day' : 'dans 1 jour';
     } else {
-      nextReviewLabel = isEn ? 'today' : "aujourd'hui";
+      nextReviewLabel = isEn ? `in ${metrics.daysUntilDue} days` : `dans ${metrics.daysUntilDue} jours`;
     }
-  } else if (metrics.daysUntilDue === 1) {
-    nextReviewLabel = isEn ? 'in 1 day' : 'dans 1 jour';
-  } else {
-    nextReviewLabel = isEn ? `in ${metrics.daysUntilDue} days` : `dans ${metrics.daysUntilDue} jours`;
   }
 
-  // Nombre de répétitions
   const repLabel = isEn
     ? (metrics.repetitions === 1 ? '1 repetition' : `${metrics.repetitions} repetitions`)
     : (metrics.repetitions === 1 ? '1 répétition' : `${metrics.repetitions} répétitions`);
 
-  // Taux de réussite
   const successLabel = metrics.totalReviews > 0 ? `${metrics.successRate} %` : '—';
 
   return {
@@ -334,283 +329,87 @@ export function formatSRSDisplay(metrics: CardSRSMetrics, promptNumberFallback: 
 }
 
 /**
- * Intelligent Daily Queue Generator:
- * Evaluates all deck flashcards and selects the priority queue for today:
- * « Aujourd'hui, voici les X cartes que tu dois absolument revoir. »
+ * Truthful Daily Queue Generator:
+ * - dueCards: strictly cards already reviewed whose nextReviewDate <= today (0 for a brand-new user)
+ * - fragileCards: reviewed cards rated hard/revoir or low success rate
+ * - discoveryCards: unreviewed cards up to targetQuota for starting/expanding study
+ * - sessionCards: prioritized list combining due -> fragile -> discovery up to targetQuota
  */
 export function computeDailyReviewQueue(
   cards: Flashcard[],
   reviews: Record<string, FlashcardReviewRecord>,
-  targetQuota: number = 17 // default target as highlighted by user
+  targetQuota: number = 17,
+  referenceDate: Date = new Date()
 ): {
   dueCards: Flashcard[];
   overdueCards: Flashcard[];
   dueTodayCards: Flashcard[];
+  fragileCards: Flashcard[];
   newCards: Flashcard[];
+  discoveryCards: Flashcard[];
+  sessionCards: Flashcard[];
   totalDue: number;
 } {
   const overdueCards: Flashcard[] = [];
   const dueTodayCards: Flashcard[] = [];
   const newCards: Flashcard[] = [];
-  const restCards: Flashcard[] = [];
+  const fragileCards: Flashcard[] = [];
 
-  cards.forEach((card, idx) => {
+  cards.forEach((card) => {
     const rev = reviews[card.id];
-    const metrics = getCardSRSMetrics(card.id, rev, idx);
-
     if (!rev) {
       newCards.push(card);
-    } else if (metrics.isOverdue) {
+      return;
+    }
+
+    const metrics = getCardSRSMetrics(card.id, rev, referenceDate);
+    if (metrics.isOverdue) {
       overdueCards.push(card);
     } else if (metrics.isDueToday) {
       dueTodayCards.push(card);
-    } else if (metrics.difficulty >= 4 || metrics.successRate < 70) {
-      // Fragile cards that benefit from targeted reinforcement
-      restCards.push(card);
+    }
+
+    if (
+      rev.rating === 'revoir' ||
+      rev.rating === 'difficile' ||
+      metrics.difficulty >= 4 ||
+      (metrics.totalReviews > 0 && metrics.successRate < 70)
+    ) {
+      fragileCards.push(card);
     }
   });
 
-  // Sort overdue cards by days overdue (descending) and difficulty
   overdueCards.sort((a, b) => {
-    const ma = getCardSRSMetrics(a.id, reviews[a.id]);
-    const mb = getCardSRSMetrics(b.id, reviews[b.id]);
-    return ma.daysUntilDue - mb.daysUntilDue; // most negative first
+    const ma = getCardSRSMetrics(a.id, reviews[a.id], referenceDate);
+    const mb = getCardSRSMetrics(b.id, reviews[b.id], referenceDate);
+    return ma.daysUntilDue - mb.daysUntilDue;
   });
 
-  // Combine due cards first
-  const dueList: Flashcard[] = [...overdueCards, ...dueTodayCards];
+  const dueCards: Flashcard[] = [...overdueCards, ...dueTodayCards];
+  const discoveryCards = newCards.slice(0, Math.min(targetQuota, newCards.length));
 
-  // If the due count is less than targetQuota (e.g. 17), fill with fragile / new cards
-  const remainingQuota = targetQuota - dueList.length;
-  if (remainingQuota > 0) {
-    // Add fragile cards first
-    for (const fc of restCards) {
-      if (dueList.length >= targetQuota) break;
-      if (!dueList.some((c) => c.id === fc.id)) {
-        dueList.push(fc);
-      }
-    }
-
-    // Then add new cards
-    for (const nc of newCards) {
-      if (dueList.length >= targetQuota) break;
-      if (!dueList.some((c) => c.id === nc.id)) {
-        dueList.push(nc);
-      }
+  const sessionCards: Flashcard[] = [...dueCards];
+  for (const fc of fragileCards) {
+    if (sessionCards.length >= targetQuota) break;
+    if (!sessionCards.some((c) => c.id === fc.id)) {
+      sessionCards.push(fc);
     }
   }
-
-  // If even with new cards we haven't reached targetQuota and there are cards in deck, add from remaining
-  if (dueList.length === 0 && cards.length > 0) {
-    dueList.push(...cards.slice(0, Math.min(targetQuota, cards.length)));
+  for (const nc of discoveryCards) {
+    if (sessionCards.length >= targetQuota) break;
+    if (!sessionCards.some((c) => c.id === nc.id)) {
+      sessionCards.push(nc);
+    }
   }
 
   return {
-    dueCards: dueList,
+    dueCards,
     overdueCards,
     dueTodayCards,
+    fragileCards,
     newCards,
-    totalDue: dueList.length,
+    discoveryCards,
+    sessionCards,
+    totalDue: dueCards.length,
   };
-}
-
-/**
- * Generates realistic baseline reviews with SM-2 metrics:
- * - Exactly 17 cards due today for C1000-177 and AI-102
- * - Card #127 pre-configured with the user's specific scenario:
- *   Dernière révision : aujourd'hui
- *   Difficulté : 3/5
- *   Prochaine révision : dans 3 jours
- *   Nombre de répétitions : 4
- *   Taux de réussite : 75 %
- */
-export function generateDefaultSeedReviews(): Record<string, FlashcardReviewRecord> {
-  const seed: Record<string, FlashcardReviewRecord> = {};
-  const todayStr = getTodayDateString();
-  const now = new Date();
-
-  const makeDate = (offsetDays: number) => {
-    const d = new Date(now);
-    d.setDate(d.getDate() + offsetDays);
-    return d.toISOString().split('T')[0];
-  };
-
-  const makeIso = (offsetDays: number) => {
-    const d = new Date(now);
-    d.setDate(d.getDate() + offsetDays);
-    return d.toISOString();
-  };
-
-  // 1. IBM watsonx C1000-177: 17 cards due today (6 overdue, 7 due today, 4 to revoir)
-  for (let i = 1; i <= 6; i++) {
-    const cardId = `fc-c1000177-d1-${String(i).padStart(3, '0')}`;
-    seed[cardId] = {
-      id: cardId,
-      userId: 'local',
-      cardId,
-      certCode: 'c1000177',
-      rating: 'difficile',
-      intervalDays: 2,
-      repetitions: 2,
-      easeFactor: 2.2,
-      difficulty: 4,
-      totalReviews: 3,
-      successReviews: 2,
-      reviewedAt: makeIso(-3),
-      nextReviewDate: makeDate(-1), // overdue
-    };
-  }
-
-  for (let i = 7; i <= 13; i++) {
-    const cardId = `fc-c1000177-d1-${String(i).padStart(3, '0')}`;
-    seed[cardId] = {
-      id: cardId,
-      userId: 'local',
-      cardId,
-      certCode: 'c1000177',
-      rating: 'moyen',
-      intervalDays: 3,
-      repetitions: 2,
-      easeFactor: 2.5,
-      difficulty: 3,
-      totalReviews: 2,
-      successReviews: 2,
-      reviewedAt: makeIso(-3),
-      nextReviewDate: todayStr, // due today
-    };
-  }
-
-  for (let i = 14; i <= 17; i++) {
-    const cardId = `fc-c1000177-d1-${String(i).padStart(3, '0')}`;
-    seed[cardId] = {
-      id: cardId,
-      userId: 'local',
-      cardId,
-      certCode: 'c1000177',
-      rating: 'revoir',
-      intervalDays: 1,
-      repetitions: 0,
-      easeFactor: 2.1,
-      difficulty: 4,
-      totalReviews: 2,
-      successReviews: 1,
-      reviewedAt: makeIso(-1),
-      nextReviewDate: todayStr, // due today
-    };
-  }
-
-  // Card #127 in C1000-177 (Domain 2 item 27: fc-c1000177-d2-027)
-  const card127Id = 'fc-c1000177-d2-027';
-  seed[card127Id] = {
-    id: card127Id,
-    userId: 'local',
-    cardId: card127Id,
-    certCode: 'c1000177',
-    rating: 'moyen',
-    intervalDays: 3,
-    repetitions: 4,
-    easeFactor: 2.5,
-    difficulty: 3, // 3/5
-    totalReviews: 4,
-    successReviews: 3, // 75%
-    reviewedAt: now.toISOString(), // aujourd'hui
-    nextReviewDate: makeDate(3), // dans 3 jours
-  };
-
-  // Mastered cards (interval 7 or 14 days)
-  for (let i = 18; i <= 35; i++) {
-    const cardId = `fc-c1000177-d1-${String(i).padStart(3, '0')}`;
-    seed[cardId] = {
-      id: cardId,
-      userId: 'local',
-      cardId,
-      certCode: 'c1000177',
-      rating: 'maitrise',
-      intervalDays: 7,
-      repetitions: 3,
-      easeFactor: 2.6,
-      difficulty: 2,
-      totalReviews: 3,
-      successReviews: 3,
-      reviewedAt: makeIso(-1),
-      nextReviewDate: makeDate(6),
-    };
-  }
-
-  // 2. Azure AI-102 seed cards (17 cards due today + Card #127)
-  for (let i = 1; i <= 6; i++) {
-    const cardId = `fc-d1-${String(i).padStart(3, '0')}`;
-    seed[cardId] = {
-      id: cardId,
-      userId: 'local',
-      cardId,
-      certCode: 'ai102',
-      rating: 'difficile',
-      intervalDays: 2,
-      repetitions: 2,
-      easeFactor: 2.2,
-      difficulty: 4,
-      totalReviews: 3,
-      successReviews: 2,
-      reviewedAt: makeIso(-3),
-      nextReviewDate: makeDate(-1),
-    };
-  }
-
-  for (let i = 7; i <= 13; i++) {
-    const cardId = `fc-d1-${String(i).padStart(3, '0')}`;
-    seed[cardId] = {
-      id: cardId,
-      userId: 'local',
-      cardId,
-      certCode: 'ai102',
-      rating: 'moyen',
-      intervalDays: 3,
-      repetitions: 2,
-      easeFactor: 2.5,
-      difficulty: 3,
-      totalReviews: 2,
-      successReviews: 2,
-      reviewedAt: makeIso(-3),
-      nextReviewDate: todayStr,
-    };
-  }
-
-  for (let i = 14; i <= 17; i++) {
-    const cardId = `fc-d1-${String(i).padStart(3, '0')}`;
-    seed[cardId] = {
-      id: cardId,
-      userId: 'local',
-      cardId,
-      certCode: 'ai102',
-      rating: 'revoir',
-      intervalDays: 1,
-      repetitions: 0,
-      easeFactor: 2.1,
-      difficulty: 4,
-      totalReviews: 2,
-      successReviews: 1,
-      reviewedAt: makeIso(-1),
-      nextReviewDate: todayStr,
-    };
-  }
-
-  const ai102Card127Id = 'fc-d2-027';
-  seed[ai102Card127Id] = {
-    id: ai102Card127Id,
-    userId: 'local',
-    cardId: ai102Card127Id,
-    certCode: 'ai102',
-    rating: 'moyen',
-    intervalDays: 3,
-    repetitions: 4,
-    easeFactor: 2.5,
-    difficulty: 3,
-    totalReviews: 4,
-    successReviews: 3,
-    reviewedAt: now.toISOString(),
-    nextReviewDate: makeDate(3),
-  };
-
-  return seed;
 }

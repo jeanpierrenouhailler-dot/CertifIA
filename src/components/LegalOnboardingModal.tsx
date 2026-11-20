@@ -17,6 +17,7 @@ import {
 import { useGuide } from '../context/GuideContext';
 import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { useTranslation } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface LegalOnboardingModalProps {
   isOpen: boolean;
@@ -38,6 +39,11 @@ export const LegalOnboardingModal: React.FC<LegalOnboardingModalProps> = ({
   const { startTour } = useOnboardingTour();
   const { t, i18n } = useTranslation(['settings', 'common']);
   const isEn = i18n.language === 'en';
+  const modalRef = useAccessibleModal({
+    isOpen,
+    onClose,
+    disableEscape: isMandatoryFirstTime,
+  });
 
   if (!isOpen) return null;
 
@@ -57,8 +63,18 @@ export const LegalOnboardingModal: React.FC<LegalOnboardingModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-[#151a26] text-slate-800 dark:text-slate-100 rounded-3xl border border-slate-200 dark:border-blue-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={!isMandatoryFirstTime ? onClose : undefined}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="legal-modal-title"
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl bg-white dark:bg-[#151a26] text-slate-800 dark:text-slate-100 rounded-3xl border border-slate-200 dark:border-blue-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+      >
         
         {/* Header Ribbon */}
         <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-[#262a35] flex items-center justify-between gap-4 bg-slate-50 dark:bg-[#0f131d]/60">
@@ -75,7 +91,7 @@ export const LegalOnboardingModal: React.FC<LegalOnboardingModalProps> = ({
                   {isEn ? 'Important' : 'Important'}
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl font-bold font-headline text-slate-900 dark:text-white mt-0.5">
+              <h2 id="legal-modal-title" className="text-lg sm:text-xl font-bold font-headline text-slate-900 dark:text-white mt-0.5">
                 {t('settings:legal.title', 'Cadre Légal & Pédagogique CertifIA')}
               </h2>
             </div>
@@ -141,8 +157,8 @@ export const LegalOnboardingModal: React.FC<LegalOnboardingModalProps> = ({
                   </h4>
                   <p>
                     {isEn 
-                      ? 'CertifIA is an independent cognitive training platform. CertifIA is in no way affiliated, sponsored, certified, or endorsed by Microsoft®, Amazon Web Services®, Google Cloud®, IBM®, NVIDIA® or any other official certification body. All trademarks mentioned remain the exclusive property of their respective holders.'
-                      : 'CertifIA est un outil technologique d\'entraînement cognitif indépendant. CertifIA n\'est en aucun cas affilié, sponsorisé, certifié ni validé par Microsoft®, Amazon Web Services®, Google Cloud®, IBM®, NVIDIA® ou tout autre organisme officiel d\'accréditation. Les marques citées demeurent la propriété exclusive de leurs détenteurs respectifs.'
+                      ? 'CertifIA is an independent cognitive training platform. CertifIA is in no way affiliated, sponsored, certified, or endorsed by Microsoft®, Amazon Web Services®, Google Cloud®, IBM® or any other official certification body. All trademarks mentioned remain the exclusive property of their respective holders.'
+                      : 'CertifIA est un outil technologique d\'entraînement cognitif indépendant. CertifIA n\'est en aucun cas affilié, sponsorisé, certifié ni validé par Microsoft®, Amazon Web Services®, Google Cloud®, IBM® ou tout autre organisme officiel d\'accréditation. Les marques citées demeurent la propriété exclusive de leurs détenteurs respectifs.'
                     }
                   </p>
                 </div>
@@ -204,8 +220,8 @@ export const LegalOnboardingModal: React.FC<LegalOnboardingModalProps> = ({
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     {isEn 
-                      ? 'CertifIA automatically selects your 17 due SRS cards, 8 weak topics, and 12 targeted exam questions according to the forgetting curve.'
-                      : 'CertifIA sélectionne automatiquement vos 17 cartes à réviser, 8 notions fragiles et 12 questions cibles selon la courbe d\'oubli.'
+                      ? 'CertifIA computes your due SM-2 flashcards, weak domains, and targeted MCQs dynamically from your actual history.'
+                      : 'CertifIA calcule dynamiquement vos cartes SM-2 à revoir, vos notions fragiles et vos QCM ciblés à partir de votre historique réel.'
                     }
                   </p>
                 </div>

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { usePwa } from '../context/PwaContext';
 import { useTranslation } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface InstallAppModalProps {
   isOpen: boolean;
@@ -21,12 +22,23 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
   const { isInstalled, hasNativePrompt, promptInstall } = usePwa();
   const { t, i18n } = useTranslation(['settings', 'common']);
   const isEn = i18n.language === 'en';
+  const modalRef = useAccessibleModal({ isOpen, onClose });
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white dark:bg-[#151a26] text-slate-800 dark:text-slate-100 rounded-3xl border border-slate-200 dark:border-blue-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="install-pwa-title"
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg bg-white dark:bg-[#151a26] text-slate-800 dark:text-slate-100 rounded-3xl border border-slate-200 dark:border-blue-500/30 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+      >
         
         {/* Header Ribbon */}
         <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-[#262a35] flex items-center justify-between gap-4 bg-slate-50 dark:bg-[#0f131d]/60">
@@ -41,7 +53,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 {t('settings:pwa.subtitle', 'Installation Progressive Web App')}
               </span>
-              <h2 className="text-lg sm:text-xl font-bold font-headline text-slate-900 dark:text-white mt-0.5">
+              <h2 id="install-pwa-title" className="text-lg sm:text-xl font-bold font-headline text-slate-900 dark:text-white mt-0.5">
                 {t('settings:pwa.title', 'Installer CertifIA sur votre Écran')}
               </h2>
             </div>

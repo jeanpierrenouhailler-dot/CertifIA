@@ -47,7 +47,7 @@
     "today": {
       "label": "Aujourd’hui",
       "shortLabel": "Aujourd’hui",
-      "description": "Cockpit du jour : 17 cartes SM-2, 8 notions fragiles, 12 QCM ciblés"
+      "description": "Cockpit du jour : file SM-2 adaptative, notions fragiles et QCM ciblés"
     },
     "quickResume": {
       "label": "Reprendre mon apprentissage",
@@ -57,7 +57,7 @@
     "catalogue": {
       "label": "Catalogue des certifications",
       "shortLabel": "Catalogue",
-      "description": "18 certifications majeures IA (Azure, AWS, GCP, IBM, NVIDIA)"
+      "description": "6 certifications majeures IA (Azure, AWS, GCP, IBM watsonx)"
     },
     "comparator": {
       "label": "Comparateur d'examens",
@@ -193,12 +193,12 @@
       "title": "Cockpit Quotidien (Aujourd’hui)",
       "summary": "Cet écran centralise votre plan d’étude du jour calculé automatiquement à partir de votre courbe d’oubli SM-2 et de vos scores récents.",
       "step1": "1. Sélectionnez votre certification cible en haut pour adapter les cartes et questions du jour.",
-      "step2": "2. Lancez « Votre session du jour » (~22 min) : 17 cartes SM-2, 8 notions fragiles et 12 QCM ciblés.",
+      "step2": "2. Lancez « Votre session du jour » : cartes SM-2 dues, notions fragiles et QCM ciblés.",
       "step3": "3. Survolez les icônes (?) pour comprendre chaque métrique ou ouvrez le blueprint officiel."
     },
     "catalogue": {
-      "title": "Catalogue des 18 Certifications",
-      "summary": "Explorez, filtrez et comparez les 18 certifications majeures Cloud & IA (Azure, AWS, Google Cloud, IBM, NVIDIA) pour bâtir votre stratégie.",
+      "title": "Catalogue des 6 Certifications",
+      "summary": "Explorez, filtrez et comparez les 6 certifications majeures Cloud & IA (Azure, AWS, Google Cloud, IBM watsonx) pour bâtir votre stratégie.",
       "step1": "1. Filtrez par fournisseur Cloud, niveau (Fondamental, Associate, Expert) ou domaine (GenAI, MLOps).",
       "step2": "2. Ouvrez « Comparer » pour mettre côte à côte durées, seuils de réussite et domaines évalués.",
       "step3": "3. Cliquez sur le Blueprint d’un examen ou sur le Tuteur IA pour inspecter son programme détaillé."

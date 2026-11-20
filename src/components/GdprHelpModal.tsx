@@ -9,21 +9,21 @@ import {
   CheckCircle2, 
   XCircle, 
   Download, 
-  HelpCircle, 
-  Eye, 
   KeyRound, 
   CreditCard, 
   MapPin, 
   Camera, 
   Cookie, 
-  Layers, 
   FileCode, 
   ExternalLink,
-  ChevronRight,
   Info
 } from 'lucide-react';
 import type { UserProfile } from '../types';
 import type { User } from 'firebase/auth';
+import { FIRESTORE_DATABASE_ID } from '../lib/firebase';
+import { useProgress } from '../context/ProgressContext';
+import { getCertificationById } from '../data/certificationsData';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 import { useTranslation } from '../i18n';
 
 interface GdprHelpModalProps {
@@ -44,24 +44,54 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
   const { t } = useTranslation(['settings', 'common']);
   const [activeTab, setActiveTab] = useState<TabType>('sent');
   const [exportNotice, setExportNotice] = useState<string | null>(null);
+  const {
+    activeCertId,
+    globalMetrics,
+    reviews,
+    quizAttempts,
+    examAttempts,
+    goalSettings,
+  } = useProgress();
+
+  const modalRef = useAccessibleModal<HTMLDivElement>({
+    isOpen,
+    onClose,
+  });
 
   if (!isOpen) return null;
+
+  const activeCert = getCertificationById(activeCertId || userProfile?.targetExam);
 
   const handleExportData = () => {
     const exportPayload = {
       rgpd_notice: "Export conforme au droit d'accès et de portabilité des données (Art. 15 et 20 du RGPD - UE 2016/679)",
       exportDate: new Date().toISOString(),
-      platform: "CertifAI Cloud Exam Prep",
-      firestoreDatabaseId: "ai-studio-certifaiaicloude",
+      platform: "CertifIA Cloud Exam Prep",
+      firestoreDatabaseId: FIRESTORE_DATABASE_ID,
       firebaseAuth: {
         uid: user?.uid || "non_authentifié",
         email: user?.email || null,
         displayName: user?.displayName || null,
         emailVerified: user?.emailVerified || false,
-        providerId: user?.providerData?.[0]?.providerId || "google.com",
+        providerId: user?.providerData?.[0]?.providerId || null,
       },
       storedProfileDocument: userProfile || {
-        status: "Document non encore synchronisé ou profil invité"
+        status: "Mode local (invité / non synchronisé Firestore)",
+        targetExam: activeCert.id,
+        targetExamTitle: `${activeCert.title} (${activeCert.code})`,
+      },
+      realProgressMetrics: {
+        activeCertId: activeCert.id,
+        goalSettings,
+        streakDays: globalMetrics.streakDays,
+        cardsReviewedTotal: globalMetrics.cardsReviewedTotal,
+        questionsSolved: globalMetrics.questionsSolved,
+        averageScore: globalMetrics.averageScore,
+        readinessIndex: globalMetrics.readinessIndex,
+        reviewsCount: Object.keys(reviews).length,
+        quizAttemptsCount: Object.keys(quizAttempts).length,
+        examAttemptsCount: examAttempts.length,
+        examAttempts,
       },
       dataMinimizationNotice: "Seules les données strictement nécessaires au calcul de la progression et à la préparation aux examens sont collectées."
     };
@@ -70,7 +100,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `certifai_donnees_rgpd_${user?.uid?.slice(0, 8) || 'export'}.json`;
+    link.download = `certifia_donnees_rgpd_${user?.uid?.slice(0, 8) || 'local'}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -90,6 +120,10 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
     >
       <div 
         id="gdpr-modal-container"
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gdpr-modal-title"
         className="relative w-full max-w-4xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
         {/* Modal Header */}
@@ -100,7 +134,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-white tracking-tight">
+                <h2 id="gdpr-modal-title" className="text-lg font-bold text-white tracking-tight">
                   {t('settings:gdpr.title', 'Confidentialité & Respect du RGPD')}
                 </h2>
                 <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
@@ -228,7 +262,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Le code de l'examen que vous préparez actuellement (ex: <code className="text-indigo-300 font-mono">{userProfile?.targetExam || 'ai102'}</code> - Azure AI Engineer) afin de personnaliser les quiz, flashcards et simulations proposés.
+                    Le code de l'examen que vous préparez actuellement (ex: <code className="text-indigo-300 font-mono">{activeCert.code}</code> - {activeCert.title}) afin de personnaliser les quiz, flashcards et simulations proposés.
                   </p>
                 </div>
 
@@ -241,7 +275,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Vos indicateurs d'assiduité : série consécutive en jours (<code className="text-indigo-300">{userProfile?.streakDays ?? 12}j</code>), nombre d'items résolus, score moyen et indice de préparation global.
+                    Vos indicateurs d'assiduité réels : série consécutive en jours (<code className="text-indigo-300">{globalMetrics.streakDays}j</code>), {globalMetrics.questionsSolved} items résolus, score moyen ({globalMetrics.averageScore}%) et indice de préparation ({globalMetrics.readinessIndex}%).
                   </p>
                 </div>
 
@@ -442,14 +476,18 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
                     {
                       userId: userProfile?.userId || user?.uid || "guest",
                       email: userProfile?.email || user?.email || "non_authentifié",
-                      displayName: userProfile?.displayName || user?.displayName || "Architecte Cloud",
-                      targetExam: userProfile?.targetExam || "ai102",
-                      targetExamTitle: userProfile?.targetExamTitle || "Azure AI Engineer Associate (AI-102)",
-                      streakDays: userProfile?.streakDays ?? 12,
-                      questionsSolved: userProfile?.questionsSolved ?? 342,
-                      averageScore: userProfile?.averageScore ?? 84,
-                      readinessIndex: userProfile?.readinessIndex ?? 78,
-                      createdAt: userProfile?.createdAt || new Date().toISOString(),
+                      displayName: userProfile?.displayName || user?.displayName || "Invité",
+                      targetExam: activeCert.id,
+                      targetExamTitle: `${activeCert.title} (${activeCert.code})`,
+                      goalSettings,
+                      streakDays: globalMetrics.streakDays,
+                      cardsReviewedTotal: globalMetrics.cardsReviewedTotal,
+                      questionsSolved: globalMetrics.questionsSolved,
+                      averageScore: globalMetrics.averageScore,
+                      readinessIndex: globalMetrics.readinessIndex,
+                      examAttemptsCount: examAttempts.length,
+                      quizAttemptsCount: Object.keys(quizAttempts).length,
+                      createdAt: userProfile?.createdAt || null,
                       updatedAt: userProfile?.updatedAt || new Date().toISOString(),
                       securityRulesIsolation: "isOwner(userId) enforced by firestore.rules"
                     }, 
@@ -460,7 +498,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
               </div>
 
               <p className="text-[11px] text-slate-500">
-                Ce payload représente l'exacte totalité de ce qui est persisté dans votre espace Cloud Firestore.
+                Ce payload représente vos données réelles persistées (LocalStorage ou Cloud Firestore).
               </p>
             </div>
           )}
@@ -470,7 +508,7 @@ export const GdprHelpModal: React.FC<GdprHelpModalProps> = ({
         <div className="px-6 py-4 border-t border-slate-800 bg-slate-950/60 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Database className="w-4 h-4 text-emerald-400" />
-            <span>Base Firestore chiffrée AES-256 : <code className="text-slate-300 font-mono">ai-studio-certifaiaicloude</code></span>
+            <span>Base Firestore chiffrée AES-256 : <code className="text-slate-300 font-mono">{FIRESTORE_DATABASE_ID}</code></span>
           </div>
 
           <div className="flex items-center gap-3">

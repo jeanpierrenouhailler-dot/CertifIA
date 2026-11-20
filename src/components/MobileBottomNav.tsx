@@ -28,6 +28,8 @@ import { usePwa } from '../context/PwaContext';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { LanguageSelector } from './LanguageSelector';
 import { useTranslation } from '../i18n';
+import { TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 interface MobileBottomNavProps {
   currentScreen: AppScreen;
@@ -49,11 +51,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onOpenMenu,
 }) => {
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
-  const { t } = useTranslation(['navigation', 'common']);
+  const { t, i18n } = useTranslation(['navigation', 'common']);
   const { user } = useAuth();
   const { isGuideModeActive, toggleGuideMode, openLegalModal } = useGuide();
   const { isInstalled, promptInstall } = usePwa();
   const { versionInfo } = useSystemUpdate();
+  const sheetRef = useAccessibleModal({
+    isOpen: isMoreSheetOpen,
+    onClose: () => setIsMoreSheetOpen(false),
+  });
 
   // Primary active states
   const isAccueilActive = currentScreen === 'today';
@@ -169,6 +175,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           aria-label={t('navigation:mobileNav.sheetAria', 'Menu complémentaire CertifIA')}
         >
           <div 
+            ref={sheetRef}
             className="w-full bg-white dark:bg-[#121622] border-t border-slate-200 dark:border-[#22283a] rounded-t-3xl max-h-[85vh] overflow-y-auto p-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl animate-in slide-in-from-bottom duration-200"
             onClick={(e) => e.stopPropagation()}
           >
@@ -231,7 +238,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     <Layers className="w-4 h-4 text-purple-500 shrink-0" />
                     <div>
                       <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">{t('navigation:items.flashcards.shortLabel', 'Fiches Mémo')}</div>
-                      <div className="text-[10px] text-slate-400">{t('navigation:mobileNav.flashcardsDesc', '2 800 cartes SRS')}</div>
+                      <div className="text-[10px] text-slate-400">
+                        {t('navigation:mobileNav.flashcardsDesc', `${TOTAL_FLASHCARDS_COUNT.toLocaleString(i18n.language === 'en' ? 'en-US' : 'fr-FR')} cartes SRS`)}
+                      </div>
                     </div>
                   </button>
 

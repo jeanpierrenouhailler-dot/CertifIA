@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   TrendingUp, 
   Sparkles, 
@@ -9,25 +9,17 @@ import {
   ArrowRight, 
   Clock, 
   Brain, 
-  Award, 
-  Calendar, 
   FileText, 
-  ChevronRight, 
   Zap, 
-  Layers, 
   X, 
-  Sliders, 
-  Share2,
-  Database,
-  BookOpen,
-  Check,
-  Bot
+  Database
 } from 'lucide-react';
 import { AppScreen, ExamSessionHistory, ExamAttemptRecord } from '../types';
-import { examHistoryData } from '../data/analyticsData';
-import { certificationsData } from '../data/certificationsData';
+import { CERTIFICATIONS_COUNT, normalizeCertId } from '../data/certificationsData';
+import { getLocalizedCertifications } from '../data/localizedCertifications';
 import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 import { PageHeader } from './ui/PageHeader';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
@@ -39,45 +31,75 @@ interface AnalyticsViewProps {
   onOpenAIAssistant?: (context?: any) => void;
 }
 
-export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpenBlueprint, onOpenAIAssistant }) => {
-  const { t } = useTranslation(['progress', 'common']);
+export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpenBlueprint }) => {
+  const { t } = useTranslation(['progress', 'common', 'navigation']);
   const lang = getCurrentLanguage();
+  const isEn = lang === 'en';
   const { 
     certProgress, 
     examAttempts, 
+    quizAttempts,
+    globalMetrics,
+    getCertMetrics,
     getCertStats, 
     activeCertId, 
-    setActiveCertId, 
     updateGoalTarget,
     isSyncing 
   } = useProgress();
-  const { userProfile, user } = useAuth();
+  const { user, isFirebaseConnected } = useAuth();
 
-  const [selectedTargetExam, setSelectedTargetExam] = useState<string>(activeCertId || 'ai102');
+  const localizedCerts = useMemo(() => getLocalizedCertifications(lang), [lang]);
+  const [selectedTargetExam, setSelectedTargetExam] = useState<string>(() => normalizeCertId(activeCertId));
   const [selectedReport, setSelectedReport] = useState<ExamSessionHistory | null>(null);
   const [isCopilotTestGenerated, setIsCopilotTestGenerated] = useState(false);
   const [activeTabSection, setActiveTabSection] = useState<'certifications' | 'examens' | 'flashcards' | 'objectifs'>('certifications');
 
-  const activeCert = certificationsData.find((c) => c.id === selectedTargetExam) || certificationsData[0];
-  const activeProg = certProgress[selectedTargetExam] || {
-    id: selectedTargetExam,
-    userId: 'user',
-    certCode: activeCert.code,
-    progress: activeCert.userProgress || 50,
-    score: 765,
-    readinessIndex: 74,
-    lastCardIndex: 0,
-    reviewedCardsCount: 52,
-    updatedAt: new Date().toISOString(),
-  };
+  useEffect(() => {
+    setSelectedTargetExam(normalizeCertId(activeCertId));
+  }, [activeCertId]);
 
+  const reportModalRef = useAccessibleModal<HTMLDivElement>({
+    isOpen: Boolean(selectedReport),
+    onClose: () => setSelectedReport(null),
+  });
+
+  const activeCert = localizedCerts.find((c) => c.id === selectedTargetExam) || localizedCerts[0];
+  const certMetrics = getCertMetrics(selectedTargetExam);
   const activeStats = getCertStats(selectedTargetExam);
 
+  const avgScaledScore = certMetrics.exams.attemptCount > 0
+    ? Math.round((certMetrics.exams.averagePct / 100) * activeCert.maxScore)
+    : 0;
+  const passThresholdPct = activeCert.maxScore > 0
+    ? Math.round((activeCert.passScore / activeCert.maxScore) * 100)
+    : 70;
+  const scoreMargin = certMetrics.exams.attemptCount > 0 ? avgScaledScore - activeCert.passScore : 0;
+
+  const wrongQuizCountForCert = useMemo(() => {
+    return Object.values(quizAttempts).filter(
+      (q) => normalizeCertId(q.certId || q.certCode) === selectedTargetExam && !q.isCorrect
+    ).length;
+  }, [quizAttempts, selectedTargetExam]);
+
+  const weakestEvaluatedDomain = useMemo(() => {
+    const evaluated = certMetrics.domains.filter((d) => d.reviewedCards > 0);
+    if (evaluated.length === 0) return null;
+    return [...evaluated].sort((a, b) => a.mastery - b.mastery)[0];
+  }, [certMetrics.domains]);
+
+  // Chronological attempts (oldest -> newest) for trajectory SVG
+  const trajectoryAttempts = useMemo(() => {
+    return [...examAttempts]
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      .slice(-6);
+  }, [examAttempts]);
+
   const handleTargetChange = (newTarget: string) => {
-    setSelectedTargetExam(newTarget);
-    const found = certificationsData.find(c => c.id === newTarget);
+    const canonical = normalizeCertId(newTarget);
+    setSelectedTargetExam(canonical);
+    const found = localizedCerts.find((c) => c.id === canonical);
     if (found) {
-      updateGoalTarget(newTarget, found.title);
+      updateGoalTarget(canonical, found.title);
     }
   };
 
@@ -88,18 +110,20 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         const parsed = JSON.parse(attempt.domainScoresSummary);
         domainScores = Object.entries(parsed).map(([k, v]) => ({ name: k, score: Number(v) }));
       } catch {
-        domainScores = [{ name: 'Score Global', score: Math.round((attempt.score / attempt.maxScore) * 100) }];
+        domainScores = [{
+          name: attempt.examCode,
+          score: attempt.maxScore > 0 ? Math.round((attempt.score / attempt.maxScore) * 100) : 0,
+        }];
       }
     } else {
-      domainScores = [
-        { name: 'Architecture & Modèles', score: 82 },
-        { name: 'Ingénierie & Pipelines', score: 74 },
-        { name: 'Sécurité & Gouvernance', score: 68 },
-      ];
+      domainScores = [{
+        name: attempt.examCode,
+        score: attempt.maxScore > 0 ? Math.round((attempt.score / attempt.maxScore) * 100) : 0,
+      }];
     }
 
     const report: ExamSessionHistory = {
-      id: `${lang === 'en' ? 'Attempt' : 'Tentative'} #${attempt.attemptNumber} (${attempt.examCode})`,
+      id: `${isEn ? 'Attempt' : 'Tentative'} #${attempt.attemptNumber} (${attempt.examCode})`,
       date: formatLocalizedDate(new Date(attempt.createdAt), {
         day: '2-digit',
         month: 'short',
@@ -115,10 +139,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
       passed: attempt.passed,
       domainScores,
       recommendation: attempt.passed
-        ? (lang === 'en'
+        ? (isEn
             ? 'Exam successfully validated! Concentrate your revisions on the identified weak points to secure a solid buffer.'
             : 'Examen validé avec succès ! Concentrez vos révisions sur les concepts identifiés comme point faible pour garantir une marge de sécurité maximale.')
-        : (lang === 'en'
+        : (isEn
             ? 'Score below the required passing threshold (700/1000). Review flashcards in your weak category before starting another trial.'
             : 'Score en deçà du seuil d\'admission (700/1000). Révisez les flashcards de la catégorie faible avant de tenter une nouvelle simulation.'),
     };
@@ -140,9 +164,17 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         ]}
         actions={
           <div className="flex items-center gap-2">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Database className="w-3.5 h-3.5 text-emerald-400" />
-              {isSyncing ? "Sync..." : "Firestore Connecté"}
+            <span className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-semibold border ${
+              user && isFirebaseConnected
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                : 'bg-slate-800/60 text-slate-300 border-slate-700'
+            }`}>
+              <Database className={`w-3.5 h-3.5 ${user && isFirebaseConnected ? 'text-emerald-400' : 'text-slate-400'}`} />
+              {isSyncing
+                ? 'Sync...'
+                : user && isFirebaseConnected
+                ? (isEn ? 'Firestore Connected' : 'Firestore Connecté')
+                : (isEn ? 'Local mode (Guest / Offline)' : 'Mode local (Invité / Hors ligne)')}
             </span>
           </div>
         }
@@ -159,12 +191,12 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
       </div>
 
         {/* Target Selector Bar */}
-        <div className="flex items-center gap-3 p-2 rounded-2xl bg-[#171b26] border border-[#262a35]">
+        <div className="flex flex-wrap items-center gap-3 p-2 rounded-2xl bg-[#171b26] border border-[#262a35]">
           <div className="text-xs text-slate-400 pl-2 font-mono inline-flex items-center gap-1.5">
             {t('progress:analytics.selectCert')}
             <InfoTooltip
-              title={lang === 'en' ? 'Certification Analytics Filter' : 'Sélecteur d’Analytics par Certification'}
-              content={lang === 'en'
+              title={isEn ? 'Certification Analytics Filter' : 'Sélecteur d’Analytics par Certification'}
+              content={isEn
                 ? 'Switch certification to inspect its readiness index, SM-2 card retention buckets, and mock exam reports.'
                 : 'Changez de certification pour analyser son indice de préparation, la rétention SM-2 et vos rapports d’examens blancs.'}
             />
@@ -172,14 +204,14 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
           <select
             value={selectedTargetExam}
             onChange={(e) => handleTargetChange(e.target.value)}
+            aria-label={t('progress:analytics.selectCert')}
             className="bg-[#0f131d] border border-[#262a35] text-slate-200 text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none focus:border-blue-500 font-mono"
           >
-            <option value="c1000177">IBM watsonx C1000-177 ({certProgress['c1000177']?.progress ?? 42}%)</option>
-            <option value="gcpmle">Google Cloud PMLE ({certProgress['gcpmle']?.progress ?? 25}%)</option>
-            <option value="aifc01">AWS AIF-C01 ({certProgress['aifc01']?.progress ?? 45}%)</option>
-            <option value="mlsc01">AWS MLS-C01 ({certProgress['mlsc01']?.progress ?? 30}%)</option>
-            <option value="ai900">Azure AI-900 ({certProgress['ai900']?.progress ?? 85}%)</option>
-            <option value="ai102">Azure AI-102 ({certProgress['ai102']?.progress ?? 74}%)</option>
+            {localizedCerts.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.code} • {c.title} ({certProgress[c.id]?.progress ?? 0}%)
+              </option>
+            ))}
           </select>
           <button
             onClick={() => onOpenBlueprint && onOpenBlueprint(selectedTargetExam)}
@@ -264,8 +296,8 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {certificationsData.map((c) => {
-                const prog = certProgress[c.id] || { progress: c.userProgress, score: c.passScore, readinessIndex: 70 };
+              {localizedCerts.map((c) => {
+                const prog = certProgress[c.id] || { progress: 0, score: 0, readinessIndex: 0 };
                 const isCurrent = selectedTargetExam === c.id;
 
                 return (
@@ -301,11 +333,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
 
                     <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-[#262a35] text-[11px] font-mono">
                       <div>
-                        <span className="text-slate-400">Score moyen :</span>
-                        <div className="font-bold text-white mt-0.5">{prog.score || 750} pts</div>
+                        <span className="text-slate-400">{isEn ? 'Avg accuracy:' : 'Score moyen :'}</span>
+                        <div className="font-bold text-white mt-0.5">{prog.score > 0 ? `${prog.score}%` : '—'}</div>
                       </div>
                       <div>
-                        <span className="text-slate-400">Domaines :</span>
+                        <span className="text-slate-400">{isEn ? 'Domains:' : 'Domaines :'}</span>
                         <div className="font-bold text-blue-300 mt-0.5">{c.domains.length} modules</div>
                       </div>
                     </div>
@@ -320,55 +352,72 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         {activeTabSection === 'examens' && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center justify-between text-xs text-slate-300 font-mono">
-              <span>Tentatives officielles d'examens enregistrées :</span>
+              <span>{isEn ? 'Recorded mock exam attempts:' : 'Tentatives d’examens blancs enregistrées :'}</span>
               <button
                 onClick={() => onNavigate('exam')}
                 className="text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1"
               >
-                <span>Lancer une nouvelle tentative</span>
+                <span>{isEn ? 'Start a new attempt' : 'Lancer une nouvelle tentative'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {examAttempts.map((attempt) => (
-                <div
-                  key={attempt.id}
-                  onClick={() => handleOpenAttemptReport(attempt)}
-                  className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-blue-500/50 cursor-pointer transition-all space-y-3"
+            {examAttempts.length === 0 ? (
+              <div className="p-6 rounded-xl bg-[#0f131d] border border-dashed border-[#262a35] text-center space-y-3">
+                <p className="text-xs text-slate-400">
+                  {isEn
+                    ? 'No mock exam attempt has been completed yet. Complete a timed simulation to populate your official score history.'
+                    : 'Aucune simulation d’examen blanc n’a encore été terminée. Complétez une simulation chronométrée pour alimenter votre historique réel.'}
+                </p>
+                <button
+                  onClick={() => onNavigate('exam')}
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-1.5"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-xs font-mono font-bold">
-                      Tentative #{attempt.attemptNumber}
-                    </span>
-                    <span
-                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase ${
-                        attempt.passed
-                          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                      }`}
-                    >
-                      {attempt.passed ? 'Validé ✓' : 'Non validé'}
-                    </span>
-                  </div>
+                  <span>{isEn ? 'Launch mock exam' : 'Démarrer un examen blanc'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {examAttempts.map((attempt) => (
+                  <div
+                    key={attempt.id}
+                    onClick={() => handleOpenAttemptReport(attempt)}
+                    className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-blue-500/50 cursor-pointer transition-all space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-xs font-mono font-bold">
+                        {t('progress:attemptNumber', { number: attempt.attemptNumber })}
+                      </span>
+                      <span
+                        className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase ${
+                          attempt.passed
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                        }`}
+                      >
+                        {attempt.passed ? t('progress:analytics.passedStatus') : t('progress:analytics.failedStatus')}
+                      </span>
+                    </div>
 
-                  <div>
-                    <div className="text-xs font-mono text-slate-400">{attempt.examCode}</div>
-                    <div className="text-sm font-bold text-white mt-0.5">{attempt.examTitle}</div>
-                  </div>
+                    <div>
+                      <div className="text-xs font-mono text-slate-400">{attempt.examCode}</div>
+                      <div className="text-sm font-bold text-white mt-0.5">{attempt.examTitle}</div>
+                    </div>
 
-                  <div className="p-2.5 rounded-lg bg-[#171b26] flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-400">Score final :</span>
-                    <span className="text-base font-bold text-emerald-400">{attempt.score} / {attempt.maxScore}</span>
-                  </div>
+                    <div className="p-2.5 rounded-lg bg-[#171b26] flex items-center justify-between text-xs font-mono">
+                      <span className="text-slate-400">{isEn ? 'Final score:' : 'Score final :'}</span>
+                      <span className="text-base font-bold text-emerald-400">{attempt.score} / {attempt.maxScore}</span>
+                    </div>
 
-                  <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between">
-                    <span>Durée : {attempt.duration}</span>
-                    <span>{new Date(attempt.createdAt).toLocaleDateString('fr-FR')}</span>
+                    <div className="text-[11px] text-slate-400 font-mono flex items-center justify-between">
+                      <span>{isEn ? 'Duration:' : 'Durée :'} {attempt.duration}</span>
+                      <span>{formatLocalizedDate(attempt.createdAt, { day: '2-digit', month: 'short', year: 'numeric' }, lang)}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -442,24 +491,30 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         {activeTabSection === 'objectifs' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in duration-200 text-xs">
             <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] space-y-2">
-              <span className="text-slate-400 font-mono">Certification Prioritaire</span>
+              <span className="text-slate-400 font-mono">{isEn ? 'Priority Certification' : 'Certification Prioritaire'}</span>
               <div className="text-sm font-bold text-white">{activeCert.title}</div>
-              <div className="text-[11px] font-mono text-blue-400">Code : {activeCert.code}</div>
+              <div className="text-[11px] font-mono text-blue-400">Code : {activeCert.code} · {CERTIFICATIONS_COUNT} certifs</div>
             </div>
             <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] space-y-2">
-              <span className="text-slate-400 font-mono">Série & Constance</span>
+              <span className="text-slate-400 font-mono">{isEn ? 'Study Streak' : 'Série & Constance'}</span>
               <div className="text-2xl font-bold font-mono text-amber-400 flex items-center gap-1.5">
-                <span>{userProfile?.streakDays ?? 14} jours</span>
+                <span>{globalMetrics.streakDays} {isEn ? 'days' : 'jours'}</span>
                 <Flame className="w-4 h-4 fill-amber-400" />
               </div>
-              <div className="text-[11px] text-slate-400">Rythme soutenu sans interruption</div>
+              <div className="text-[11px] text-slate-400">
+                {globalMetrics.streakDays === 0
+                  ? (isEn ? 'Start a session today to launch your streak' : 'Complétez une activité aujourd’hui pour démarrer votre série')
+                  : (isEn ? 'Computed from real activity timestamps' : 'Calculé depuis vos jours actifs réels')}
+              </div>
             </div>
             <div className="p-4 rounded-xl bg-[#0f131d] border border-[#262a35] space-y-2">
-              <span className="text-slate-400 font-mono">Volume de validation</span>
+              <span className="text-slate-400 font-mono">{isEn ? 'Validated Volume' : 'Volume de validation'}</span>
               <div className="text-2xl font-bold font-mono text-emerald-400">
-                {userProfile?.questionsSolved ?? 482} qcm
+                {globalMetrics.questionsSolved} {isEn ? 'items' : 'qcm'}
               </div>
-              <div className="text-[11px] text-slate-400">Toutes certifications confondues</div>
+              <div className="text-[11px] text-slate-400">
+                {globalMetrics.cardsReviewedTotal} {isEn ? 'flashcards reviewed across catalog' : 'flashcards révisées toutes certifs'}
+              </div>
             </div>
           </div>
         )}
@@ -471,14 +526,25 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] flex items-center justify-between shadow-lg">
           <div>
             <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-              Indice Préparation
+              {isEn ? 'Readiness Index' : 'Indice Préparation'}
             </div>
-            <div className="text-2xl font-bold font-mono text-white mt-1">74%</div>
-            <div className="text-xs font-semibold text-emerald-400 mt-0.5 flex items-center gap-1">
-              <span>Prêt J-6</span>
-              <span className="text-[10px] text-slate-400 font-mono font-normal">(+8% s/sem.)</span>
+            <div className="text-2xl font-bold font-mono text-white mt-1">{certMetrics.readinessIndex}%</div>
+            <div className={`text-xs font-semibold mt-0.5 flex items-center gap-1 ${
+              certMetrics.readinessIndex >= 70 ? 'text-emerald-400' : certMetrics.readinessIndex > 0 ? 'text-blue-400' : 'text-slate-400'
+            }`}>
+              <span>
+                {certMetrics.readinessIndex === 0
+                  ? (isEn ? 'No data yet' : 'Aucune activité')
+                  : certMetrics.readinessIndex >= 70
+                  ? (isEn ? 'Target reached' : 'Seuil atteint')
+                  : (isEn ? 'In progress' : 'En progression')}
+              </span>
             </div>
-            <div className="text-[10px] text-slate-400 mt-2">Seuil de certification (70%) dépassé</div>
+            <div className="text-[10px] text-slate-400 mt-2">
+              {certMetrics.readinessIndex >= 70
+                ? (isEn ? 'Indicative threshold (70%) reached' : 'Seuil indicatif (70%) atteint')
+                : (isEn ? 'Weighted across exams, MCQs & SRS' : 'Pondéré examens, QCM et rétention SRS')}
+            </div>
           </div>
           {/* Circular progress ring */}
           <div className="relative w-16 h-16 shrink-0">
@@ -491,13 +557,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                 stroke="#4edea3"
                 strokeWidth="6"
                 strokeDasharray="163.36"
-                strokeDashoffset={163.36 * (1 - 0.74)}
+                strokeDashoffset={163.36 * (1 - certMetrics.readinessIndex / 100)}
                 strokeLinecap="round"
                 fill="none"
               />
             </svg>
             <span className="absolute inset-0 flex items-center justify-center font-mono text-xs font-bold text-white">
-              74%
+              {certMetrics.readinessIndex}%
             </span>
           </div>
         </div>
@@ -506,39 +572,57 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-lg flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-              <span>Score Moyen</span>
-              <span className="text-emerald-400 font-bold">PASS ✓</span>
+              <span>{isEn ? 'Avg Exam Score' : 'Score Moyen'}</span>
+              {certMetrics.exams.attemptCount > 0 ? (
+                <span className={`font-bold ${avgScaledScore >= activeCert.passScore ? 'text-emerald-400' : 'text-amber-400'}`}>
+                  {avgScaledScore >= activeCert.passScore ? 'PASS ✓' : `${certMetrics.exams.attemptCount} ${isEn ? 'try' : 'essai(s)'}`}
+                </span>
+              ) : (
+                <span className="text-slate-500 font-mono">—</span>
+              )}
             </div>
             <div className="text-2xl font-bold font-mono text-blue-400 mt-1">
-              765 <span className="text-sm font-normal text-slate-400">/ 1000</span>
+              {avgScaledScore} <span className="text-sm font-normal text-slate-400">/ {activeCert.maxScore}</span>
             </div>
           </div>
           <div className="mt-3">
             <div className="w-full h-2 bg-[#0a0e18] rounded-full overflow-hidden relative">
-              <div className="h-full bg-blue-500 rounded-full" style={{ width: '76.5%' }} />
-              {/* Cutoff 700 marker */}
-              <div className="absolute top-0 bottom-0 left-[70%] w-0.5 bg-emerald-400" title="Seuil 700 pts" />
+              <div
+                className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                style={{ width: `${certMetrics.exams.attemptCount > 0 ? certMetrics.exams.averagePct : 0}%` }}
+              />
+              <div
+                className="absolute top-0 bottom-0 w-0.5 bg-emerald-400"
+                style={{ left: `${passThresholdPct}%` }}
+                title={`${isEn ? 'Threshold' : 'Seuil'} ${activeCert.passScore} pts`}
+              />
             </div>
             <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1.5">
-              <span>Cutoff 700 pts</span>
-              <span className="text-emerald-400 font-semibold">+65 pts marge</span>
+              <span>Cutoff {activeCert.passScore} pts</span>
+              <span className={scoreMargin >= 0 && certMetrics.exams.attemptCount > 0 ? 'text-emerald-400 font-semibold' : 'text-slate-400'}>
+                {certMetrics.exams.attemptCount === 0
+                  ? (isEn ? 'No attempt yet' : 'Aucune tentative')
+                  : `${scoreMargin >= 0 ? '+' : ''}${scoreMargin} pts ${isEn ? 'margin' : 'marge'}`}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* KPI 3: Volume Traité & Vélocité */}
+        {/* KPI 3: Volume Traité & Précision */}
         <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-lg flex flex-col justify-between">
           <div>
             <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-              Volume Traité
+              {isEn ? 'Solved Questions' : 'Volume Traité'}
             </div>
             <div className="text-2xl font-bold font-mono text-white mt-1">
-              482 <span className="text-xs font-normal text-slate-400">questions</span>
+              {globalMetrics.questionsSolved} <span className="text-xs font-normal text-slate-400">questions</span>
             </div>
-            <div className="text-xs text-blue-300 font-mono mt-0.5">Précision globale : 78.4%</div>
+            <div className="text-xs text-blue-300 font-mono mt-0.5">
+              {isEn ? 'Global accuracy:' : 'Précision globale :'} {globalMetrics.questionsSolved > 0 ? `${globalMetrics.averageScore}%` : '—'}
+            </div>
           </div>
           <div className="mt-2 text-[10px] text-slate-400 font-mono">
-            104 erreurs décortiquées & révisées
+            {certMetrics.flashcards.reviewedCount} / {certMetrics.flashcards.deckSize} {isEn ? 'cards reviewed' : 'fiches révisées'} ({activeCert.code})
           </div>
         </div>
 
@@ -546,15 +630,17 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         <div className="p-5 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-lg flex flex-col justify-between">
           <div>
             <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
-              Discipline & Rétention
+              {isEn ? 'Streak & Retention' : 'Discipline & Rétention'}
             </div>
             <div className="text-2xl font-bold font-mono text-amber-400 mt-1 flex items-center gap-2">
-              14 jours <Flame className="w-5 h-5 fill-amber-400" />
+              {globalMetrics.streakDays} {isEn ? 'days' : 'jours'} <Flame className="w-5 h-5 fill-amber-400" />
             </div>
-            <div className="text-xs text-emerald-400 font-mono mt-0.5">89% rétention active</div>
+            <div className="text-xs text-emerald-400 font-mono mt-0.5">
+              {certMetrics.flashcards.retentionRate}% {isEn ? 'SRS retention' : 'rétention active'}
+            </div>
           </div>
           <div className="mt-2 text-[10px] text-slate-400 font-mono">
-            138 fiches consolidées en mémoire longue
+            {certMetrics.flashcards.masteredCount} {isEn ? 'mastered cards (≥ 7d)' : 'fiches consolidées (≥ 7j)'}
           </div>
         </div>
       </div>
@@ -565,25 +651,26 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
         <div className="lg:col-span-8 space-y-6">
           {/* Domain Breakdown Card */}
           <div className="p-6 rounded-2xl bg-[#171b26] border border-[#262a35] shadow-xl space-y-5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <h3 className="text-base font-bold text-white font-headline">
-                  Cartographie des Domaines & Diagnostic des Lacunes
+                  {isEn ? 'Domain Breakdown & Gap Diagnostics' : 'Cartographie des Domaines & Diagnostic des Lacunes'}
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Analyse granulaire par section du blueprint officiel {activeCert.code}
+                  {isEn ? 'Real SRS mastery across blueprint sections for' : 'Analyse réelle par section du blueprint officiel'} {activeCert.code}
                 </p>
               </div>
               <span className="text-xs font-mono px-2.5 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
-                5 Domaines Évalués
+                {certMetrics.domains.length} {isEn ? 'Blueprint Domains' : 'Domaines Évalués'}
               </span>
             </div>
 
             {/* Domains List */}
             <div className="space-y-4">
-              {activeCert.domains.map((dom, idx) => {
-                const isCriticalWeak = dom.mastery < 60;
-                const isWarning = dom.mastery >= 60 && dom.mastery < 70;
+              {certMetrics.domains.map((dom, idx) => {
+                const isEvaluated = dom.reviewedCards > 0;
+                const isCriticalWeak = isEvaluated && dom.mastery < 60;
+                const isWarning = isEvaluated && dom.mastery >= 60 && dom.mastery < 70;
 
                 return (
                   <div
@@ -596,24 +683,29 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                         : 'bg-[#0f131d]/60 border-[#262a35]'
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-3 mb-2">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-bold text-white font-headline">
                           {dom.name}
                         </span>
+                        {!isEvaluated && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                            {isEn ? 'Not started' : 'Non évalué'}
+                          </span>
+                        )}
                         {isCriticalWeak && (
                           <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase">
-                            Point Faible Critique
+                            {isEn ? 'Weak Point' : 'Point Faible'}
                           </span>
                         )}
                         {isWarning && (
                           <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
-                            À Renforcer
+                            {isEn ? 'Needs Review' : 'À Renforcer'}
                           </span>
                         )}
                       </div>
                       <span className="text-xs font-mono font-bold text-slate-200">
-                        {dom.mastery}% / {dom.weight}
+                        {dom.mastery}% · {dom.reviewedCards}/{dom.totalCards} {isEn ? 'cards' : 'fiches'} ({dom.weight})
                       </span>
                     </div>
 
@@ -628,7 +720,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                               ? '#4edea3'
                               : dom.mastery >= 60
                               ? '#adc6ff'
-                              : '#ffb4ab',
+                              : dom.mastery > 0
+                              ? '#ffb4ab'
+                              : '#334155',
                         }}
                       />
                     </div>
@@ -638,21 +732,16 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                         {dom.description}
                       </p>
 
-                      {/* Targeted CTA */}
-                      {isCriticalWeak && (
-                        <button
-                          onClick={() => onNavigate('quiz')}
-                          className="px-3 py-1.5 rounded-lg bg-rose-600/20 text-rose-300 hover:bg-rose-600 hover:text-white border border-rose-500/30 text-[11px] font-semibold whitespace-nowrap transition-colors"
-                        >
-                          Entraînement ciblé Vision
-                        </button>
-                      )}
-                      {isWarning && (
+                      {(isCriticalWeak || isWarning) && (
                         <button
                           onClick={() => onNavigate('flashcards')}
-                          className="px-3 py-1.5 rounded-lg bg-amber-600/20 text-amber-300 hover:bg-amber-600 hover:text-white border border-amber-500/30 text-[11px] font-semibold whitespace-nowrap transition-colors"
+                          className={`px-3 py-1.5 rounded-lg border text-[11px] font-semibold whitespace-nowrap transition-colors ${
+                            isCriticalWeak
+                              ? 'bg-rose-600/20 text-rose-300 hover:bg-rose-600 hover:text-white border-rose-500/30'
+                              : 'bg-amber-600/20 text-amber-300 hover:bg-amber-600 hover:text-white border-amber-500/30'
+                          }`}
                         >
-                          Réviser fiches Gouvernance
+                          {isEn ? 'Practice this domain' : 'Réviser ce domaine'}
                         </button>
                       )}
                     </div>
@@ -662,48 +751,66 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
             </div>
           </div>
 
-          {/* 3 Secondary Telemetry Blocks */}
+          {/* 3 Secondary Telemetry Blocks (100% real data) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 rounded-xl bg-[#171b26] border border-[#262a35]">
-              <div className="text-[10px] font-mono text-slate-400 uppercase">Vitesse Moyenne</div>
-              <div className="text-lg font-bold font-mono text-white mt-1">1m 18s / q</div>
-              <div className="text-[10px] text-emerald-400 font-mono mt-0.5">Cadence nominale : 1m 30s</div>
+              <div className="text-[10px] font-mono text-slate-400 uppercase">
+                {isEn ? 'Fragile Flashcards' : 'Fiches à renforcer'}
+              </div>
+              <div className="text-lg font-bold font-mono text-white mt-1">
+                {certMetrics.flashcards.fragileCount} {isEn ? 'cards' : 'fiches'}
+              </div>
+              <div className="text-[10px] text-amber-400 font-mono mt-0.5">
+                {certMetrics.flashcards.dueCount} {isEn ? 'SRS due today' : 'dues SM-2 aujourd’hui'}
+              </div>
             </div>
             <div className="p-4 rounded-xl bg-[#171b26] border border-[#262a35]">
-              <div className="text-[10px] font-mono text-slate-400 uppercase">Questions Flagged</div>
-              <div className="text-lg font-bold font-mono text-amber-400 mt-1">23 questions</div>
+              <div className="text-[10px] font-mono text-slate-400 uppercase">
+                {isEn ? 'Incorrect MCQs' : 'QCM à retravailler'}
+              </div>
+              <div className="text-lg font-bold font-mono text-amber-400 mt-1">
+                {wrongQuizCountForCert} {isEn ? 'questions' : 'questions'}
+              </div>
               <div 
                 onClick={() => onNavigate('quiz')}
                 className="text-[10px] text-blue-400 hover:underline cursor-pointer font-mono mt-0.5"
               >
-                Ouvrir la pile de révision →
+                {isEn ? 'Open MCQ practice →' : 'Ouvrir l’entraînement QCM →'}
               </div>
             </div>
             <div className="p-4 rounded-xl bg-[#171b26] border border-[#262a35]">
-              <div className="text-[10px] font-mono text-slate-400 uppercase">Indice Prédictibilité</div>
-              <div className="text-lg font-bold font-mono text-blue-400 mt-1">Tier Architecte</div>
-              <div className="text-[10px] text-slate-400 font-mono mt-0.5">91.2% corrélation score réel</div>
+              <div className="text-[10px] font-mono text-slate-400 uppercase">
+                {isEn ? 'Deck Coverage' : 'Couverture du deck'}
+              </div>
+              <div className="text-lg font-bold font-mono text-blue-400 mt-1">
+                {certMetrics.flashcards.deckCoveragePct}%
+              </div>
+              <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                {certMetrics.flashcards.reviewedCount} / {certMetrics.flashcards.deckSize} {activeCert.code}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: CertifAI AI Orchestrator Action Plan (4 cols) */}
+        {/* Right Column: Dynamic CertifIA Action Plan (4 cols) */}
         <div className="lg:col-span-4 space-y-6">
           <div className="p-6 rounded-2xl bg-gradient-to-b from-[#1c2438] to-[#171b26] border border-blue-500/30 shadow-xl space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping" />
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-400" />
                 <h3 className="text-sm font-bold text-white font-headline">
-                  Orchestrateur CertifAI
+                  {isEn ? 'CertifIA Study Plan' : 'Plan d’action CertifIA'}
                 </h3>
               </div>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold uppercase">
-                Plan J-6
+                {activeCert.code}
               </span>
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed">
-              Pour franchir 800 pts avant votre passage officiel, voici vos 3 actions prioritaires ordonnées par gain de points attendu :
+              {isEn
+                ? `Prioritized next actions calculated from your live ${activeCert.code} telemetry:`
+                : `Prochaines actions priorisées à partir de vos résultats réels sur ${activeCert.code} :`}
             </p>
 
             {/* Action Items List */}
@@ -711,60 +818,80 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
               {/* Item 1 */}
               <div className="p-3.5 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-blue-500/40 transition-colors">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-white">Priorité Immédiate #1</span>
-                  <span className="font-mono text-emerald-400 text-[11px] font-bold">+35 pts</span>
+                  <span className="font-semibold text-white">{isEn ? 'Priority #1 · Weakest Domain' : 'Priorité #1 · Domaine ciblé'}</span>
+                  <span className="font-mono text-blue-400 text-[11px] font-bold">
+                    {weakestEvaluatedDomain ? `${weakestEvaluatedDomain.mastery}%` : '0%'}
+                  </span>
                 </div>
                 <div className="text-xs text-slate-300 leading-relaxed">
-                  Calibration Custom Vision (seuils IoU et probabilité).
+                  {weakestEvaluatedDomain
+                    ? `${weakestEvaluatedDomain.name} (${weakestEvaluatedDomain.fragileCards} ${isEn ? 'fragile cards' : 'fiches fragiles'})`
+                    : (isEn
+                        ? `Start exploring ${activeCert.domains[0]?.name || activeCert.code} scenario questions.`
+                        : `Démarrez l’entraînement QCM sur ${activeCert.domains[0]?.name || activeCert.code}.`)}
                 </div>
                 <button
                   onClick={() => onNavigate('quiz')}
                   className="mt-2.5 w-full py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-all shadow-sm"
                 >
-                  Démarrer série QCM ciblée
+                  {isEn ? 'Practice targeted MCQs' : 'Démarrer série QCM'}
                 </button>
               </div>
 
               {/* Item 2 */}
               <div className="p-3.5 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-blue-500/40 transition-colors">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-white">Échéance SRS #2</span>
-                  <span className="font-mono text-blue-400 text-[11px] font-bold">+20 pts</span>
+                  <span className="font-semibold text-white">{isEn ? 'SRS Queue #2' : 'Échéance SRS #2'}</span>
+                  <span className="font-mono text-amber-400 text-[11px] font-bold">
+                    {certMetrics.flashcards.dueCount} {isEn ? 'due' : 'dues'}
+                  </span>
                 </div>
                 <div className="text-xs text-slate-300 leading-relaxed">
-                  5 fiches mémo de gouvernance arrivent à échéance SM-2 aujourd'hui.
+                  {certMetrics.flashcards.dueCount > 0
+                    ? (isEn
+                        ? `${certMetrics.flashcards.dueCount} reviewed card(s) have reached their SM-2 review interval today.`
+                        : `${certMetrics.flashcards.dueCount} fiche(s) révisée(s) arrivent à échéance SM-2 aujourd’hui.`)
+                    : (isEn
+                        ? `${certMetrics.flashcards.unreviewedCount} new cards available in ${activeCert.code} deck (${certMetrics.flashcards.deckSize} total).`
+                        : `${certMetrics.flashcards.unreviewedCount} nouvelles fiches disponibles sur ${activeCert.code} (${certMetrics.flashcards.deckSize} au total).`)}
                 </div>
                 <button
                   onClick={() => onNavigate('flashcards')}
                   className="mt-2.5 w-full py-1.5 rounded-lg bg-[#171b26] hover:bg-[#262a35] border border-[#262a35] text-slate-200 hover:text-white text-xs font-semibold transition-all"
                 >
-                  Lancer les 5 fiches dues
+                  {certMetrics.flashcards.dueCount > 0
+                    ? (isEn ? `Review ${certMetrics.flashcards.dueCount} due cards` : `Réviser les ${certMetrics.flashcards.dueCount} fiches dues`)
+                    : (isEn ? 'Open Flashcards deck' : 'Ouvrir le deck Flashcards')}
                 </button>
               </div>
 
               {/* Item 3 */}
               <div className="p-3.5 rounded-xl bg-[#0f131d] border border-[#262a35] hover:border-blue-500/40 transition-colors">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-white">Simulation Finale #3</span>
-                  <span className="font-mono text-amber-400 text-[11px] font-bold">+45 pts</span>
+                  <span className="font-semibold text-white">{isEn ? 'Mock Exam #3' : 'Simulation #3'}</span>
+                  <span className="font-mono text-emerald-400 text-[11px] font-bold">
+                    {certMetrics.exams.attemptCount} {isEn ? 'runs' : 'essai(s)'}
+                  </span>
                 </div>
                 <div className="text-xs text-slate-300 leading-relaxed">
-                  Examen blanc en conditions réelles (100 min, 50 questions chronométrées).
+                  {isEn
+                    ? `Timed exam simulation calibrated for ${activeCert.code} (official blueprint: ${activeCert.durationMinutes} min, ${activeCert.itemsCount} items).`
+                    : `Simulation chronométrée sur ${activeCert.code} (référentiel officiel : ${activeCert.durationMinutes} min, ${activeCert.itemsCount} questions).`}
                 </div>
                 <button
                   onClick={() => onNavigate('exam')}
                   className="mt-2.5 w-full py-1.5 rounded-lg bg-[#171b26] hover:bg-[#262a35] border border-[#262a35] text-slate-200 hover:text-white text-xs font-semibold transition-all"
                 >
-                  Démarrer la simulation
+                  {isEn ? 'Start simulation' : 'Démarrer la simulation'}
                 </button>
               </div>
             </div>
 
-            {/* AI Generator Tool */}
+            {/* Diagnostic Generator Shortcut */}
             <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs">
               <div className="font-semibold text-blue-300 mb-1 flex items-center gap-1.5">
                 <Brain className="w-4 h-4 text-blue-400" />
-                Générateur Diagnostic Sur-Mesure
+                {isEn ? 'Targeted Practice Session' : 'Session QCM Ciblée'}
               </div>
               <p className="text-[11px] text-slate-400 mb-3">
                 {t('progress:analytics.copilotDesc')}
@@ -775,7 +902,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                   setTimeout(() => {
                     setIsCopilotTestGenerated(false);
                     onNavigate('quiz');
-                  }, 800);
+                  }, 300);
                 }}
                 className="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all flex items-center justify-center gap-1.5"
               >
@@ -816,66 +943,108 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
           </div>
         </div>
 
-        {/* Progression Curve (Interactive SVG Chart) */}
+        {/* Dynamic Progression Curve (plotted strictly from persisted examAttempts) */}
         <div className="p-4 rounded-xl bg-[#0a0e18] border border-[#262a35]">
-          <svg viewBox="0 0 600 180" className="w-full h-auto">
-            <defs>
-              <linearGradient id="scoreArea" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
-              </linearGradient>
-            </defs>
+          {trajectoryAttempts.length === 0 ? (
+            <div className="py-10 text-center space-y-3">
+              <TrendingUp className="w-8 h-8 text-slate-600 mx-auto" />
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                {isEn
+                  ? 'Your score progression curve will appear automatically after your first completed mock exam simulation.'
+                  : 'Votre courbe d’évolution des scores s’affichera automatiquement dès votre première simulation d’examen blanc terminée.'}
+              </p>
+              <button
+                onClick={() => onNavigate('exam')}
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-1.5"
+              >
+                <span>{isEn ? 'Take first mock exam' : 'Lancer un premier examen blanc'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <svg viewBox="0 0 600 180" className="w-full h-auto" role="img" aria-label={t('progress:analytics.examTrajectory')}>
+              <defs>
+                <linearGradient id="scoreArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.35" />
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+                </linearGradient>
+              </defs>
 
-            {/* Horizontal Grid lines */}
-            <line x1="40" y1="30" x2="560" y2="30" stroke="#1c1f2a" strokeWidth="1" strokeDasharray="3 3" />
-            <text x="30" y="34" fill="#64748b" fontSize="8" textAnchor="end" fontFamily="monospace">900</text>
+              <line x1="45" y1="25" x2="560" y2="25" stroke="#1c1f2a" strokeWidth="1" strokeDasharray="3 3" />
+              <text x="38" y="29" fill="#64748b" fontSize="8" textAnchor="end" fontFamily="monospace">100%</text>
 
-            {/* PASS Threshold Line at 700 pts (y = 75) */}
-            <line x1="40" y1="75" x2="560" y2="75" stroke="#10b981" strokeWidth="1.5" strokeDasharray="4 4" />
-            <text x="30" y="78" fill="#10b981" fontSize="9" fontWeight="bold" textAnchor="end" fontFamily="monospace">700</text>
-            <text x="565" y="78" fill="#10b981" fontSize="8" textAnchor="start" fontFamily="monospace">PASS</text>
+              <line x1="45" y1="64" x2="560" y2="64" stroke="#10b981" strokeWidth="1.5" strokeDasharray="4 4" />
+              <text x="38" y="67" fill="#10b981" fontSize="9" fontWeight="bold" textAnchor="end" fontFamily="monospace">70%</text>
+              <text x="565" y="67" fill="#10b981" fontSize="8" textAnchor="start" fontFamily="monospace">PASS</text>
 
-            <line x1="40" y1="120" x2="560" y2="120" stroke="#1c1f2a" strokeWidth="1" strokeDasharray="3 3" />
-            <text x="30" y="124" fill="#64748b" fontSize="8" textAnchor="end" fontFamily="monospace">500</text>
+              <line x1="45" y1="115" x2="560" y2="115" stroke="#1c1f2a" strokeWidth="1" strokeDasharray="3 3" />
+              <text x="38" y="119" fill="#64748b" fontSize="8" textAnchor="end" fontFamily="monospace">30%</text>
 
-            {/* Area under curve */}
-            {/* Points: SIM1=(100, 105 [610pts]), SIM2=(230, 88 [660pts]), SIM3=(370, 64 [735pts]), SIM4=(500, 56 [765pts]) */}
-            <path
-              d="M100,105 L230,88 L370,64 L500,56 L500,160 L100,160 Z"
-              fill="url(#scoreArea)"
-            />
+              {(() => {
+                const count = trajectoryAttempts.length;
+                const points = trajectoryAttempts.map((att, idx) => {
+                  const pct = att.maxScore > 0 ? Math.min(100, Math.max(0, (att.score / att.maxScore) * 100)) : 0;
+                  const x = count === 1 ? 300 : 85 + (idx * (450 / (count - 1)));
+                  const y = 155 - (pct / 100) * 130;
+                  return { x, y, pct: Math.round(pct), att };
+                });
 
-            {/* Main Score Line */}
-            <path
-              d="M100,105 L230,88 L370,64 L500,56"
-              fill="none"
-              stroke="#60a5fa"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+                const linePath = points.map((p, idx) => `${idx === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+                const areaPath = count > 1
+                  ? `${linePath} L${points[points.length - 1].x.toFixed(1)},155 L${points[0].x.toFixed(1)},155 Z`
+                  : '';
 
-            {/* Interactive Points */}
-            {/* P1: 610 */}
-            <circle cx="100" cy="105" r="5" fill="#171b26" stroke="#f43f5e" strokeWidth="2.5" />
-            <text x="100" y="95" fill="#f43f5e" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace">610 pts</text>
-            <text x="100" y="172" fill="#94a3b8" fontSize="8" textAnchor="middle" fontFamily="monospace">SIM-01 (J-14)</text>
-
-            {/* P2: 660 */}
-            <circle cx="230" cy="88" r="5" fill="#171b26" stroke="#f43f5e" strokeWidth="2.5" />
-            <text x="230" y="78" fill="#f43f5e" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace">660 pts</text>
-            <text x="230" y="172" fill="#94a3b8" fontSize="8" textAnchor="middle" fontFamily="monospace">SIM-02 (J-9)</text>
-
-            {/* P3: 735 */}
-            <circle cx="370" cy="64" r="5" fill="#171b26" stroke="#10b981" strokeWidth="2.5" />
-            <text x="370" y="54" fill="#10b981" fontSize="9" fontWeight="bold" textAnchor="middle" fontFamily="monospace">735 pts</text>
-            <text x="370" y="172" fill="#94a3b8" fontSize="8" textAnchor="middle" fontFamily="monospace">SIM-03 (J-4)</text>
-
-            {/* P4: 765 */}
-            <circle cx="500" cy="56" r="6" fill="#3b82f6" stroke="#ffffff" strokeWidth="2.5" />
-            <text x="500" y="44" fill="#60a5fa" fontSize="10" fontWeight="bold" textAnchor="middle" fontFamily="monospace">765 pts</text>
-            <text x="500" y="172" fill="#60a5fa" fontSize="8" fontWeight="bold" textAnchor="middle" fontFamily="monospace">SIM-04 (Hier)</text>
-          </svg>
+                return (
+                  <>
+                    {areaPath && <path d={areaPath} fill="url(#scoreArea)" />}
+                    {count > 1 && (
+                      <path
+                        d={linePath}
+                        fill="none"
+                        stroke="#60a5fa"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    )}
+                    {points.map((p) => (
+                      <g key={p.att.id}>
+                        <circle
+                          cx={p.x}
+                          cy={p.y}
+                          r="5"
+                          fill="#171b26"
+                          stroke={p.att.passed ? '#10b981' : '#f43f5e'}
+                          strokeWidth="2.5"
+                        />
+                        <text
+                          x={p.x}
+                          y={Math.max(14, p.y - 10)}
+                          fill={p.att.passed ? '#10b981' : '#f43f5e'}
+                          fontSize="9"
+                          fontWeight="bold"
+                          textAnchor="middle"
+                          fontFamily="monospace"
+                        >
+                          {p.att.score} ({p.pct}%)
+                        </text>
+                        <text
+                          x={p.x}
+                          y="172"
+                          fill="#94a3b8"
+                          fontSize="8"
+                          textAnchor="middle"
+                          fontFamily="monospace"
+                        >
+                          #{p.att.attemptNumber} · {p.att.examCode}
+                        </text>
+                      </g>
+                    ))}
+                  </>
+                );
+              })()}
+            </svg>
+          )}
         </div>
 
         {/* Detailed Session History Table */}
@@ -893,54 +1062,62 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
               </tr>
             </thead>
             <tbody className="divide-y divide-[#262a35]/60 font-sans">
-              {examAttempts.map((item) => (
-                <tr key={item.id} className="hover:bg-[#0f131d]/50 transition-colors">
-                  <td className="py-3 font-mono font-bold text-white">
-                    <span className="text-blue-400 font-bold">{t('progress:attemptNumber', { number: item.attemptNumber })}</span>
-                    <span className="ml-2 text-[10px] text-slate-400 font-mono">({item.examCode})</span>
-                  </td>
-                  <td className="py-3 text-slate-300 font-mono text-[11px]">
-                    {formatLocalizedDate(item.createdAt, {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }, lang)}
-                  </td>
-                  <td className="py-3 font-mono text-slate-400">
-                    {item.duration}
-                  </td>
-                  <td className="py-3 text-slate-300">
-                    <span className="flex items-center gap-1.5">
-                      <AlertTriangle className={`w-3.5 h-3.5 ${item.passed ? 'text-amber-400' : 'text-rose-400'}`} />
-                      <span className="line-clamp-1">{item.weakPoint}</span>
-                    </span>
-                  </td>
-                  <td className="py-3 text-right font-mono font-bold text-white">
-                    {item.score} / {item.maxScore}
-                  </td>
-                  <td className="py-3 text-center">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                        item.passed
-                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                          : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
-                      }`}
-                    >
-                      {item.passed ? t('progress:analytics.passedStatus') : t('progress:analytics.failedStatus')}
-                    </span>
-                  </td>
-                  <td className="py-3 text-right">
-                    <button
-                      onClick={() => handleOpenAttemptReport(item)}
-                      className="text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
-                    >
-                      {t('progress:analytics.detailedReport')}
-                    </button>
+              {examAttempts.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-6 text-center text-xs text-slate-500 font-mono">
+                    {isEn ? 'No mock exam recorded yet.' : 'Aucun examen blanc enregistré pour le moment.'}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                examAttempts.map((item) => (
+                  <tr key={item.id} className="hover:bg-[#0f131d]/50 transition-colors">
+                    <td className="py-3 font-mono font-bold text-white">
+                      <span className="text-blue-400 font-bold">{t('progress:attemptNumber', { number: item.attemptNumber })}</span>
+                      <span className="ml-2 text-[10px] text-slate-400 font-mono">({item.examCode})</span>
+                    </td>
+                    <td className="py-3 text-slate-300 font-mono text-[11px]">
+                      {formatLocalizedDate(item.createdAt, {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }, lang)}
+                    </td>
+                    <td className="py-3 font-mono text-slate-400">
+                      {item.duration}
+                    </td>
+                    <td className="py-3 text-slate-300">
+                      <span className="flex items-center gap-1.5">
+                        <AlertTriangle className={`w-3.5 h-3.5 ${item.passed ? 'text-amber-400' : 'text-rose-400'}`} />
+                        <span className="line-clamp-1">{item.weakPoint}</span>
+                      </span>
+                    </td>
+                    <td className="py-3 text-right font-mono font-bold text-white">
+                      {item.score} / {item.maxScore}
+                    </td>
+                    <td className="py-3 text-center">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                          item.passed
+                            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                            : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
+                        }`}
+                      >
+                        {item.passed ? t('progress:analytics.passedStatus') : t('progress:analytics.failedStatus')}
+                      </span>
+                    </td>
+                    <td className="py-3 text-right">
+                      <button
+                        onClick={() => handleOpenAttemptReport(item)}
+                        className="text-xs font-semibold text-blue-400 hover:text-blue-300 hover:underline"
+                      >
+                        {t('progress:analytics.detailedReport')}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -948,8 +1125,15 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
 
       {/* Detailed Session Report Modal */}
       {selectedReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div 
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setSelectedReport(null)}
+        >
+          <div
+            ref={reportModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="analytics-report-title"
             className="w-full max-w-lg bg-[#171b26] border border-[#262a35] rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -959,7 +1143,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
                   <FileText className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white font-headline">
+                  <h3 id="analytics-report-title" className="text-lg font-bold text-white font-headline">
                     {t('progress:analytics.sessionReportTitle', { id: selectedReport.id })}
                   </h3>
                   <p className="text-xs text-slate-400">
@@ -969,6 +1153,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ onNavigate, onOpen
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
+                aria-label={t('common:close', 'Fermer')}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white"
               >
                 <X className="w-5 h-5" />

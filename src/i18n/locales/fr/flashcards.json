@@ -127,7 +127,7 @@
   },
   "algorithmModal": {
     "title": "Moteur SRS CertifAI : SuperMemo SM-2 & FSRS",
-    "subtitle": "Pourquoi réviser 17 cartes ciblées bat le défilement aveugle de 500 fiches",
+    "subtitle": "Pourquoi la révision espacée ciblée bat le défilement aveugle de centaines de fiches",
     "ebbinghausTitle": "La Courbe de l'Oubli d'Ebbinghaus inversée",
     "ebbinghausDesc": "Sans révision espacée, le cerveau humain oublie 70% des notions techniques complexes en 48 heures. Le moteur SRS de CertifAI calcule la date exacte où la probabilité de rappel descend sous 85%, pour te faire réviser la carte au moment le plus efficace mathématiquement.",
     "idTitle": "1. Identifiant unique",

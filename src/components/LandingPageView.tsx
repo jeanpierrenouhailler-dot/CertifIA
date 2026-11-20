@@ -31,6 +31,9 @@ import { AppScreen } from '../types';
 import { CertifAILogo } from './CertifAILogo';
 import { LanguageSelector } from './LanguageSelector';
 import { useTheme } from '../context/ThemeContext';
+import { CERTIFICATIONS_COUNT } from '../data/certificationsData';
+import { getLocalizedCertifications } from '../data/localizedCertifications';
+import { TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
 
 interface LandingPageViewProps {
   onNavigate: (screen: AppScreen) => void;
@@ -56,7 +59,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [activePillar, setActivePillar] = useState<number>(0);
   const [activeMethodStep, setActiveMethodStep] = useState<number>(0);
-  const [selectedProvider, setSelectedProvider] = useState<'all' | 'azure' | 'aws' | 'gcp' | 'ibm' | 'nvidia'>('all');
+  const [selectedProvider, setSelectedProvider] = useState<'all' | 'azure' | 'aws' | 'gcp' | 'ibm'>('all');
   const [activeScreenshotTab, setActiveScreenshotTab] = useState<string>('today');
   const [retentionMode, setRetentionMode] = useState<'sm2' | 'ebbinghaus'>('sm2');
 
@@ -207,9 +210,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       titleEn: 'Daily Cockpit & CertifIA Algorithm',
       badge: '01. Cockpit',
       descFr:
-        'Session matinale calibrée (~22 min) : 17 fiches prioritaires au seuil d’oubli SM-2, 8 notions fragiles identifiées, 12 QCM ciblés et progression vers les 700 / 1 000 points.',
+        'Session quotidienne calibrée dynamiquement : fiches prioritaires au seuil d’oubli SM-2, notions fragiles identifiées, QCM ciblés et progression vers les 700 / 1 000 points.',
       descEn:
-        'Calibrated morning session (~22 min): 17 priority cards at SM-2 decay threshold, 8 fragile concepts, 12 targeted MCQs, and telemetry toward 700 / 1,000 pts.',
+        'Dynamically calibrated daily session: priority cards at SM-2 decay threshold, fragile concepts, targeted MCQs, and telemetry toward 700 / 1,000 pts.',
       src: 'assets/screenshots/certifia-cockpit-today.png',
       screen: 'today' as AppScreen,
     },
@@ -231,21 +234,21 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       titleEn: 'Target Exam & Recent Activity Log',
       badge: '03. Activité',
       descFr:
-        'Suivi de l’examen cible (AI-102), date cible, objectif hebdomadaire et prochaines étapes priorisées.',
+        'Suivi de l’examen cible, date d’échéance, objectif hebdomadaire et prochaines étapes priorisées selon vos révisions.',
       descEn:
-        'Target exam tracking (AI-102), target exam date, weekly revision pace, and prioritized next steps.',
+        'Target exam tracking, target exam date, weekly revision pace, and prioritized next steps from your study log.',
       src: 'assets/screenshots/certifia-details-activity.png',
       screen: 'today' as AppScreen,
     },
     {
       id: 'catalogue',
-      titleFr: 'Catalogue des 18 Certifications Cloud & IA',
-      titleEn: 'Official 18 Cloud AI Certifications Catalog',
+      titleFr: `Catalogue des ${CERTIFICATIONS_COUNT} Certifications Cloud & IA`,
+      titleEn: `Official ${CERTIFICATIONS_COUNT} Cloud AI Certifications Catalog`,
       badge: '04. Catalogue',
       descFr:
-        'Référentiel bilingue Microsoft Azure, AWS, Google Cloud, IBM watsonx et NVIDIA avec blueprints détaillés et comparateur.',
+        'Référentiel bilingue Microsoft Azure, AWS, Google Cloud et IBM watsonx avec blueprints détaillés et comparateur.',
       descEn:
-        'Bilingual catalog covering Microsoft Azure, AWS, Google Cloud, IBM watsonx, and NVIDIA with detailed blueprints.',
+        'Bilingual catalog covering Microsoft Azure, AWS, Google Cloud, and IBM watsonx with detailed blueprints.',
       src: 'assets/screenshots/certifia-catalogue-view.svg',
       screen: 'catalogue' as AppScreen,
     },
@@ -323,154 +326,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     },
   ];
 
-  const extendedCatalog = [
-    {
-      id: 'ai102',
-      code: 'AI-102',
-      provider: 'azure',
-      providerName: 'Microsoft Azure',
-      title: 'Azure AI Engineer Associate',
-      level: 'Associate',
-      descFr: 'Solutions d’IA générative Azure OpenAI, Azure AI Search, RAG hybride, Vision et Speech.',
-      descEn: 'Enterprise generative AI with Azure OpenAI, Azure AI Search, Hybrid RAG, Vision, and Speech.',
-      duration: 100,
-      passScore: 700,
-    },
-    {
-      id: 'ai900',
-      code: 'AI-900',
-      provider: 'azure',
-      providerName: 'Microsoft Azure',
-      title: 'Azure AI Fundamentals',
-      level: 'Fondamental',
-      descFr: 'Principes fondamentaux du machine learning, computer vision, NLP et IA responsable.',
-      descEn: 'Foundational concepts of machine learning, computer vision, NLP, and responsible AI.',
-      duration: 65,
-      passScore: 700,
-    },
-    {
-      id: 'dp100',
-      code: 'DP-100',
-      provider: 'azure',
-      providerName: 'Microsoft Azure',
-      title: 'Azure Data Scientist Associate',
-      level: 'Associate',
-      descFr: 'Entraînement de modèles ML, AutoML, MLflow et déploiement d’endpoints d’inférence.',
-      descEn: 'Training ML models, AutoML, MLflow, compute targets, and real-time inference endpoints.',
-      duration: 120,
-      passScore: 700,
-    },
-    {
-      id: 'aifc01',
-      code: 'AIF-C01',
-      provider: 'aws',
-      providerName: 'Amazon Web Services',
-      title: 'AWS Certified AI Practitioner',
-      level: 'Fondamental',
-      descFr: 'IA générative, Amazon Bedrock, SageMaker JumpStart, sécurité IAM et gouvernance.',
-      descEn: 'Generative AI fundamentals, Amazon Bedrock, SageMaker JumpStart, IAM security, and governance.',
-      duration: 85,
-      passScore: 700,
-    },
-    {
-      id: 'mlsc01',
-      code: 'MLS-C01',
-      provider: 'aws',
-      providerName: 'Amazon Web Services',
-      title: 'AWS Machine Learning Specialty',
-      level: 'Spécialiste',
-      descFr: 'Ingénierie des données S3/Glue, algorithmes SageMaker, tuning et MLOps.',
-      descEn: 'Data engineering on S3/Glue, SageMaker modeling, hyperparameter tuning, and MLOps.',
-      duration: 180,
-      passScore: 750,
-    },
-    {
-      id: 'aws-bedrock',
-      code: 'AWS-BEDROCK',
-      provider: 'aws',
-      providerName: 'Amazon Web Services',
-      title: 'Amazon Bedrock Specialist',
-      level: 'Associate',
-      descFr: 'Agents autonomes Bedrock, Knowledge Bases OpenSearch, Guardrails et LoRA.',
-      descEn: 'Bedrock autonomous agents, OpenSearch Knowledge Bases, Guardrails, and LoRA tuning.',
-      duration: 100,
-      passScore: 720,
-    },
-    {
-      id: 'gcpmle',
-      code: 'GCP-PMLE',
-      provider: 'gcp',
-      providerName: 'Google Cloud',
-      title: 'Professional ML Engineer',
-      level: 'Spécialiste',
-      descFr: 'Architecture Vertex AI, Kubeflow Pipelines, GPU/TPU, BigQuery ML et drift monitoring.',
-      descEn: 'Vertex AI architecture, Kubeflow Pipelines, GPU/TPU accelerators, BigQuery ML, and drift checks.',
-      duration: 120,
-      passScore: 750,
-    },
-    {
-      id: 'gcp-cdl',
-      code: 'GCP-CDL-AI',
-      provider: 'gcp',
-      providerName: 'Google Cloud',
-      title: 'Cloud Digital Leader & GenAI',
-      level: 'Fondamental',
-      descFr: 'Transformation cloud, cas d’usage Vertex AI Studio, Gemini d’entreprise et IAM.',
-      descEn: 'Enterprise cloud transformation, Vertex AI Studio, Gemini enterprise models, and IAM.',
-      duration: 90,
-      passScore: 700,
-    },
-    {
-      id: 'watsonx',
-      code: 'C1000-177',
-      provider: 'ibm',
-      providerName: 'IBM watsonx',
-      title: 'IBM watsonx.ai Specialist',
-      level: 'Spécialiste',
-      descFr: 'Prompt Lab, modèles Granite, watsonx.data Iceberg et conformité EU AI Act.',
-      descEn: 'Prompt Lab, Granite models, watsonx.data Iceberg lakehouse, and EU AI Act readiness.',
-      duration: 90,
-      passScore: 620,
-    },
-    {
-      id: 'ibm-wgov',
-      code: 'IBM-WGOV',
-      provider: 'ibm',
-      providerName: 'IBM watsonx',
-      title: 'IBM watsonx.governance Specialist',
-      level: 'Spécialiste',
-      descFr: 'Factsheets automatisées, détection de biais, Disparate Impact et conformité ISO.',
-      descEn: 'Automated Factsheets, bias mitigation, Disparate Impact tracking, and ISO compliance.',
-      duration: 90,
-      passScore: 650,
-    },
-    {
-      id: 'nv-genai',
-      code: 'NV-GENAI',
-      provider: 'nvidia',
-      providerName: 'NVIDIA DLI',
-      title: 'Generative AI LLMs Associate',
-      level: 'Associate',
-      descFr: 'Transformers, quantization AWQ/FP8, TensorRT-LLM, NeMo et NeMo Guardrails.',
-      descEn: 'Transformers, AWQ/FP8 quantization, TensorRT-LLM, NeMo framework, and NeMo Guardrails.',
-      duration: 90,
-      passScore: 700,
-    },
-    {
-      id: 'nv-triton',
-      code: 'NV-TRITON',
-      provider: 'nvidia',
-      providerName: 'NVIDIA DLI',
-      title: 'Triton & TensorRT Architect',
-      level: 'Spécialiste',
-      descFr: 'Dynamic batching, model pipelining et inférence GPU basse latence Hopper/Blackwell.',
-      descEn: 'Dynamic batching, model pipelining, and ultra-low-latency Hopper/Blackwell GPU serving.',
-      duration: 90,
-      passScore: 700,
-    },
-  ];
+  const catalogCertifications = React.useMemo(
+    () => getLocalizedCertifications(currentLang),
+    [currentLang]
+  );
 
-  const filteredCerts = extendedCatalog.filter((c) => {
+  const filteredCerts = catalogCertifications.filter((c) => {
     if (selectedProvider === 'all') return true;
     return c.provider === selectedProvider;
   });
@@ -518,8 +379,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     {
       qFr: 'Qu’est-ce que CertifIA exactement ?',
       qEn: 'What exactly is CertifIA?',
-      aFr: 'CertifIA est un environnement intelligent dédié à la préparation des certifications Cloud Computing et Intelligence Artificielle (Microsoft Azure, AWS, Google Cloud, IBM watsonx et NVIDIA). Il réunit un cockpit quotidien avec répétition espacée SM-2, 2 800 fiches mémo, des QCM scénarisés, des examens blancs chronométrés et un tuteur socratique.',
-      aEn: 'CertifIA is an intelligent platform dedicated to Cloud Computing and AI certification preparation (Microsoft Azure, AWS, Google Cloud, IBM watsonx, and NVIDIA). It combines a daily SM-2 spaced repetition cockpit, 2,800 flashcards, scenario MCQs, timed mock exams, and a Socratic AI tutor.',
+      aFr: `CertifIA est un environnement intelligent dédié à la préparation des certifications Cloud Computing et Intelligence Artificielle (Microsoft Azure, AWS, Google Cloud et IBM watsonx). Il réunit un cockpit quotidien avec répétition espacée SM-2, ${TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')} fiches mémo, des QCM scénarisés, des examens blancs chronométrés et un guide pédagogique structuré.`,
+      aEn: `CertifIA is an intelligent platform dedicated to Cloud Computing and AI certification preparation (Microsoft Azure, AWS, Google Cloud, and IBM watsonx). It combines a daily SM-2 spaced repetition cockpit, ${TOTAL_FLASHCARDS_COUNT.toLocaleString('en-US')} flashcards, scenario MCQs, timed mock exams, and a structured pedagogical study guide.`,
     },
     {
       qFr: 'À qui s’adresse la plateforme ?',
@@ -530,8 +391,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     {
       qFr: 'Quelles certifications sont disponibles dans le catalogue ?',
       qEn: 'Which certifications are available in the catalog?',
-      aFr: 'Le catalogue couvre 18 certifications Cloud & IA majeures réparties entre Microsoft Azure (AI-102, AI-900, DP-100), AWS (AIF-C01, MLS-C01, Bedrock), Google Cloud (PMLE, Cloud Digital Leader AI), IBM watsonx (C1000-177, watsonx.governance) et NVIDIA (GenAI LLMs, Triton Inference Server).',
-      aEn: 'The catalog covers 18 major Cloud & AI certifications across Microsoft Azure (AI-102, AI-900, DP-100), AWS (AIF-C01, MLS-C01, Bedrock), Google Cloud (PMLE, Cloud Digital Leader AI), IBM watsonx (C1000-177, watsonx.governance), and NVIDIA (GenAI LLMs, Triton Inference Server).',
+      aFr: `Le catalogue couvre ${CERTIFICATIONS_COUNT} certifications Cloud & IA majeures : Microsoft Azure (AI-102, AI-900), AWS (AIF-C01, MLS-C01), Google Cloud (GCP-PMLE) et IBM watsonx (C1000-177).`,
+      aEn: `The catalog covers ${CERTIFICATIONS_COUNT} major Cloud & AI certifications across Microsoft Azure (AI-102, AI-900), AWS (AIF-C01, MLS-C01), Google Cloud (GCP-PMLE), and IBM watsonx (C1000-177).`,
     },
     {
       qFr: 'Comment fonctionne la répétition espacée SM-2 ?',
@@ -542,14 +403,14 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     {
       qFr: 'Peut-on passer des examens blancs en conditions réelles ?',
       qEn: 'Can I take timed mock exams under realistic conditions?',
-      aFr: 'Oui. Le mode Examen Blanc simule le chronomètre officiel (85 à 180 minutes), le marquage des questions à revoir et la notation au seuil officiel (700 ou 750 / 1 000 pts) avec débriefing détaillé par domaine.',
-      aEn: 'Yes. Mock Exam mode simulates official countdown timers (85 to 180 minutes), question flagging for review, and strict grading against official passing thresholds (700 or 750 / 1,000 pts) with domain debriefing.',
+      aFr: 'Oui. Le mode Examen Blanc simule le chronomètre officiel (65 à 180 minutes), le marquage des questions à revoir et la notation au seuil officiel (620, 700 ou 750 / 1 000 pts) avec débriefing détaillé par domaine.',
+      aEn: 'Yes. Mock Exam mode simulates official countdown timers (65 to 180 minutes), question flagging for review, and strict grading against official passing thresholds (620, 700, or 750 / 1,000 pts) with domain debriefing.',
     },
     {
       qFr: 'Comment fonctionne le tuteur pédagogique IA ?',
       qEn: 'How does the pedagogical AI tutor work?',
-      aFr: 'Le tuteur emploie une approche socratique : au lieu de donner la réponse brute, il guide votre raisonnement sur les compromis d’architecture (coût, latence, précision, sécurité) avec des références aux documentations officielles.',
-      aEn: 'The tutor follows a Socratic approach: instead of giving away raw answers, it guides your reasoning around architectural trade-offs (cost, latency, accuracy, security) with references to official vendor documentation.',
+      aFr: 'Le tuteur emploie une approche structurée : il synthétise les concepts clés, pièges d’examen et compromis d’architecture (coût, latence, précision, sécurité) avec des références aux documentations officielles.',
+      aEn: 'The tutor uses a structured pedagogical approach: summarizing core concepts, exam traps, and architectural trade-offs (cost, latency, accuracy, security) with references to official vendor documentation.',
     },
     {
       qFr: 'CertifIA est-il disponible en anglais ?',
@@ -566,12 +427,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
     {
       qFr: 'L’application fonctionne-t-elle hors ligne ?',
       qEn: 'Does the application work offline?',
-      aFr: 'CertifIA est une Progressive Web App (PWA) installable. Les ressources mises en cache via le Service Worker (interface, 2 800 fiches mémo, algorithme SM-2 et progression locale) restent utilisables hors ligne. Les requêtes dynamiques au tuteur IA nécessitent une connexion Internet.',
-      aEn: 'CertifIA is an installable Progressive Web App (PWA). Service Worker cached assets (UI, 2,800 flashcards, SM-2 scheduler, and local progress) remain functional offline. Real-time AI tutor requests require an active connection.',
+      aFr: `CertifIA est une Progressive Web App (PWA) installable. Les ressources mises en cache via le Service Worker (interface, ${TOTAL_FLASHCARDS_COUNT.toLocaleString('fr-FR')} fiches mémo, algorithme SM-2 et progression locale) restent utilisables hors ligne.`,
+      aEn: `CertifIA is an installable Progressive Web App (PWA). Service Worker cached assets (UI, ${TOTAL_FLASHCARDS_COUNT.toLocaleString('en-US')} flashcards, SM-2 scheduler, and local progress) remain functional offline.`,
     },
     {
-      qFr: 'CertifIA est-il affilié à Microsoft, AWS, Google, IBM ou NVIDIA ?',
-      qEn: 'Is CertifIA affiliated with Microsoft, AWS, Google, IBM, or NVIDIA?',
+      qFr: 'CertifIA est-il affilié à Microsoft, AWS, Google Cloud ou IBM ?',
+      qEn: 'Is CertifIA affiliated with Microsoft, AWS, Google Cloud, or IBM?',
       aFr: 'Non. CertifIA est un projet indépendant d’entraînement cognitif et n’est affilié, sponsorisé ni certifié par aucun organisme certificateur officiel. Toutes les marques citées appartiennent à leurs détenteurs respectifs.',
       aEn: 'No. CertifIA is an independent cognitive preparation project and is neither affiliated with, sponsored by, nor endorsed by any official certification vendor. All trademarks belong to their respective owners.',
     },
@@ -901,9 +762,9 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     </span>
                   </div>
                   <div className="hidden sm:flex items-center gap-3 font-mono text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
-                    <span>AI-102 Azure AI Engineer</span>
+                    <span>{currentLang === 'en' ? 'Cockpit Preview' : 'Aperçu Cockpit'}</span>
                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-                      {currentLang === 'en' ? '17 SRS due' : '17 fiches SRS'}
+                      SM-2 · FSRS
                     </span>
                   </div>
                 </div>
@@ -927,18 +788,18 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                     <div className="flex items-center gap-2 text-[11px] font-mono text-blue-400 mb-1">
                       <Target className="w-3.5 h-3.5 text-blue-400 shrink-0" aria-hidden="true" />
                       <span>
-                        {currentLang === 'en' ? 'RECOMMENDED DAILY SESSION' : 'SESSION QUOTIDIENNE RECOMMANDÉE'}
+                        {currentLang === 'en' ? 'ADAPTIVE DAILY SESSION' : 'SESSION QUOTIDIENNE ADAPTATIVE'}
                       </span>
                     </div>
                     <h2 className="text-sm font-bold text-white">
                       {currentLang === 'en'
-                        ? '17 SRS Cards · 8 Weak Concepts · 12 MCQs'
-                        : '17 Fiches SRS · 8 Notions Fragiles · 12 QCM'}
+                        ? 'SM-2 Cards · Weak Concepts · Targeted MCQs'
+                        : 'Fiches SM-2 · Notions Fragiles · QCM Ciblés'}
                     </h2>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
                       {currentLang === 'en'
-                        ? 'Spaced intervals computed at the critical forgetting threshold.'
-                        : 'Rappels calculés au seuil critique d’oubli pour une mémorisation durable.'}
+                        ? 'Spaced intervals computed dynamically at the critical forgetting threshold.'
+                        : 'Rappels calculés dynamiquement au seuil critique d’oubli pour une mémorisation durable.'}
                     </p>
                     <button
                       type="button"
@@ -961,8 +822,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   </div>
                   <div className="text-sm font-bold">
                     {currentLang === 'en'
-                      ? '17 SRS Cards · 8 Weak Concepts · 12 MCQs'
-                      : '17 Fiches SRS · 8 Notions Fragiles · 12 QCM'}
+                      ? 'SM-2 Cards · Weak Concepts · Targeted MCQs'
+                      : 'Fiches SM-2 · Notions Fragiles · QCM Ciblés'}
                   </div>
                   <button
                     type="button"
@@ -986,21 +847,21 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               <div className="min-w-0">
                 <div className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-900 dark:text-white tabular-nums">
-                  18
+                  {CERTIFICATIONS_COUNT}
                 </div>
                 <div className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">
                   {currentLang === 'en' ? 'Cloud & AI Certifications' : 'Certifications Cloud & IA'}
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   {currentLang === 'en'
-                    ? 'Aligned with Azure, AWS, Google Cloud, IBM watsonx, and NVIDIA syllabi.'
-                    : 'Alignées sur les syllabi officiels Azure, AWS, GCP, IBM et NVIDIA.'}
+                    ? 'Aligned with official Azure, AWS, Google Cloud, and IBM watsonx syllabi.'
+                    : 'Alignées sur les syllabi officiels Azure, AWS, GCP et IBM watsonx.'}
                 </p>
               </div>
 
               <div className="min-w-0">
                 <div className="text-3xl sm:text-4xl font-extrabold font-mono text-blue-600 dark:text-blue-400 tabular-nums">
-                  {currentLang === 'en' ? '2,800' : '2 800'}
+                  {TOTAL_FLASHCARDS_COUNT.toLocaleString(currentLang === 'en' ? 'en-US' : 'fr-FR')}
                 </div>
                 <div className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-1">
                   {currentLang === 'en' ? 'SM-2 Flashcards' : 'Fiches Mémo SM-2'}
@@ -1300,16 +1161,16 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   num: '02',
                   titleFr: 'Catalogue des certifications',
                   titleEn: 'Certifications Catalog',
-                  subtitleFr: 'Microsoft Azure, AWS, Google Cloud, IBM watsonx et NVIDIA avec filtres et comparateur.',
-                  subtitleEn: 'Microsoft Azure, AWS, Google Cloud, IBM watsonx, and NVIDIA with filters and comparator.',
+                  subtitleFr: 'Microsoft Azure, AWS, Google Cloud et IBM watsonx avec filtres et comparateur.',
+                  subtitleEn: 'Microsoft Azure, AWS, Google Cloud, and IBM watsonx with filters and comparator.',
                   featuresFr: [
-                    '18 certifications Cloud & IA structurées par niveau et fournisseur',
+                    `${CERTIFICATIONS_COUNT} certifications Cloud & IA structurées par niveau et fournisseur`,
                     'Blueprints détaillés avec pondérations officielles par domaine',
                     'Comparateur côte à côte : durée, prérequis, score minimal et modules',
                     'Filtres rapides par fournisseur, domaine technologique et difficulté',
                   ],
                   featuresEn: [
-                    '18 Cloud & AI certifications organized by vendor and difficulty tier',
+                    `${CERTIFICATIONS_COUNT} Cloud & AI certifications organized by vendor and difficulty tier`,
                     'Detailed blueprints detailing official skill domain weights',
                     'Side-by-side exam comparator for duration, passing score, and topics',
                     'Instant filtering by provider, specialization domain, and level',
@@ -1772,8 +1633,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               <div className="px-4 sm:px-6 py-4 bg-slate-50 dark:bg-[#0c0f18] border-t border-slate-200 dark:border-[#1c2130] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <span className="text-slate-500 dark:text-slate-400">
                   {currentLang === 'en'
-                    ? 'Ready to train across all 18 Cloud & AI certifications?'
-                    : 'Prêt à vous entraîner sur les 18 certifications Cloud & IA ?'}
+                    ? `Ready to train across all ${CERTIFICATIONS_COUNT} Cloud & AI certifications?`
+                    : `Prêt à vous entraîner sur les ${CERTIFICATIONS_COUNT} certifications Cloud & IA ?`}
                 </span>
                 <button
                   type="button"
@@ -2048,20 +1909,19 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 </h2>
                 <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                   {currentLang === 'en'
-                    ? 'Microsoft Azure, Amazon Web Services, Google Cloud, IBM watsonx, and NVIDIA.'
-                    : 'Microsoft Azure, Amazon Web Services, Google Cloud, IBM watsonx et NVIDIA.'}
+                    ? 'Microsoft Azure, Amazon Web Services, Google Cloud, and IBM watsonx.'
+                    : 'Microsoft Azure, Amazon Web Services, Google Cloud et IBM watsonx.'}
                 </p>
               </div>
 
               {/* Clean wrapping provider filter */}
               <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-white dark:bg-[#141824] border border-slate-200 dark:border-[#222738] rounded-xl self-start lg:self-auto">
                 {[
-                  { id: 'all', label: currentLang === 'en' ? 'All (18)' : 'Toutes (18)' },
+                  { id: 'all', label: `${currentLang === 'en' ? 'All' : 'Toutes'} (${CERTIFICATIONS_COUNT})` },
                   { id: 'azure', label: 'Azure' },
                   { id: 'aws', label: 'AWS' },
                   { id: 'gcp', label: 'Google Cloud' },
                   { id: 'ibm', label: 'IBM watsonx' },
-                  { id: 'nvidia', label: 'NVIDIA' },
                 ].map((p) => (
                   <button
                     key={p.id}
@@ -2084,34 +1944,32 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {filteredCerts.map((cert) => (
                 <div
-                  key={cert.code}
+                  key={cert.id}
                   className="rounded-2xl bg-white dark:bg-[#121622] border border-slate-200 dark:border-[#222738] p-6 flex flex-col justify-between hover:border-blue-500/50 transition-colors"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400 mb-3">
                       <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{cert.code}</span>
                       <span className="truncate">
-                        {cert.providerName} · {cert.level}
+                        {cert.providerName} · {cert.levelLabel}
                       </span>
                     </div>
 
                     <h3 className="text-base font-bold text-slate-900 dark:text-white">{cert.title}</h3>
 
-                    <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                      {currentLang === 'en' ? cert.descEn : cert.descFr}
+                    <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3">
+                      {cert.targetAudience}
                     </p>
                   </div>
 
                   <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#1c2130] flex items-center justify-between gap-3">
                     <span className="text-xs font-mono text-slate-500 dark:text-slate-400 tabular-nums">
-                      {cert.duration} min · {cert.passScore} pts
+                      {cert.durationMinutes} min · {cert.passScore} pts
                     </span>
                     <button
                       type="button"
                       onClick={() =>
-                        onOpenBlueprint && ['ai102', 'ai900', 'aifc01', 'mlsc01', 'gcpmle', 'watsonx'].includes(cert.id)
-                          ? onOpenBlueprint(cert.id)
-                          : onNavigate('catalogue')
+                        onOpenBlueprint ? onOpenBlueprint(cert.id) : onNavigate('catalogue')
                       }
                       className="py-2 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold inline-flex items-center gap-1 transition-colors shrink-0"
                     >
@@ -2132,8 +1990,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
                 <span>
                   {currentLang === 'en'
-                    ? 'Open Full 18-Certification Catalog'
-                    : 'Consulter le catalogue complet des 18 certifications'}
+                    ? `Open Full ${CERTIFICATIONS_COUNT}-Certification Catalog`
+                    : `Consulter le catalogue complet des ${CERTIFICATIONS_COUNT} certifications`}
                 </span>
               </button>
             </div>
@@ -2406,7 +2264,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 <div className="p-5 rounded-2xl bg-white dark:bg-[#121622] border border-slate-200 dark:border-[#222738] flex items-center justify-between gap-4">
                   <div>
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono block">
-                      {currentLang === 'en' ? 'MCQ ACCURACY' : 'PRÉCISION QCM'}
+                      {currentLang === 'en' ? 'MCQ ACCURACY (DEMO)' : 'PRÉCISION QCM (DÉMO)'}
                     </span>
                     <span className="text-xl font-extrabold font-mono text-slate-900 dark:text-white tabular-nums">
                       78.4 %
@@ -2414,7 +2272,7 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                   </div>
                   <div className="text-right">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono block">
-                      {currentLang === 'en' ? 'CONSISTENCY' : 'RÉGULARITÉ'}
+                      {currentLang === 'en' ? 'CONSISTENCY (DEMO)' : 'RÉGULARITÉ (DÉMO)'}
                     </span>
                     <span className="text-xl font-extrabold font-mono text-amber-500 tabular-nums">
                       {currentLang === 'en' ? '14 days' : '14 jours'}

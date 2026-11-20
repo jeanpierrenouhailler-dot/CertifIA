@@ -3,11 +3,11 @@
 ## 1. Vision & Objectifs Produit
 **CertifIA** est une plateforme applicative de préparation intensive et de télémétrie cognitive pour les certifications d'intelligence artificielle et de Cloud (Microsoft Azure AI-102 & AI-900, AWS Certified AI Practitioner & MLS-C01, Google Cloud Professional ML Engineer, IBM watsonx.ai Specialist C1000-177).
 
-Plutôt qu'un catalogue passif de 500 fiches et de centaines de questions, CertifIA agit comme un **coach cognitif proactif** capable de :
-1. Calculer précisément la **courbe d'oubli** de l'utilisateur grâce à l'algorithme **SuperMemo-2 (SM-2)** et au modèle **FSRS**.
-2. Composer chaque matin une **session quotidienne personnalisée** ("Aujourd'hui") ciblant 17 cartes prioritaires, 8 notions fragiles et 12 questions non maîtrisées.
+Plutôt qu'un catalogue passif, CertifIA agit comme un **coach cognitif déterministe** capable de :
+1. Calculer précisément la **courbe d'oubli** de l'utilisateur grâce à l'algorithme **SuperMemo-2 (SM-2)** et au modèle **FSRS**, sans aucune statistique fictive (tout utilisateur neuf démarre à `0`).
+2. Composer une **session quotidienne dynamique** ("Aujourd'hui") alimentée par `src/lib/metricsEngine.ts` et `ProgressContext.tsx` (cartes SRS dues, notions fragiles issues des révisions réelles, QCM non maîtrisés).
 3. Structurer l'orientation de carrière grâce à un **moteur de recommandation en 4 niveaux** (Fondations → IA Générative → Cloud AI → Machine Learning & MLOps).
-4. Offrir une expérience logicielle de niveau professionnel : **Menu Hamburger catégorisé** (`Ctrl+M`), **barre supérieure allégée en 3 zones**, **mode clair et mode sombre**, **paramètres système avec mises à jour automatiques en arrière-plan (`SKIP_WAITING`)**, **onboarding contextuel et infobulles sur les 10 écrans**, **onboarding légal avec décharge explicite de responsabilité des données**, et **installation PWA mobile/desktop avec icônes dédiées**.
+4. Offrir une expérience logicielle accessible et fiable : **Menu Hamburger catégorisé** (`Ctrl+M`), **barre supérieure allégée en 3 zones**, **modales accessibles standardisées (`useAccessibleModal.ts` avec focus trap, `Échap` et restauration du focus)**, **mode clair et mode sombre**, **paramètres système PWA**, **onboarding contextuel et infobulles sur les 10 écrans**, et **onboarding légal avec décharge explicite**.
 
 ---
 
@@ -77,7 +77,7 @@ Une trajectoire en 4 paliers interconnectés :
 ## 5. Cadre Juridique & Mentions Légales
 ### Cadre Juridique & Mentions Légales (`src/components/LegalOnboardingModal.tsx`)
 * Clause explicite de non-responsabilité indiquant que l'éditeur et le concepteur ne sont en aucun cas responsables des données, informations, questions, réponses ou simulations fournies dans l'application, qui demeurent purement indicatives.
-* Déclaration d'indépendance vis-à-vis de Microsoft, AWS, Google Cloud, IBM et NVIDIA.
+* Déclaration d'indépendance vis-à-vis de Microsoft, AWS, Google Cloud et IBM.
 * Acceptation obligatoire lors de la première utilisation (`localStorage` : `certifai_legal_accepted_v1`), avec accès permanent depuis le menu hamburger, le menu compte et les paramètres système.
 
 ---
@@ -111,12 +111,12 @@ Conçu pour combler le fossé entre la mémorisation brute et la compréhension 
 ---
 
 ## 8. Architecture de Navigation Allégée & Onboarding Contextuel (v2.9.0)
-Restructuration fondée sur 5 piliers cardinaux et un design anti-slop à haute lisibilité :
-1. **ACCUEIL (`today`)** : Message de bienvenue, progression générale, certification en cours, bouton d'action principal « Reprendre mon apprentissage » en 1 clic, récapitulatif des 17 cartes SM-2 dues, 8 notions fragiles, 12 questions ciblées, flux des activités récentes et prochaines étapes recommandées.
-2. **CERTIFICATIONS (`catalogue`)** : Catalogue des 18 certifications officielles, filtres (fournisseur, niveau, domaine, budget), fiches détaillées (Blueprints), comparateur interactif côte à côte (`CertificationsComparatorModal.tsx`) et passerelles directes d'entraînement.
-3. **APPRENTISSAGE (`quiz`, `flashcards`, `exam`, `recommendation`)** : Mes parcours, Quiz & entraînements scénarisés, Fiches mémo avec répétition espacée SRS SM-2 (2 800 cartes), examens blancs chronométrés 90 minutes en conditions réelles, et passerelles post-activité (revoir les erreurs, fiches associées, tuteur IA).
-4. **PROGRESSION (`analytics`)** : Télémétrie cognitive, diagnostic des compétences maîtrisées vs compétences à renforcer, historique des tentatives avec clause de rigueur méthodologique (les estimations ne sont pas des garanties d'examen).
-5. **ASSISTANT IA (`assistant` & `AIAssistantDrawer.tsx`)** : Tuteur pédagogique IA disponible en tiroir latéral contextuel ou écran dédié, fournissant explications pas à pas, pièges d'examen officiels et astuces mnémotechniques.
+Restructuration fondée sur 5 piliers cardinaux et un moteur de métriques unifié (`src/lib/metricsEngine.ts`) :
+1. **ACCUEIL (`today`)** : Tableau de bord épuré, progression générale calculée en direct (`0 %` sans activité), certification en cours (`normalizeCertId`), bouton d'action principal en 1 clic, cartes SM-2 dues, notions fragiles, QCM non maîtrisés, et flux des activités récentes réelles.
+2. **CERTIFICATIONS (`catalogue`)** : Catalogue des **6 certifications officielles** (`AI-102`, `AI-900`, `AIF-C01`, `MLS-C01`, `GCP-PMLE`, `C1000-177`), filtres (fournisseur Cloud, niveau de difficulté), fiches détaillées (`BlueprintDrawer.tsx` branché sur `metricsEngine`), et comparateur interactif côte à côte (`CertificationsComparatorModal.tsx`).
+3. **APPRENTISSAGE (`quiz`, `flashcards`, `exam`, `recommendation`)** : Mes parcours, Quiz & entraînements scénarisés avec persistance `quizAttempts`, Fiches mémo SRS SM-2 (2 800 cartes), examens blancs chronométrés, et passerelles post-activité.
+4. **PROGRESSION (`analytics`)** : Télémétrie cognitive 100 % issue des données persistées (`reviews`, `quizAttempts`, `examAttempts`), diagnostic des domaines, trajectoire dynamique et remise à zéro complète (`resetAllProgress`).
+5. **ASSISTANT IA (`assistant` & `AIAssistantDrawer.tsx`)** : Guide pédagogique hors-ligne basé sur les blueprints officiels et les échéances SRS réelles de l'utilisateur.
 * **Barre Latérale Rétractable (`Sidebar.tsx`)** : Mode étendu (72) et mode réduit (icônes avec tooltips natifs), avec accès rapide **« Installer l’application »** lorsque non installée.
 * **Barre Supérieure Allégée en 3 Zones (`Header.tsx`)** : Navigation + Fil d'Ariane à gauche (bouton Hamburger visible `< lg`), Command Palette (`Ctrl+K`) au centre, certification cible + Menu unifié Compte & Préférences (Thème, Langue, Mode Guide, Tour, Paramètres, Installer) à droite.
 * **Onboarding Contextuel & Infobulles sur Tous les Écrans (`ScreenGuideBanner.tsx` & `InfoTooltip.tsx`)** : Présents sur l'intégralité des 10 écrans applicatifs (`today`, `catalogue`, `recommendation`, `quiz`, `flashcards`, `exam`, `glossary`, `analytics`, `assistant`, `profile`) pour expliquer clairement le fonctionnement de chaque vue et guider les utilisateurs novices.

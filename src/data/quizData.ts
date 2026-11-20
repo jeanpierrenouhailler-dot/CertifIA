@@ -239,27 +239,3 @@ export const quizQuestionsData: QuizQuestion[] = [
     }
   }
 ];
-
-// Complete 20 questions status matrix for the Entraînement grid navigation
-export const quizMatrixItems = [
-  { num: 1, status: 'correct', score: 30 },
-  { num: 2, status: 'correct', score: 35 },
-  { num: 3, status: 'correct', score: 35 },
-  { num: 4, status: 'incorrect', score: 0 },
-  { num: 5, status: 'correct', score: 40 },
-  { num: 6, status: 'correct', score: 30 },
-  { num: 7, status: 'active', score: null }, // Current active item
-  { num: 8, status: 'unanswered', score: null },
-  { num: 9, status: 'unanswered', score: null },
-  { num: 10, status: 'unanswered', score: null },
-  { num: 11, status: 'unanswered', score: null },
-  { num: 12, status: 'unanswered', score: null },
-  { num: 13, status: 'unanswered', score: null },
-  { num: 14, status: 'unanswered', score: null },
-  { num: 15, status: 'unanswered', score: null },
-  { num: 16, status: 'unanswered', score: null },
-  { num: 17, status: 'unanswered', score: null },
-  { num: 18, status: 'unanswered', score: null },
-  { num: 19, status: 'unanswered', score: null },
-  { num: 20, status: 'unanswered', score: null },
-];

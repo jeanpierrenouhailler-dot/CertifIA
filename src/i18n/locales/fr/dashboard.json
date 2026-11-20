@@ -13,7 +13,7 @@
   "startSession": "Commencer ma session",
   "resumeLearning": "Reprendre mon apprentissage",
   "quickActions": "Passerelles directes",
-  "browseCatalogue": "Explorer le catalogue (18 certifs)",
+  "browseCatalogue": "Explorer le catalogue (6 certifs)",
   "openTutor": "Consulter le tuteur IA",
   "takeMockExam": "Lancer un examen blanc (90 min)",
   "readGlossary": "Consulter le glossaire IA",
@@ -62,12 +62,12 @@
   "sessionDetails": {
     "title": "Détail de la Session",
     "totalSteps": "Total {{count}} étapes",
-    "step1Title": "17 Fiches SRS",
+    "step1Title": "Fiches SRS à revoir",
     "step1Desc": "Rappels espacés calculés aujourd'hui ({{overdue}} en retard, {{due}} à échéance).",
-    "step2Title": "8 Notions Fragiles",
-    "step2Desc": "Pièges d'examen à haute pondération identifiés par CertifIA.",
-    "step3Title": "12 Questions QCM",
-    "step3Desc": "Mise en situation d'architecture avec explications officielles Microsoft / AWS / IBM."
+    "step2Title": "Notions Fragiles",
+    "step2Desc": "Notions à consolider identifiées à partir de votre historique SM-2.",
+    "step3Title": "Questions QCM",
+    "step3Desc": "Mise en situation d'architecture avec explications officielles Microsoft / AWS / GCP / IBM."
   },
   "coachTip": {
     "title": "Conseil du Jour CertifIA",
@@ -93,19 +93,19 @@
     "title": "Prochaines Étapes",
     "guided": "Guidé",
     "step1Title": "1. Terminer la session du jour",
-    "step1Desc": "17 cartes pour sécuriser le seuil SM-2",
-    "step2Title": "2. Renforcer les pièges RAG",
-    "step2Desc": "Vérifier les filtres Custom Blocklists",
+    "step1Desc": "Réviser les fiches prioritaires SM-2 du jour",
+    "step2Title": "2. Renforcer les notions fragiles",
+    "step2Desc": "Consolider les domaines sous le seuil cible",
     "step3Title": "3. Examen blanc complet",
-    "step3Desc": "Valider 700/1000 en 90 minutes"
+    "step3Desc": "Atteindre le seuil de réussite officiel"
   },
   "tooltips": {
     "sm2Cards": "Cartes SRS à réviser (SM-2)",
-    "sm2CardsDesc": "Ces 17 cartes ont atteint leur seuil d'oubli critique calculé par l'algorithme SuperMemo-2 / FSRS. Les revoir aujourd'hui maximise votre rétention sans surcharger votre mémoire.",
+    "sm2CardsDesc": "Ces cartes ont atteint leur seuil d'oubli critique calculé par l'algorithme SuperMemo-2 / FSRS. Les revoir aujourd'hui maximise votre rétention sans surcharger votre mémoire.",
     "fragileConcepts": "Notions Fragiles & Pièges",
-    "fragileConceptsDesc": "Concepts à fort coefficient d'examen où vos réponses précédentes ont montré des hésitations, des erreurs répétées ou une difficulté supérieure à 3/5.",
+    "fragileConceptsDesc": "Concepts où vos révisions précédentes ont montré des hésitations, des erreurs répétées ou une difficulté élevée.",
     "targetedMcq": "QCM d'Architecture Ciblés",
-    "targetedMcqDesc": "12 questions d'examen représentatives sélectionnées pour tester votre capacité à appliquer vos connaissances théoriques dans des cas réels d'entreprise.",
+    "targetedMcqDesc": "Questions d'examen représentatives sélectionnées pour valider votre capacité à appliquer vos connaissances dans des cas réels d'entreprise.",
     "activeCert": "Certification Active",
     "activeCertDesc": "L'examen officiel ciblé par vos sessions quotidiennes. Vous pouvez changer d'examen cible en un clic via la barre supérieure."
   }

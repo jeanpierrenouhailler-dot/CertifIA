@@ -1,12 +1,12 @@
 {
   "title": "Catalogue des Certifications IA",
-  "subtitle": "Explorez les 18 certifications officielles en Intelligence Artificielle et Cloud AI.",
+  "subtitle": "Explorez les 6 certifications Cloud et Intelligence Artificielle couvertes.",
   "filterAll": "Tous",
   "filterByProvider": "Organisme / Fournisseur",
   "filterByLevel": "Niveau de difficulté",
   "filterBySearch": "Recherche par mot-clé, code d'examen...",
   "comparatorTitle": "Comparateur de Certifications",
-  "badgeCount": "18 Certifications 2025",
+  "badgeCount": "6 Certifications",
   "searchPlaceholder": "Filtrer par titre, code (AI-102...), module...",
   "filters": {
     "allLevels": "Tous niveaux",
@@ -63,8 +63,7 @@
     "azure": "Microsoft Azure",
     "aws": "Amazon Web Services",
     "gcp": "Google Cloud",
-    "ibm": "IBM watsonx",
-    "nvidia": "NVIDIA DLI"
+    "ibm": "IBM watsonx"
   },
   "blueprint": {
     "skillsFramework": "Référentiel officiel des compétences et pondération d'examen",

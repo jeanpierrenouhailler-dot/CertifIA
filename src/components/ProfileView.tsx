@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   User, 
   Mail, 
@@ -21,13 +21,15 @@ import {
   TrendingUp,
   Cpu,
   HelpCircle,
-  Shield,
-  Download,
   Lock,
-  XCircle
+  XCircle,
+  Trash2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
+import { FIRESTORE_DATABASE_ID } from '../lib/firebase';
+import { normalizeCertId, getCertificationById } from '../data/certificationsData';
+import { getLocalizedCertifications } from '../data/localizedCertifications';
 import { GdprHelpModal } from './GdprHelpModal';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
@@ -46,12 +48,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
     user, 
     userProfile, 
     loading, 
+    isFirebaseConnected,
     loginWithGoogle, 
     logout, 
-    updateUserGoal, 
     updateDisplayName 
   } = useAuth();
-  const { examAttempts, reviews, certProgress } = useProgress();
+  const {
+    activeCertId,
+    globalMetrics,
+    updateGoalTarget,
+    resetAllProgress,
+  } = useProgress();
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
@@ -59,15 +66,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
   const [copiedUid, setCopiedUid] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const [isGdprModalOpen, setIsGdprModalOpen] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [resetDoneNotice, setResetDoneNotice] = useState(false);
 
-  const availableCertifications = [
-    { id: 'c1000177', code: 'C1000-177', title: 'IBM watsonx.ai Specialist v1.0', provider: 'IBM Cloud' },
-    { id: 'gcpmle', code: 'GCP-PMLE', title: 'Professional Machine Learning Engineer', provider: 'Google Cloud' },
-    { id: 'aifc01', code: 'AIF-C01', title: 'AWS Certified AI Practitioner', provider: 'AWS Cloud' },
-    { id: 'mlsc01', code: 'MLS-C01', title: 'AWS Machine Learning Specialty', provider: 'AWS Cloud' },
-    { id: 'ai900', code: 'AI-900', title: 'Azure AI Fundamentals', provider: 'Microsoft Azure' },
-    { id: 'ai102', code: 'AI-102', title: 'Azure AI Engineer Associate', provider: 'Microsoft Azure' },
-  ];
+  const availableCertifications = useMemo(
+    () => getLocalizedCertifications(isEn ? 'en' : 'fr'),
+    [isEn]
+  );
+  const selectedCertId = normalizeCertId(activeCertId || userProfile?.targetExam);
+  const activeCert = useMemo(() => getCertificationById(selectedCertId), [selectedCertId]);
 
   const handleStartEditName = () => {
     setNameInput(userProfile?.displayName || user?.displayName || '');
@@ -239,15 +246,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
 
         {/* Sync & Database Meta bar */}
         <div className="mt-6 pt-5 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              {t('settings:profile.liveFirestore')} : ai-studio-certifaiaicloude
+          <div className="flex items-center gap-4 flex-wrap">
+            <span className={`flex items-center gap-1.5 font-medium ${user && isFirebaseConnected ? 'text-emerald-400' : 'text-slate-300'}`}>
+              <span className={`w-2 h-2 rounded-full ${user && isFirebaseConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+              {user && isFirebaseConnected
+                ? `${t('settings:profile.liveFirestore')} : ${FIRESTORE_DATABASE_ID}`
+                : (isEn ? 'Local mode (Guest / Offline)' : 'Mode local (Invité / Hors ligne)')}
             </span>
             <span className="text-slate-600">|</span>
             <span className="flex items-center gap-1 text-slate-400">
               <Database className="w-3.5 h-3.5 text-indigo-400" />
-              Document: <code className="text-indigo-300 font-mono">/users/{user?.uid ? `${user.uid.slice(0, 10)}...` : 'guest'}</code>
+              {user ? (
+                <>Document: <code className="text-indigo-300 font-mono">/users/{user.uid.slice(0, 10)}...</code></>
+              ) : (
+                <span>{isEn ? 'Storage: Browser LocalStorage' : 'Stockage : LocalStorage navigateur'}</span>
+              )}
             </span>
           </div>
 
@@ -305,15 +318,23 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
           </button>
         </div>
 
-        {/* Target Cert Selector */}
+        {/* Target Cert Selector (works in both guest & authenticated modes) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
           {availableCertifications.map((cert) => {
-            const isSelected = (userProfile?.targetExam || 'ai102') === cert.id;
+            const isSelected = selectedCertId === cert.id;
             return (
               <div
                 key={cert.id}
                 id={`profile-cert-option-${cert.id}`}
-                onClick={() => user && updateUserGoal(cert.id, `${cert.title} (${cert.code})`)}
+                onClick={() => updateGoalTarget(cert.id, `${cert.title} (${cert.code})`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    updateGoalTarget(cert.id, `${cert.title} (${cert.code})`);
+                  }
+                }}
                 className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
                   isSelected 
                     ? 'bg-indigo-950/40 border-indigo-500/50 shadow-md shadow-indigo-950/50' 
@@ -325,7 +346,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                     <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                       {cert.code}
                     </span>
-                    <span className="text-xs text-slate-400">{cert.provider}</span>
+                    <span className="text-xs text-slate-400">{cert.providerName}</span>
                   </div>
                   <h3 className="text-sm font-semibold text-white">{cert.title}</h3>
                 </div>
@@ -334,11 +355,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
                   {isSelected ? (
                     <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      Actif
+                      {isEn ? 'Active' : 'Actif'}
                     </div>
                   ) : (
                     <span className="text-xs text-slate-400 hover:text-slate-300">
-                      Sélectionner
+                      {isEn ? 'Select' : 'Sélectionner'}
                     </span>
                   )}
                 </div>
@@ -348,51 +369,65 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* Progress & Telemetry Cards */}
+      {/* Progress & Telemetry Cards (100% deterministic from ProgressContext) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Streak */}
         <div id="profile-stat-streak" className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
           <div className="flex items-center justify-between text-amber-400">
-            <span className="text-xs font-medium text-slate-400">Série d'assiduité</span>
+            <span className="text-xs font-medium text-slate-400">{isEn ? 'Study streak' : "Série d'assiduité"}</span>
             <Flame className="w-5 h-5" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-white tracking-tight">
-              {userProfile?.streakDays ?? 12}
+              {globalMetrics.streakDays}
             </span>
-            <span className="text-xs text-slate-400">jours consécutifs</span>
+            <span className="text-xs text-slate-400">{isEn ? 'consecutive days' : 'jours consécutifs'}</span>
           </div>
-          <p className="text-xs text-amber-400/80">Prochaine étape : Badge 15 jours</p>
+          <p className="text-xs text-amber-400/80">
+            {globalMetrics.streakDays === 0
+              ? (isEn ? 'Complete a session to start your streak' : 'Démarrez une session pour lancer votre série')
+              : globalMetrics.streakDays < 7
+              ? (isEn ? 'Next goal: 7-day streak' : 'Prochaine étape : 7 jours')
+              : (isEn ? 'Consistent study rhythm' : 'Rythme régulier confirmé')}
+          </p>
         </div>
 
         {/* Questions Solved */}
         <div id="profile-stat-questions" className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
           <div className="flex items-center justify-between text-indigo-400">
-            <span className="text-xs font-medium text-slate-400">Questions résolues</span>
+            <span className="text-xs font-medium text-slate-400">{isEn ? 'Questions solved' : 'Questions résolues'}</span>
             <Cpu className="w-5 h-5" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-white tracking-tight">
-              {userProfile?.questionsSolved ?? 342}
+              {globalMetrics.questionsSolved}
             </span>
-            <span className="text-xs text-slate-400">items validés</span>
+            <span className="text-xs text-slate-400">{isEn ? 'validated items' : 'items validés'}</span>
           </div>
-          <p className="text-xs text-indigo-400/80">+28 cette semaine</p>
+          <p className="text-xs text-indigo-400/80">
+            {globalMetrics.cardsReviewedTotal} {isEn ? 'cards' : 'fiches'} · {globalMetrics.examAttemptsCount} {isEn ? 'exams' : 'examens'}
+          </p>
         </div>
 
         {/* Average Score */}
         <div id="profile-stat-score" className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2">
           <div className="flex items-center justify-between text-emerald-400">
-            <span className="text-xs font-medium text-slate-400">Score Moyen</span>
+            <span className="text-xs font-medium text-slate-400">{isEn ? 'Average Score' : 'Score Moyen'}</span>
             <TrendingUp className="w-5 h-5" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-white tracking-tight">
-              {userProfile?.averageScore ?? 84}%
+              {globalMetrics.averageScore}%
             </span>
-            <span className="text-xs text-emerald-400 font-medium">Seuil 70%</span>
+            <span className="text-xs text-emerald-400 font-medium">{isEn ? '70% target' : 'Seuil 70%'}</span>
           </div>
-          <p className="text-xs text-emerald-400/80">Simulation certifiante admissible</p>
+          <p className="text-xs text-emerald-400/80">
+            {globalMetrics.averageScore === 0
+              ? (isEn ? 'No scored session yet' : 'Aucune session évaluée')
+              : globalMetrics.averageScore >= 70
+              ? (isEn ? 'Above 70% benchmark' : 'Au-dessus du seuil 70%')
+              : (isEn ? 'Building toward 70%' : 'En progression vers 70%')}
+          </p>
         </div>
 
         {/* Readiness Index */}
@@ -411,18 +446,24 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-white tracking-tight">
-              {userProfile?.readinessIndex ?? 78}%
+              {globalMetrics.readinessIndex}%
             </span>
-            <span className="text-xs text-violet-400 font-medium">{t('settings:profile.confirmedLevel')}</span>
+            <span className="text-xs text-violet-400 font-medium">{activeCert.code}</span>
           </div>
-          <p className="text-xs text-violet-400/80">{t('settings:profile.readyForExam')}</p>
+          <p className="text-xs text-violet-400/80">
+            {globalMetrics.readinessIndex >= 70
+              ? t('settings:profile.readyForExam')
+              : globalMetrics.readinessIndex > 0
+              ? (isEn ? 'Consolidation in progress' : 'Consolidation en cours')
+              : (isEn ? 'Start studying to compute index' : 'Démarrez une session pour le calculer')}
+          </p>
         </div>
       </div>
 
       {/* Quick Launchpad to modules */}
       <div className="rounded-2xl bg-slate-900/60 border border-slate-800/80 p-6 space-y-4">
         <h3 className="text-sm font-semibold text-white uppercase tracking-wider text-slate-400">
-          {t('settings:profile.resumeTraining', { exam: userProfile?.targetExamTitle || 'AI-102' })}
+          {t('settings:profile.resumeTraining', { exam: activeCert.code })}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <button
@@ -574,6 +615,63 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigate }) => {
           >
             {t('settings:profile.viewSecurityDetails')}
           </button>
+        </div>
+      </div>
+
+      {/* Data Reset (Inline 2-Step Confirmation, zero browser dialogs) */}
+      <div className="rounded-2xl bg-slate-900/60 border border-rose-500/20 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <Trash2 className="w-4 h-4 text-rose-400" />
+            <span>{isEn ? 'Reset Progression Data' : 'Réinitialiser ma progression'}</span>
+          </h3>
+          <p className="text-xs text-slate-400">
+            {isEn
+              ? 'Clears all recorded SRS flashcard reviews, quiz attempts, exam history, and resets counters to 0.'
+              : 'Efface vos révisions de flashcards SRS, tentatives QCM et examens blancs, et remet vos compteurs à 0.'}
+          </p>
+          {resetDoneNotice && (
+            <p className="text-xs text-emerald-400 font-medium">
+              {isEn ? 'All progression data has been reset to 0.' : 'Toute la progression a été réinitialisée à 0.'}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {!confirmReset ? (
+            <button
+              type="button"
+              id="profile-reset-progress-btn"
+              onClick={() => setConfirmReset(true)}
+              className="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors"
+            >
+              {isEn ? 'Reset my progress' : 'Réinitialiser ma progression'}
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                id="profile-reset-cancel-btn"
+                onClick={() => setConfirmReset(false)}
+                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium"
+              >
+                {isEn ? 'Cancel' : 'Annuler'}
+              </button>
+              <button
+                type="button"
+                id="profile-reset-confirm-btn"
+                onClick={async () => {
+                  await resetAllProgress();
+                  setConfirmReset(false);
+                  setResetDoneNotice(true);
+                  setTimeout(() => setResetDoneNotice(false), 3500);
+                }}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition-colors"
+              >
+                {isEn ? 'Confirm reset to 0' : 'Confirmer la remise à 0'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 

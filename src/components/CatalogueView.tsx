@@ -16,8 +16,10 @@ import {
   BookOpen,
   DollarSign
 } from 'lucide-react';
-import { Certification, CloudProvider, CertificationLevel, AppScreen } from '../types';
+import { CloudProvider, CertificationLevel, AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
+import { CERTIFICATIONS_COUNT, normalizeCertId } from '../data/certificationsData';
+import { useProgress } from '../context/ProgressContext';
 import { PageHeader } from './ui/PageHeader';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
@@ -41,13 +43,15 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   const { t } = useTranslation(['certifications', 'common']);
   const lang = getCurrentLanguage();
   const certs = getLocalizedCertifications(lang);
+  const { certProgress, activeCertId, setActiveCertId } = useProgress();
+  const canonicalActiveCertId = normalizeCertId(activeCertId);
+
   const [providerFilter, setProviderFilter] = useState<CloudProvider>(initialProviderFilter);
   const [levelFilter, setLevelFilter] = useState<CertificationLevel>('all');
   const [domainFilter, setDomainFilter] = useState<'all' | 'genai' | 'cloud_ai' | 'ml'>('all');
   const [priceFilter, setPriceFilter] = useState<'all' | 'free_eco' | 'standard'>('all');
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState<'recommended' | 'progress' | 'duration'>('recommended');
-  const [isCohortModalOpen, setIsCohortModalOpen] = useState(false);
 
   const providerCounts = {
     Tous: certs.length,
@@ -55,7 +59,6 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
     aws: certs.filter((c) => c.provider === 'aws').length,
     gcp: certs.filter((c) => c.provider === 'gcp').length,
     ibm: certs.filter((c) => c.provider === 'ibm').length,
-    nvidia: 2,
   };
 
   const filteredCertifications = certs
@@ -74,7 +77,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
 
       // Price filter check
       if (priceFilter === 'free_eco') {
-        if (c.provider !== 'nvidia' && c.level !== 'fondamental') return false;
+        if (c.level !== 'fondamental') return false;
       }
 
       if (searchFilter.trim()) {
@@ -87,13 +90,15 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
       return true;
     })
     .sort((a, b) => {
+      const progA = certProgress[a.id]?.progress ?? 0;
+      const progB = certProgress[b.id]?.progress ?? 0;
       if (sortBy === 'recommended') {
-        if (a.isActiveTarget) return -1;
-        if (b.isActiveTarget) return 1;
-        return b.userProgress - a.userProgress;
+        if (a.id === canonicalActiveCertId) return -1;
+        if (b.id === canonicalActiveCertId) return 1;
+        return progB - progA;
       }
       if (sortBy === 'progress') {
-        return b.userProgress - a.userProgress;
+        return progB - progA;
       }
       if (sortBy === 'duration') {
         return b.durationMinutes - a.durationMinutes;
@@ -107,7 +112,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
       <PageHeader
         title={t('certifications:title')}
         subtitle={t('certifications:subtitle')}
-        badge={t('certifications:badgeCount', '18 Certifications 2025')}
+        badge={`${CERTIFICATIONS_COUNT} Certifications`}
         breadcrumbs={[
           { label: t('navigation:items.today.label'), onClick: () => onNavigate('today') },
           { label: t('navigation:categories.certifications.label'), active: true },
@@ -307,12 +312,12 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
               <div className="space-y-1">
                 <div className="flex justify-between text-xs font-mono">
                   <span className="text-slate-400">{t('certifications:card.progress', 'Progression')}</span>
-                  <span className="font-bold text-emerald-500">{cert.userProgress}%</span>
+                  <span className="font-bold text-emerald-500">{certProgress[cert.id]?.progress ?? 0}%</span>
                 </div>
                 <div className="w-full h-1.5 bg-slate-100 dark:bg-[#10141f] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-blue-500 rounded-full transition-all duration-500"
-                    style={{ width: `${cert.userProgress}%` }}
+                    style={{ width: `${certProgress[cert.id]?.progress ?? 0}%` }}
                   />
                 </div>
               </div>
@@ -350,6 +355,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
             <div className="p-3.5 border-t border-slate-100 dark:border-[#202533] bg-slate-50 dark:bg-[#121622] rounded-b-2xl flex items-center gap-2">
               <button
                 onClick={() => {
+                  setActiveCertId(cert.id);
                   if (cert.id === 'aifc01') {
                     onNavigate('exam');
                   } else {

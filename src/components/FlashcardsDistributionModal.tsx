@@ -21,8 +21,10 @@ import {
   aifc01DomainsMeta, 
   mlsc01DomainsMeta, 
   gcpmleDomainsMeta, 
-  c1000177DomainsMeta 
+  c1000177DomainsMeta,
+  TOTAL_FLASHCARDS_COUNT
 } from '../data/flashcardsData';
+import { CERTIFICATIONS_COUNT } from '../data/certificationsData';
 
 export type FlashcardCertId = 'c1000177' | 'gcpmle' | 'aifc01' | 'mlsc01' | 'ai900' | 'ai102';
 
@@ -33,6 +35,7 @@ interface FlashcardsDistributionModalProps {
 }
 
 import { useTranslation, getCurrentLanguage } from '../i18n';
+import { useAccessibleModal } from '../hooks/useAccessibleModal';
 
 export interface CertDistributionInfo {
   id: FlashcardCertId;
@@ -157,7 +160,8 @@ export const FlashcardsDistributionModal: React.FC<FlashcardsDistributionModalPr
 
   const [providerFilter, setProviderFilter] = useState<'All' | 'Microsoft Azure' | 'Amazon Web Services' | 'Google Cloud' | 'IBM'>('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCertId, setExpandedCertId] = useState<FlashcardCertId | null>('ai102');
+  const [expandedCertId, setExpandedCertId] = useState<FlashcardCertId | null>('c1000177');
+  const modalRef = useAccessibleModal({ isOpen, onClose });
 
   if (!isOpen) return null;
 
@@ -187,7 +191,13 @@ export const FlashcardsDistributionModal: React.FC<FlashcardsDistributionModalPr
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-4xl max-h-[92vh] bg-white dark:bg-[#0c101b] rounded-3xl border border-slate-200 dark:border-[#262a35] shadow-2xl flex flex-col z-10 overflow-hidden">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="distribution-modal-title"
+        className="relative w-full max-w-4xl max-h-[92vh] bg-white dark:bg-[#0c101b] rounded-3xl border border-slate-200 dark:border-[#262a35] shadow-2xl flex flex-col z-10 overflow-hidden"
+      >
         
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-[#1c1f2a] bg-gradient-to-r from-slate-50 via-blue-50/20 to-slate-50 dark:from-[#0a0e18] dark:via-blue-950/20 dark:to-[#0a0e18] flex items-start justify-between gap-4">
@@ -197,10 +207,10 @@ export const FlashcardsDistributionModal: React.FC<FlashcardsDistributionModalPr
                 <PieChart className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h2 id="distribution-modal-title" className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <span>{t('flashcards:distribution.title')}</span>
                   <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    2 800 {t('flashcards:distribution.cards')}
+                    {TOTAL_FLASHCARDS_COUNT.toLocaleString(isEn ? 'en-US' : 'fr-FR')} {t('flashcards:distribution.cards')}
                   </span>
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -212,16 +222,16 @@ export const FlashcardsDistributionModal: React.FC<FlashcardsDistributionModalPr
             {/* Quick Metrics Badges */}
             <div className="flex items-center gap-2 pt-2 flex-wrap text-[11px] font-mono">
               <span className="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 font-semibold">
-                🔢 {totalCardsCount} {t('flashcards:distribution.totalCards')}
+                {totalCardsCount} {t('flashcards:distribution.totalCards')}
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20 font-semibold">
-                📁 {totalDomainsCount} {t('flashcards:distribution.examDomains')}
+                {totalDomainsCount} {t('flashcards:distribution.examDomains')}
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 font-semibold">
-                🎓 6 {t('flashcards:distribution.keyCerts')}
+                {CERTIFICATIONS_COUNT} {t('flashcards:distribution.keyCerts')}
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20 font-semibold">
-                🧠 {t('flashcards:distribution.srsAlgorithm')}
+                {t('flashcards:distribution.srsAlgorithm')}
               </span>
             </div>
           </div>
@@ -241,8 +251,8 @@ export const FlashcardsDistributionModal: React.FC<FlashcardsDistributionModalPr
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 text-xs">
             {(['All', 'Microsoft Azure', 'Amazon Web Services', 'Google Cloud', 'IBM'] as const).map(p => {
               const label = p === 'All' 
-                ? (isEn ? 'All (2,800)' : 'Tous (2 800)') 
-                : p === 'Microsoft Azure' ? 'Azure (1 000)' 
+                ? `${isEn ? 'All' : 'Tous'} (${TOTAL_FLASHCARDS_COUNT.toLocaleString(isEn ? 'en-US' : 'fr-FR')})`
+                : p === 'Microsoft Azure' ? `Azure (${isEn ? '1,000' : '1 000'})`
                 : p === 'Amazon Web Services' ? 'AWS (900)' 
                 : p === 'Google Cloud' ? 'GCP (500)' 
                 : 'IBM (400)';

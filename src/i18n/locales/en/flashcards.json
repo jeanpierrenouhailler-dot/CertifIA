@@ -127,7 +127,7 @@
   },
   "algorithmModal": {
     "title": "CertifAI SRS Engine: SuperMemo SM-2 & FSRS",
-    "subtitle": "Why reviewing 17 targeted cards beats blindly flipping through 500 flashcards",
+    "subtitle": "Why targeted spaced reviews beat blindly flipping through hundreds of flashcards",
     "ebbinghausTitle": "The Inverted Ebbinghaus Forgetting Curve",
     "ebbinghausDesc": "Without spaced repetition, the human brain forgets 70% of complex technical concepts within 48 hours. CertifAI's SRS engine calculates the exact date when recall probability drops below 85%, scheduling reviews at the mathematically optimal moment.",
     "idTitle": "1. Unique Identifier",
