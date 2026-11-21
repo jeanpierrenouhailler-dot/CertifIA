@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   BookOpen, 
@@ -75,6 +75,15 @@ export const GlossaryView: React.FC<GlossaryViewProps> = ({
       return [];
     }
   });
+
+  useEffect(() => {
+    const handleReset = () => {
+      setBookmarkedIds([]);
+      setOnlyBookmarks(false);
+    };
+    window.addEventListener('certifia:data-reset', handleReset);
+    return () => window.removeEventListener('certifia:data-reset', handleReset);
+  }, []);
 
   const toggleBookmark = (id: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();

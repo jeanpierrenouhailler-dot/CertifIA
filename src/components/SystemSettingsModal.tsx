@@ -12,7 +12,8 @@ import {
   Download, 
   Terminal,
   Zap,
-  Info
+  Info,
+  RotateCcw
 } from 'lucide-react';
 import { useSystemUpdate } from '../context/SystemUpdateContext';
 import { useGuide } from '../context/GuideContext';
@@ -25,11 +26,13 @@ import { useAccessibleModal } from '../hooks/useAccessibleModal';
 interface SystemSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenResetData?: () => void;
 }
 
 export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
   isOpen,
   onClose,
+  onOpenResetData,
 }) => {
   const { 
     versionInfo, 
@@ -401,6 +404,32 @@ export const SystemSettingsModal: React.FC<SystemSettingsModalProps> = ({
                   {t('settings:systemSection.openLegal')}
                 </button>
               </div>
+
+              {onOpenResetData && (
+                <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/30 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <RotateCcw className="w-4 h-4 text-rose-500" />
+                    <h4 className="font-bold text-rose-600 dark:text-rose-400 text-xs">
+                      {t('settings:resetData.settingsTitle', 'Réinitialisation complète des données')}
+                    </h4>
+                  </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {t('settings:resetData.settingsDesc', 'Efface toutes les révisions, scores de quiz, examens blancs et caches locaux pour repartir à zéro (0).')}
+                  </p>
+                  <button
+                    id="system-settings-reset-data-btn"
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenResetData();
+                    }}
+                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold transition-colors flex items-center gap-2"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>{t('settings:resetData.openModalBtn', 'Remettre à zéro')}</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

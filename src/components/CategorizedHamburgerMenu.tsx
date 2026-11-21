@@ -50,6 +50,7 @@ interface CategorizedHamburgerMenuProps {
   onOpenComparator?: () => void;
   onOpenAIAssistant?: () => void;
   onSelectCertFlashcards?: (certId: 'c1000177' | 'gcpmle' | 'aifc01' | 'mlsc01' | 'ai900' | 'ai102') => void;
+  onOpenResetData?: () => void;
 }
 
 export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> = ({
@@ -63,6 +64,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
   onOpenComparator,
   onOpenAIAssistant,
   onSelectCertFlashcards,
+  onOpenResetData,
 }) => {
   const [filterQuery, setFilterQuery] = useState('');
   const { t } = useTranslation(['navigation', 'common']);
@@ -90,6 +92,8 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
       promptInstall();
     } else if (item.actionKey === 'open-tour') {
       startTour(0);
+    } else if (item.actionKey === 'open-reset-data' && onOpenResetData) {
+      onOpenResetData();
     } else if (item.category === 'assistant' && onOpenAIAssistant) {
       onOpenAIAssistant();
     } else {

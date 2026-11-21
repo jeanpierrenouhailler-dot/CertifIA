@@ -19,6 +19,7 @@ import {
   PieChart,
   History,
   TrendingUp,
+  RotateCcw,
   LucideIcon
 } from 'lucide-react';
 import { AppScreen } from '../types';
@@ -371,6 +372,19 @@ export const NAV_ITEMS: NavItemConfig[] = [
     screen: 'landing',
     icon: Sparkles,
     description: 'Découvrir la méthode pédagogique et les piliers d’apprentissage CertifIA',
+    visibility: { desktop: true, mobileBar: false, mobileMore: true, search: true },
+  },
+  {
+    id: 'nav-resetData',
+    label: 'Remettre à zéro les données',
+    shortLabel: 'Remise à zéro',
+    category: 'plus',
+    screen: 'today',
+    icon: RotateCcw,
+    description: 'Effacer toutes les révisions, scores et caches pour repartir à 0',
+    actionKey: 'open-reset-data',
+    badge: 'Reset',
+    badgeColor: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
     visibility: { desktop: true, mobileBar: false, mobileMore: true, search: true },
   },
 ];

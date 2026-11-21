@@ -24,6 +24,7 @@ import { ShortcutsModal } from './components/ShortcutsModal';
 import { ProfileView } from './components/ProfileView';
 import { CategorizedHamburgerMenu } from './components/CategorizedHamburgerMenu';
 import { SystemSettingsModal } from './components/SystemSettingsModal';
+import { ResetDataModal } from './components/ResetDataModal';
 import { LegalOnboardingModal } from './components/LegalOnboardingModal';
 import { InstallAppModal } from './components/InstallAppModal';
 import { FlashcardsDistributionModal, FlashcardCertId } from './components/FlashcardsDistributionModal';
@@ -75,6 +76,7 @@ function AppContent() {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isSystemSettingsOpen, setIsSystemSettingsOpen] = useState(false);
+  const [isResetDataOpen, setIsResetDataOpen] = useState(false);
   const [isFlashcardsDistributionOpen, setIsFlashcardsDistributionOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isComparatorOpen, setIsComparatorOpen] = useState(false);
@@ -114,6 +116,7 @@ function AppContent() {
         setIsMobileSidebarOpen(false);
         setIsHamburgerOpen(false);
         setIsSystemSettingsOpen(false);
+        setIsResetDataOpen(false);
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsCommandPaletteOpen((prev) => !prev);
@@ -192,6 +195,7 @@ function AppContent() {
         onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
         onOpenComparator={() => setIsComparatorOpen(true)}
         onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
+        onOpenResetData={() => setIsResetDataOpen(true)}
       />
 
       {/* Main Workspace (offset dynamically based on sidebar collapsed state) */}
@@ -206,6 +210,7 @@ function AppContent() {
           onNavigate={(screen) => setCurrentScreen(screen)}
           onOpenBlueprint={handleOpenBlueprint}
           onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
+          onOpenResetData={() => setIsResetDataOpen(true)}
         />
 
         {/* Dynamic Screen View */}
@@ -297,6 +302,7 @@ function AppContent() {
         onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
         onOpenComparator={() => setIsComparatorOpen(true)}
         onOpenMenu={() => setIsHamburgerOpen(true)}
+        onOpenResetData={() => setIsResetDataOpen(true)}
       />
 
       {/* Contextual AI Pedagogical Assistant Slide-Over Drawer */}
@@ -326,6 +332,7 @@ function AppContent() {
         onOpenAIAssistant={() => handleOpenAIAssistantWithContext()}
         onOpenSystemSettings={() => setIsSystemSettingsOpen(true)}
         onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
+        onOpenResetData={() => setIsResetDataOpen(true)}
       />
 
       {/* Categorized Hamburger Menu Drawer */}
@@ -338,6 +345,7 @@ function AppContent() {
         onOpenBlueprint={handleOpenBlueprint}
         onOpenFlashcardsDistribution={() => setIsFlashcardsDistributionOpen(true)}
         onSelectCertFlashcards={handleSelectCertFlashcards}
+        onOpenResetData={() => setIsResetDataOpen(true)}
       />
 
       {/* Flashcards Distribution & Inventory Modal */}
@@ -351,6 +359,13 @@ function AppContent() {
       <SystemSettingsModal
         isOpen={isSystemSettingsOpen}
         onClose={() => setIsSystemSettingsOpen(false)}
+        onOpenResetData={() => setIsResetDataOpen(true)}
+      />
+
+      {/* Complete Data Reset Confirmation Modal */}
+      <ResetDataModal
+        isOpen={isResetDataOpen}
+        onClose={() => setIsResetDataOpen(false)}
       />
 
       {/* Legal Onboarding & Disclaimer Modal (Mandatory on 1st visit, revisitable anytime) */}

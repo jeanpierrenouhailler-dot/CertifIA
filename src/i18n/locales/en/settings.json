@@ -169,5 +169,26 @@
     "tabRawData": "Raw Data & Export",
     "exportBtn": "Export my data (JSON)",
     "close": "Close"
+  },
+  "resetData": {
+    "badge": "Reset Zone",
+    "title": "Reset All Application Data",
+    "warning": "This action is permanent: it deletes all study history stored on this device and in your Cloud Firestore account.",
+    "currentDataTitle": "Currently stored data",
+    "cardsLabel": "SM-2 Cards",
+    "quizzesLabel": "Solved MCQs",
+    "examsLabel": "Mock Exams",
+    "scopeTitle": "Items reset to zero:",
+    "scope1": "All SM-2 flashcard reviews, weak concepts, bookmarks, and card indices.",
+    "scope2": "All solved MCQs and complete mock examination history.",
+    "scope3": "Global counters (study streak, average score, readiness index), glossary bookmarks, and pathway profile.",
+    "preservedNote": "Your language, visual theme, and sign-in session remain intact.",
+    "confirmBtn": "Confirm Full Reset",
+    "resetting": "Resetting...",
+    "successTitle": "Full Reset Complete",
+    "successDesc": "All local and cloud-synced learning data has been reset to 0. You are starting fresh.",
+    "settingsTitle": "Complete Data Reset (Back to 0)",
+    "settingsDesc": "Clears all reviews, quiz scores, mock exams, and local study caches to start cleanly from zero.",
+    "openModalBtn": "Reset all data"
   }
 }

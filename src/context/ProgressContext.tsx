@@ -92,6 +92,8 @@ const LOCAL_STORAGE_QUIZ_ATTEMPTS_KEY = 'certifai_quiz_attempts_v1';
 const LOCAL_STORAGE_PROGRESS_KEY = 'certifai_cert_progress_v1';
 const LOCAL_STORAGE_ACTIVE_CERT_KEY = 'certifai_active_cert_v1';
 const LOCAL_STORAGE_GOAL_KEY = 'certifai_goal_settings_v1';
+const LOCAL_STORAGE_GLOSSARY_BOOKMARKS_KEY = 'certifia_glossary_bookmarks';
+const LOCAL_STORAGE_RECOMMENDATION_PROFILE_KEY = 'certifai_recommendation_profile_v1';
 
 const defaultCertCodes: Record<string, string> = {
   c1000177: 'C1000-177',
@@ -323,12 +325,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         });
 
-        setReviews((prev) => ({ ...prev, ...remoteReviews }));
-        setBookmarkedCardIds((prev) => {
-          const next = new Set(prev);
-          remoteBookmarks.forEach((id) => next.add(id));
-          return next;
-        });
+        setReviews(remoteReviews);
+        setBookmarkedCardIds(remoteBookmarks);
         setIsSyncing(false);
       },
       (error) => {
@@ -346,14 +344,12 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const unsubAttempts = onSnapshot(
       attemptsColRef,
       (snapshot) => {
-        if (!snapshot.empty) {
-          const remoteAttempts: ExamAttemptRecord[] = [];
-          snapshot.forEach((docSnap) => {
-            remoteAttempts.push(docSnap.data() as ExamAttemptRecord);
-          });
-          remoteAttempts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-          setExamAttempts(remoteAttempts);
-        }
+        const remoteAttempts: ExamAttemptRecord[] = [];
+        snapshot.forEach((docSnap) => {
+          remoteAttempts.push(docSnap.data() as ExamAttemptRecord);
+        });
+        remoteAttempts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setExamAttempts(remoteAttempts);
       },
       (error) => {
         if (error instanceof Error && (error.message.includes('unavailable') || error.message.includes('offline'))) {
@@ -368,15 +364,15 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const unsubCerts = onSnapshot(
       certsColRef,
       (snapshot) => {
-        if (!snapshot.empty) {
-          snapshot.forEach((docSnap) => {
-            const data = docSnap.data() as CertificationProgress;
-            const canonicalId = normalizeCertId(docSnap.id);
-            if (data.lastCardIndex !== undefined) {
-              setLastCardIndices((prev) => ({ ...prev, [canonicalId]: data.lastCardIndex }));
-            }
-          });
-        }
+        const nextIndices: Record<string, number> = { ...EMPTY_INDICES };
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data() as CertificationProgress;
+          const canonicalId = normalizeCertId(docSnap.id);
+          if (typeof data.lastCardIndex === 'number') {
+            nextIndices[canonicalId] = data.lastCardIndex;
+          }
+        });
+        setLastCardIndices(nextIndices);
       },
       (error) => {
         if (error instanceof Error && (error.message.includes('unavailable') || error.message.includes('offline'))) {
@@ -762,8 +758,9 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     [user, setActiveCertId]
   );
 
-  // Full reset (local + authenticated reviews)
+  // Full reset (all localStorage learning/preference data + all authenticated Firestore collections)
   const resetAllProgress = useCallback(async () => {
+    setActiveCertIdState('c1000177');
     setReviews({});
     setBookmarkedCardIds(new Set());
     setLastCardIndices({ ...EMPTY_INDICES });
@@ -778,19 +775,39 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       localStorage.removeItem(LOCAL_STORAGE_ATTEMPTS_KEY);
       localStorage.removeItem(LOCAL_STORAGE_QUIZ_ATTEMPTS_KEY);
       localStorage.removeItem(LOCAL_STORAGE_PROGRESS_KEY);
+      localStorage.removeItem(LOCAL_STORAGE_ACTIVE_CERT_KEY);
       localStorage.removeItem(LOCAL_STORAGE_GOAL_KEY);
+      localStorage.removeItem(LOCAL_STORAGE_GLOSSARY_BOOKMARKS_KEY);
+      localStorage.removeItem(LOCAL_STORAGE_RECOMMENDATION_PROFILE_KEY);
     } catch (e) {
       console.warn('LocalStorage clear error:', e);
     }
 
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('certifia:data-reset'));
+    }
+
     if (user) {
       try {
-        const reviewsSnap = await getDocs(collection(db, 'users', user.uid, 'reviews'));
-        await Promise.all(reviewsSnap.docs.map((d) => deleteDoc(d.ref)));
+        const [reviewsSnap, attemptsSnap, certsSnap] = await Promise.all([
+          getDocs(collection(db, 'users', user.uid, 'reviews')),
+          getDocs(collection(db, 'users', user.uid, 'attempts')),
+          getDocs(collection(db, 'users', user.uid, 'certifications')),
+        ]);
+
+        await Promise.all([
+          ...reviewsSnap.docs.map((d) => deleteDoc(d.ref)),
+          ...attemptsSnap.docs.map((d) => deleteDoc(d.ref)),
+          ...certsSnap.docs.map((d) => deleteDoc(d.ref)),
+        ]);
 
         await setDoc(
           doc(db, 'users', user.uid),
           {
+            targetExam: 'c1000177',
+            targetExamTitle: 'IBM watsonx.ai Specialist (C1000-177)',
+            targetDate: '',
+            weeklyTarget: 50,
             streakDays: 0,
             questionsSolved: 0,
             averageScore: 0,
@@ -800,7 +817,11 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           { merge: true }
         );
       } catch (err) {
-        console.warn('[ProgressContext] Remote reset partially skipped:', err);
+        if (err instanceof Error && (err.message.includes('unavailable') || err.message.includes('offline'))) {
+          console.warn('[ProgressContext] Remote reset offline, local state cleared:', err.message);
+        } else {
+          handleFirestoreError(err, OperationType.DELETE, `users/${user.uid}`);
+        }
       }
     }
   }, [user]);

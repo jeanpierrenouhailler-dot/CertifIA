@@ -23,7 +23,8 @@ import {
   PieChart,
   HelpCircle,
   FileText,
-  Download
+  Download,
+  RotateCcw
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usePwa } from '../context/PwaContext';
@@ -50,6 +51,7 @@ interface SidebarProps {
   onOpenFlashcardsDistribution?: () => void;
   onOpenComparator?: () => void;
   onOpenAIAssistant?: () => void;
+  onOpenResetData?: () => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
 }
@@ -64,6 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenFlashcardsDistribution,
   onOpenComparator,
   onOpenAIAssistant,
+  onOpenResetData,
   isCollapsed: controlledCollapsed,
   onToggleCollapse: controlledToggleCollapse,
 }) => {
@@ -527,6 +530,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span className="truncate">{t('navigation:items.pwa.label', 'Installer l’application')}</span>
+                  </button>
+                )}
+
+                {onOpenResetData && (
+                  <button
+                    id="sidebar-reset-data-btn"
+                    onClick={() => {
+                      onOpenResetData();
+                      if (onCloseMobile) onCloseMobile();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{t('navigation:items.resetData.shortLabel', 'Remise à zéro')}</span>
                   </button>
                 )}
               </div>

@@ -17,6 +17,7 @@ import {
   Globe,
   LayoutGrid,
   Download,
+  RotateCcw,
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -40,6 +41,7 @@ interface HeaderProps {
   onNavigate: (screen: AppScreen) => void;
   onOpenBlueprint?: (examId: string) => void;
   onOpenAIAssistant?: () => void;
+  onOpenResetData?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -51,6 +53,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   onOpenBlueprint,
   onOpenAIAssistant,
+  onOpenResetData,
 }) => {
   const { t } = useTranslation(['common', 'navigation', 'dashboard']);
   const { user, userProfile } = useAuth();
@@ -200,6 +203,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* 4. Unified Account, Preferences & Tools Dropdown */}
         <div className="relative" ref={menuContainerRef}>
           <button
+            id="header-user-menu-btn"
             type="button"
             onClick={() => setIsWorkspaceMenuOpen((prev) => !prev)}
             className={`h-9 pl-1.5 pr-2 rounded-xl border transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
@@ -382,6 +386,25 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                   <span className="text-[10px] font-mono text-slate-400">{versionInfo.version}</span>
                 </button>
+
+                {onOpenResetData && (
+                  <button
+                    id="header-menu-reset-data-btn"
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setIsWorkspaceMenuOpen(false);
+                      onOpenResetData();
+                    }}
+                    className="w-full px-2.5 py-2 rounded-xl flex items-center justify-between text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                  >
+                    <span className="flex items-center gap-2.5 truncate">
+                      <RotateCcw className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      <span className="truncate">{t('navigation:items.resetData.label', 'Remettre à zéro les données')}</span>
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/10 border border-rose-500/20">0</span>
+                  </button>
+                )}
               </div>
             </div>
           )}

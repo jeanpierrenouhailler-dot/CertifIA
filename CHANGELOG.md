@@ -9,7 +9,8 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 ### 🛡️ Source Unique de Vérité & Zéro Donnée Fictive
 * **Moteur Centralisé de Métriques (`src/lib/metricsEngine.ts` & `src/context/ProgressContext.tsx`) :**
   * Suppression intégrale des statistiques codées en dur (`17 cartes SM-2`, `8 notions fragiles`, `12 QCM`, `74%`, `765/1000`, `482 questions`, `14 jours`, identité `"Jean-Pierre"`, historique de démo) dans l'application.
-  * Garantie **zéro-état propre** : tout nouvel utilisateur démarre strictement à `0` (`streakDays: 0`, `readinessIndex: 0`, `dueCount: 0`, `recentActivities: []`), avec persistance complète (`reviews`, `quizAttempts`, `examAttempts`, `goalSettings`, `activeCertId`) en LocalStorage et Cloud Firestore (`FIRESTORE_DATABASE_ID`) et remise à zéro complète (`resetAllProgress`).
+  * Garantie **zéro-état propre** : tout nouvel utilisateur démarre strictement à `0` (`streakDays: 0`, `readinessIndex: 0`, `dueCount: 0`, `failedQuizCount: 0`, `recentActivities: []`), avec séparation entre QCM échoués (`0` par défaut) et QCM prêts à pratiquer, persistance complète (`reviews`, `quizAttempts`, `examAttempts`, `goalSettings`, `activeCertId`) en LocalStorage et Cloud Firestore (`FIRESTORE_DATABASE_ID`).
+  * **Menu global « Remettre à zéro les données » (`ResetDataModal.tsx`)** : accessible depuis le menu Compte en haut à droite, le menu Hamburger / Barre latérale (`Plus`), les Paramètres Système (`Préférences & Cache`), la Palette de Commandes (`Ctrl+K`), le tiroir mobile (`+ Plus`) et Mon Profil — purge simultanément tous les caches locaux (révisions, QCM, examens, favoris du glossaire, profil d'orientation) et toutes les sous-collections Firestore (`reviews`, `attempts`, `certifications`) avec règles `firestore.rules` déployées.
 * **Cohérence du Référentiel (`src/data/certificationsData.ts` & `src/data/flashcardsData.ts`) :**
   * Alignement strict sur les **6 certifications réelles** (`CERTIFICATIONS_COUNT = 6`) et **2 800 flashcards** (`TOTAL_FLASHCARDS_COUNT = 2800`) dans la navigation, la landing page, les modales, le glossaire et les traductions FR/EN.
   * Normalisation canonique de l'ID IBM watsonx (`'c1000177'` via `normalizeCertId()`, remplaçant l'alias inconsistant `'watsonx'`).
@@ -20,7 +21,7 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 * **Hook Partagé `useAccessibleModal` (`src/hooks/useAccessibleModal.ts`) :**
   * Gestion centralisée de `role="dialog"`, `aria-modal="true"`, fermeture `Échap` (avec `disableEscape` pour les modales obligatoires), piège de focus clavier `Tab`/`Shift+Tab`, restauration du focus et verrouillage du scroll sans conflit multi-modales.
 * **Tests Unitaires & E2E (`tests/metricsEngine.test.ts` & `tests/landing-responsive.mjs`) :**
-  * Ajout de tests unitaires (`npm test`) et extension de la suite Playwright (`npm run test:e2e`) couvrant la matrice responsive (`320px–1920px`), la persistance au rechargement, la remise à zéro et l'accessibilité clavier.
+  * Ajout de tests unitaires (`npm test`) et extension de la suite Playwright (`npm run test:e2e`) couvrant la matrice responsive (`320px–1920px`), la persistance au rechargement, la remise à zéro globale via le menu Header et l'accessibilité clavier.
 
 ---
 

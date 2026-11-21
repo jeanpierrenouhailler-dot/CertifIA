@@ -153,6 +153,11 @@
       "label": "Visite guidée automatique",
       "shortLabel": "Visite guidée",
       "description": "Parcours de découverte progressive et automatique de l’interface"
+    },
+    "resetData": {
+      "label": "Remettre à zéro les données",
+      "shortLabel": "Remise à zéro",
+      "description": "Effacer toutes les révisions, scores et caches pour repartir à 0"
     }
   },
   "search": {

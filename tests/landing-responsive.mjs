@@ -413,6 +413,7 @@ async function run() {
     const cleanText = await page.locator('#today-main-container').innerText();
     assert.match(cleanText, /0 jours consécutifs/);
     assert.match(cleanText, /0\s*%/);
+    assert.match(cleanText, /0\s*\/\s*400\s+fiches révisées/i);
     assert.match(cleanText, /Aucune activité enregistrée/i);
     assert.equal(await page.locator('aside').innerText().then((t) => t.includes('SRS 0')), true, 'Sidebar should start at SRS 0');
 
@@ -454,17 +455,25 @@ async function run() {
     await page.keyboard.press('Escape');
     await cmdDialog.waitFor({ state: 'hidden', timeout: 10000 });
 
-    // Trigger Reset Progress in ProfileView and confirm return to 0
-    await page.locator('aside button', { hasText: /Mode invité|Guest mode|Apprenant IA/i }).click();
-    await page.waitForSelector('#profile-reset-progress-btn', { state: 'visible', timeout: 10000 });
-    await page.locator('#profile-reset-progress-btn').click();
-    await page.locator('#profile-reset-confirm-btn').click();
-    await page.waitForTimeout(250);
-    await page.locator('aside button', { hasText: /Aujourd’hui|Aujourd'hui|Today/i }).first().click();
+    // Trigger global Reset Data modal from Header Account Menu & confirm complete return to 0 across reload
+    await page.locator('#header-user-menu-btn').click();
+    await page.locator('#header-menu-reset-data-btn').waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('#header-menu-reset-data-btn').click();
+    await page.locator('#reset-data-modal').waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('#reset-modal-confirm-btn').click();
+    await page.locator('#reset-modal-success-banner').waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('#reset-modal-done-btn').click();
+    await page.locator('#reset-data-modal').waitFor({ state: 'hidden', timeout: 10000 });
+
+    await page.reload({ waitUntil: 'load' });
     await page.waitForSelector('#today-main-container', { state: 'visible', timeout: 10000 });
     const resetText = await page.locator('#today-main-container').innerText();
+    assert.match(resetText, /C1000-177/, 'Active certification did not reset to default C1000-177');
     assert.match(resetText, /0 jours consécutifs/, 'Streak did not reset to 0');
+    assert.match(resetText, /0\s*%/, 'Progress percentage did not reset to 0%');
+    assert.match(resetText, /0\s*\/\s*400\s+fiches révisées/i, 'Reviewed cards counter did not reset to 0 / 400');
     assert.match(resetText, /Aucune activité enregistrée/i, 'Recent activity did not reset');
+    assert.equal(await page.locator('aside').innerText().then((t) => t.includes('SRS 0')), true, 'Sidebar did not reset to SRS 0');
 
     assert.equal(consoleErrors.length, 0, `Console errors detected: ${JSON.stringify(consoleErrors)}`);
     assert.equal(pageErrors.length, 0, `Uncaught page errors detected: ${JSON.stringify(pageErrors)}`);

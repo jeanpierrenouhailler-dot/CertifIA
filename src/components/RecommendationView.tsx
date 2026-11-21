@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -104,6 +104,17 @@ export const RecommendationView: React.FC<RecommendationViewProps> = ({
   const [selectedPathwayId, setSelectedPathwayId] = useState<string>('primary-recommended');
   const [isDiagnosticMode, setIsDiagnosticMode] = useState<boolean>(false);
   const [adoptedFeedback, setAdoptedFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleReset = () => {
+      setProfile({ ...DEFAULT_USER_PROFILE });
+      setActiveStep(1);
+      setSelectedPathwayId('primary-recommended');
+      setIsDiagnosticMode(false);
+    };
+    window.addEventListener('certifia:data-reset', handleReset);
+    return () => window.removeEventListener('certifia:data-reset', handleReset);
+  }, []);
 
   // Compute generated pathways
   const pathways = useMemo(() => {

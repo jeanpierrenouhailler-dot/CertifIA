@@ -169,5 +169,26 @@
     "tabRawData": "Données Brutes & Export",
     "exportBtn": "Exporter mes données (JSON)",
     "close": "Fermer"
+  },
+  "resetData": {
+    "badge": "Zone de réinitialisation",
+    "title": "Remettre à zéro toutes les données",
+    "warning": "Cette action est définitive : elle supprime l’ensemble de votre historique d’étude enregistré sur cet appareil et sur votre compte Cloud Firestore.",
+    "currentDataTitle": "Données actuellement stockées",
+    "cardsLabel": "Fiches SM-2",
+    "quizzesLabel": "QCM validés",
+    "examsLabel": "Examens blancs",
+    "scopeTitle": "Éléments remis à zéro :",
+    "scope1": "Toutes les révisions de flashcards SM-2, notions fragiles, favoris et positions de cartes.",
+    "scope2": "Tous les QCM validés et l’historique complet des examens blancs.",
+    "scope3": "Compteurs globaux (série, score moyen, indice de préparation), favoris du glossaire et profil d’orientation.",
+    "preservedNote": "Votre langue, votre thème visuel et votre connexion restent inchangés.",
+    "confirmBtn": "Confirmer la remise à zéro",
+    "resetting": "Remise à zéro...",
+    "successTitle": "Remise à zéro effectuée",
+    "successDesc": "Toutes vos données d’apprentissage locales et synchronisées ont été remises à 0. Vous repartez sur un environnement vierge.",
+    "settingsTitle": "Réinitialisation complète des données",
+    "settingsDesc": "Efface toutes les révisions, scores de quiz, examens blancs et caches locaux pour repartir à zéro (0).",
+    "openModalBtn": "Remettre à zéro"
   }
 }

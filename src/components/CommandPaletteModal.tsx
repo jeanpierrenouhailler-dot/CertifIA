@@ -14,7 +14,8 @@ import {
   Settings, 
   Scale, 
   Sparkles,
-  Target
+  Target,
+  RotateCcw
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
@@ -34,6 +35,7 @@ interface CommandPaletteModalProps {
   onOpenAIAssistant: () => void;
   onOpenSystemSettings: () => void;
   onOpenFlashcardsDistribution: () => void;
+  onOpenResetData?: () => void;
 }
 
 export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
@@ -45,6 +47,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   onOpenAIAssistant,
   onOpenSystemSettings,
   onOpenFlashcardsDistribution,
+  onOpenResetData,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -212,6 +215,21 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         onClose();
       },
     },
+    ...(onOpenResetData
+      ? [
+          {
+            id: 'act-reset-data',
+            type: 'action',
+            title: `${t('navigation:items.resetData.label', 'Remettre à zéro les données')} (reset 0)`,
+            category: t('navigation:categories.plus', 'Système'),
+            icon: RotateCcw,
+            onSelect: () => {
+              onOpenResetData();
+              onClose();
+            },
+          },
+        ]
+      : []),
   ];
 
   const q = query.trim().toLowerCase();

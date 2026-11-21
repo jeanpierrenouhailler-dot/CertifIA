@@ -153,6 +153,11 @@
       "label": "Automated Onboarding Tour",
       "shortLabel": "Guided Tour",
       "description": "Progressive automated discovery tour of the CertifIA platform"
+    },
+    "resetData": {
+      "label": "Reset All Data",
+      "shortLabel": "Reset Data",
+      "description": "Clear all reviews, scores, and caches to start cleanly from 0"
     }
   },
   "search": {

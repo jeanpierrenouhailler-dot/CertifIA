@@ -19,7 +19,8 @@ import {
   Clock,
   Layers,
   ChevronRight,
-  Globe
+  Globe,
+  RotateCcw
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -39,6 +40,7 @@ interface MobileBottomNavProps {
   onOpenFlashcardsDistribution?: () => void;
   onOpenComparator?: () => void;
   onOpenMenu?: () => void;
+  onOpenResetData?: () => void;
 }
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
@@ -49,6 +51,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onOpenFlashcardsDistribution,
   onOpenComparator,
   onOpenMenu,
+  onOpenResetData,
 }) => {
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
   const { t, i18n } = useTranslation(['navigation', 'common']);
@@ -391,6 +394,23 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </button>
+
+                  {onOpenResetData && (
+                    <button
+                      id="mobile-reset-data-btn"
+                      onClick={() => {
+                        setIsMoreSheetOpen(false);
+                        onOpenResetData();
+                      }}
+                      className="w-full p-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/15 border border-rose-500/25 flex items-center justify-between text-left"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <RotateCcw className="w-4 h-4 text-rose-500 shrink-0" />
+                        <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">{t('navigation:items.resetData.label', 'Remettre à zéro les données')}</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-rose-400" />
+                    </button>
+                  )}
 
                   {!isInstalled && (
                     <button

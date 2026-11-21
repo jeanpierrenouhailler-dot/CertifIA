@@ -110,21 +110,22 @@ service cloud.firestore {
       match /certifications/{certId} {
         allow get, list: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidId(certId) && isValidCertificationProgress(incoming(), userId);
-        allow delete: if false;
+        allow delete: if isOwner(userId) && isValidId(certId);
       }
 
       // Subcollection: Exam attempts
       match /attempts/{attemptId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && isValidId(attemptId) && isValidExamAttempt(incoming(), userId);
-        allow update, delete: if false;
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(attemptId);
       }
 
       // Subcollection: Flashcard spaced repetition reviews
       match /reviews/{reviewId} {
         allow get, list: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidId(reviewId) && isValidFlashcardReview(incoming(), userId);
-        allow delete: if isOwner(userId);
+        allow delete: if isOwner(userId) && isValidId(reviewId);
       }
     }
   }

@@ -93,7 +93,12 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
     return dueCards.length > 0 ? dueCards : discoveryCards;
   }, [dueCards, discoveryCards]);
 
-  // 3. Unmastered MCQ questions strictly from the real quiz pool (no duplicate padding)
+  // 3. Quiz questions: separate genuinely failed attempts (0 when fresh) from unattempted practice MCQs
+  const failedQuizQuestions = useMemo(() => {
+    const pool = getLocalizedQuizQuestions(currentLang);
+    return pool.filter((q) => quizAttempts[q.id] && !quizAttempts[q.id].isCorrect);
+  }, [currentLang, quizAttempts]);
+
   const unmasteredQuestions = useMemo(() => {
     const pool = getLocalizedQuizQuestions(currentLang);
     return pool.filter((q) => !quizAttempts[q.id]?.isCorrect);
@@ -427,14 +432,18 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                   </div>
                   <div className="mt-3">
                     <div className="text-2xl font-extrabold text-rose-400 font-mono">
-                      {unmasteredQuestions.length}
+                      {failedQuizQuestions.length}
                     </div>
                     <div className="text-xs font-semibold text-slate-200 mt-0.5">
                       {t('dashboard:unmasteredQuestions', 'questions non maîtrisées')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-mono mt-1">
-                      {unmasteredQuestions.length > 0
+                      {failedQuizQuestions.length > 0
                         ? t('dashboard:unmasteredQuestionsDesc', "Cas pratiques d'architecture")
+                        : unmasteredQuestions.length > 0
+                        ? (currentLang === 'en'
+                            ? `${unmasteredQuestions.length} new MCQs ready to practice`
+                            : `${unmasteredQuestions.length} QCM prêts à pratiquer`)
                         : (currentLang === 'en' ? 'All active MCQs mastered!' : 'Tous les QCM actifs validés !')}
                     </div>
                   </div>
@@ -643,7 +652,9 @@ export const TodayView: React.FC<TodayViewProps> = ({ onNavigate, onOpenBlueprin
                 </div>
                 <div className="text-xs">
                   <div className="font-bold text-white font-mono">
-                    {unmasteredQuestions.length} {currentLang === 'en' ? 'MCQ Scenarios' : 'Questions QCM'}
+                    {failedQuizQuestions.length > 0
+                      ? `${failedQuizQuestions.length} ${currentLang === 'en' ? 'Failed MCQs to Retry' : 'QCM à consolider'}`
+                      : `${unmasteredQuestions.length} ${currentLang === 'en' ? 'Discovery MCQs' : 'QCM de découverte'}`}
                   </div>
                   <div className="text-slate-400 text-[11px] mt-0.5">
                     {t('dashboard:sessionDetails.step3Desc', 'Mise en situation d\'architecture avec explications officielles Microsoft / AWS / IBM.')}
