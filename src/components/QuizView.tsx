@@ -24,6 +24,7 @@ import { QuizQuestion, AppScreen } from '../types';
 import { getLocalizedQuizQuestions } from '../data/localizedQuizData';
 import { getCertificationById } from '../data/certificationsData';
 import { useProgress } from '../context/ProgressContext';
+import { usePublishedContent } from '../context/PublishedContentContext';
 import { computeQuizMetrics } from '../lib/metricsEngine';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
@@ -39,7 +40,11 @@ export const QuizView: React.FC<QuizViewProps> = ({ onNavigate, onOpenBlueprint,
   const { t } = useTranslation(['quizzes', 'common']);
   const lang = getCurrentLanguage();
   const isEn = lang === 'en';
-  const questions = getLocalizedQuizQuestions(lang);
+  const baseQuestions = getLocalizedQuizQuestions(lang);
+  const { getPublishedPatch } = usePublishedContent();
+  const questions = baseQuestions.map((q) =>
+    getPublishedPatch(`mcq:${q.id}`, q as unknown as Record<string, unknown>) as unknown as QuizQuestion
+  );
   const { activeCertId, quizAttempts, recordQuizAttempt } = useProgress();
   const activeCert = getCertificationById(activeCertId);
 

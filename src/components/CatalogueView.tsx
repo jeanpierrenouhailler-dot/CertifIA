@@ -14,12 +14,14 @@ import {
   Scale,
   Bot,
   BookOpen,
-  DollarSign
+  DollarSign,
+  AlertTriangle
 } from 'lucide-react';
 import { CloudProvider, CertificationLevel, AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
 import { CERTIFICATIONS_COUNT, normalizeCertId } from '../data/certificationsData';
 import { useProgress } from '../context/ProgressContext';
+import { usePublishedContent } from '../context/PublishedContentContext';
 import { PageHeader } from './ui/PageHeader';
 import { InfoTooltip } from './InfoTooltip';
 import { ScreenGuideBanner } from './ScreenGuideBanner';
@@ -44,6 +46,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
   const lang = getCurrentLanguage();
   const certs = getLocalizedCertifications(lang);
   const { certProgress, activeCertId, setActiveCertId } = useProgress();
+  const { getCertLifecycleNotice } = usePublishedContent();
   const canonicalActiveCertId = normalizeCertId(activeCertId);
 
   const [providerFilter, setProviderFilter] = useState<CloudProvider>(initialProviderFilter);
@@ -306,6 +309,23 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                   {cert.targetAudience}
                 </p>
+                {(() => {
+                  const notice = getCertLifecycleNotice(cert.id);
+                  if (!notice) return null;
+                  return (
+                    <div className="mt-2 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[11px] text-amber-700 dark:text-amber-300 flex items-start gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" />
+                      <span>
+                        {notice.changeAlert ||
+                          (notice.retirementDate
+                            ? (lang === 'en'
+                                ? `Status ${notice.officialStatus} (${notice.retirementDate})`
+                                : `Statut ${notice.officialStatus} (${notice.retirementDate})`)
+                            : notice.officialStatus)}
+                      </span>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Progress Bar */}

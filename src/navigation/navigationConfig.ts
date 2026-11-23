@@ -20,6 +20,7 @@ import {
   History,
   TrendingUp,
   RotateCcw,
+  ShieldCheck,
   LucideIcon
 } from 'lucide-react';
 import { AppScreen } from '../types';
@@ -48,6 +49,7 @@ export interface NavItemConfig {
   badge?: string;
   badgeColor?: string;
   actionKey?: string;
+  adminOnly?: boolean;
   visibility: {
     desktop: boolean;
     mobileBar: boolean;
@@ -372,6 +374,19 @@ export const NAV_ITEMS: NavItemConfig[] = [
     screen: 'landing',
     icon: Sparkles,
     description: 'Découvrir la méthode pédagogique et les piliers d’apprentissage CertifIA',
+    visibility: { desktop: true, mobileBar: false, mobileMore: true, search: true },
+  },
+  {
+    id: 'nav-audit',
+    label: 'Audit du contenu',
+    shortLabel: 'Audit contenu',
+    category: 'plus',
+    screen: 'audit',
+    icon: ShieldCheck,
+    description: 'Gouvernance éditoriale, sources officielles, audit IA et validation humaine',
+    badge: 'Admin',
+    badgeColor: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+    adminOnly: true,
     visibility: { desktop: true, mobileBar: false, mobileMore: true, search: true },
   },
   {

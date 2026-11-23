@@ -24,7 +24,8 @@ const NAMESPACES = [
   'assistant',
   'settings',
   'errors',
-  'notifications'
+  'notifications',
+  'audit'
 ];
 
 function getAllKeys(obj: Record<string, any>, prefix = ''): string[] {

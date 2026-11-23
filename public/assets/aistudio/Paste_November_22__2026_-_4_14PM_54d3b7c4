@@ -1,0 +1,1478 @@
+# CERTIFIA — CAHIER DES CHARGES ET PROMPT CODEX
+## Création de l'espace d'administration « Audit du contenu »
+
+**Projet :** CertifIA  
+**Dépôt :** https://github.com/jeanpierrenouhailler-dot/CertifIA  
+**Application :** https://certifia.swinux.ch/  
+**Module :** Audit du contenu  
+**Objectif :** fiabiliser, contrôler, valider et actualiser l'ensemble des connaissances pédagogiques de CertifIA.
+
+---
+
+# PARTIE I — CAHIER DES CHARGES FONCTIONNEL
+
+## 1. Présentation du projet
+
+### 1.1 Contexte
+
+CertifIA est une application de préparation aux certifications professionnelles dans les domaines de l'intelligence artificielle, du cloud et des technologies associées.
+
+Elle comporte notamment :
+- Des certifications.
+- Des questions de QCM.
+- Des réponses et explications.
+- Des fiches de révision.
+- Un glossaire.
+- Des notions techniques.
+- Des scénarios pédagogiques.
+- Des informations relatives aux examens.
+- Des contenus en français et en anglais.
+
+La qualité de ces informations est fondamentale.
+
+Une erreur dans une question, une réponse ou une explication peut conduire un utilisateur à apprendre une information incorrecte et à échouer à son examen.
+
+L'application doit donc disposer d'un mécanisme structuré permettant de contrôler l'exactitude, la pertinence, la fraîcheur et la conformité de ses contenus.
+
+### 1.2 Objectif
+
+Créer un espace d'administration accessible depuis CertifIA, intitulé :
+
+**Audit du contenu**
+
+Cet espace permettra à l'administrateur de :
+- Inventorier l'ensemble des contenus pédagogiques.
+- Contrôler leur conformité aux programmes officiels.
+- Vérifier les affirmations techniques.
+- Comparer les contenus avec les documentations des fournisseurs.
+- Détecter les erreurs et les contradictions.
+- Repérer les questions ambiguës.
+- Identifier les informations obsolètes.
+- Vérifier les réponses et les explications des QCM.
+- Contrôler les traductions.
+- Corriger et valider les contenus.
+- Suivre leur historique.
+- Produire des rapports de qualité.
+
+Le système doit permettre de distinguer clairement un contenu simplement analysé par une IA d'un contenu réellement validé par une personne.
+
+### 1.3 Principes fondamentaux
+
+Le développement doit respecter cinq principes :
+
+1. Aucune affirmation ne doit être considérée comme exacte uniquement parce qu'une IA l'affirme.
+2. Toute vérification importante doit être accompagnée de preuves documentaires.
+3. Les sources officielles doivent être privilégiées.
+4. Toute modification doit être traçable et réversible.
+5. La validation humaine doit rester déterminante pour l'approbation éditoriale finale.
+
+---
+
+## 2. Périmètre fonctionnel
+
+L'audit doit couvrir tous les contenus pédagogiques de l'application.
+
+| Type de contenu | Contrôles attendus |
+|---|---|
+| Certifications | Existence, statut, dates, programme officiel |
+| Questions QCM | Exactitude, pertinence, ambiguïté, réponse correcte |
+| Réponses | Justification et cohérence avec la documentation |
+| Explications | Exactitude technique, précision, exhaustivité |
+| Flashcards | Exactitude des définitions et des réponses |
+| Glossaire | Définitions, terminologie, actualité |
+| Scénarios | Réalisme technique et cohérence des solutions |
+| Informations d'examen | Durée, score, modalités, pondérations |
+| Domaines d'examen | Correspondance avec les objectifs officiels |
+| Traductions | Fidélité et équivalence technique FR/EN |
+| Sources | Fiabilité, disponibilité et actualité |
+
+L'inventaire doit être construit à partir des véritables sources de données du projet.
+
+Il faut notamment examiner les fichiers actuellement présents, dont :
+- `src/data/localizedQuizData.ts`
+- `src/data/glossaryData.ts`
+- `src/data/flashcardsData.ts`
+- `src/data/certificationsData.ts`
+- `src/types.ts`
+
+Ne pas supposer que cette liste est exhaustive.
+
+---
+
+# 3. Architecture de l'espace d'administration
+
+Créer une entrée « Audit du contenu » dans la navigation de l'application.
+
+L'accès doit être réservé à un administrateur autorisé.
+
+L'espace doit être intégré à l'identité visuelle existante de CertifIA :
+- Thème sombre et thème clair.
+- Interface responsive.
+- Composants graphiques cohérents.
+- Navigation adaptée aux écrans mobiles.
+- Français et anglais.
+- Compatibilité avec les composants et conventions existants.
+
+## 3.1 Menu principal
+
+Créer les rubriques suivantes :
+
+1. Tableau de bord
+2. Inventaire des contenus
+3. Certifications
+4. Questions et QCM
+5. Flashcards
+6. Glossaire
+7. Sources documentaires
+8. Audits et anomalies
+9. Validations
+10. Historique
+11. Paramètres
+
+Chaque rubrique doit correspondre à une fonctionnalité réelle.
+
+Ne pas créer de boutons ou de menus sans action opérationnelle.
+
+---
+
+# 4. Écran 1 — Tableau de bord de l'audit
+
+Créer une page de synthèse présentant l'état global du contenu.
+
+### 4.1 Indicateurs principaux
+
+Afficher :
+
+- Nombre total de contenus.
+- Nombre de certifications.
+- Nombre de questions.
+- Nombre de flashcards.
+- Nombre d'entrées du glossaire.
+- Nombre de contenus audités.
+- Nombre de contenus validés humainement.
+- Nombre de contenus en attente de vérification.
+- Nombre de contenus présentant des anomalies.
+- Nombre de contenus obsolètes.
+- Nombre de contenus sans source documentaire.
+- Nombre de contenus à actualiser.
+
+Toutes les valeurs doivent être calculées à partir des données réelles.
+
+Aucune statistique ne doit être codée en dur.
+
+### 4.2 Indicateurs de qualité
+
+Présenter notamment :
+
+**Couverture documentaire**
+
+Pourcentage de contenus possédant au moins une référence documentaire exploitable.
+
+**Taux de validation humaine**
+
+Pourcentage de contenus ayant reçu une approbation humaine explicite.
+
+**Taux d'anomalies**
+
+Proportion de contenus comportant au moins une anomalie non résolue.
+
+**Couverture des programmes officiels**
+
+Proportion des objectifs officiels couverts par les contenus pédagogiques.
+
+**Fraîcheur documentaire**
+
+Proportion de contenus dont les sources ont été contrôlées dans la période de validité définie.
+
+Préciser les règles de calcul de chaque indicateur.
+
+Ne jamais présenter ces indicateurs comme une mesure absolue de vérité.
+
+### 4.3 Alertes prioritaires
+
+Afficher une liste des problèmes les plus importants :
+
+- Certification retirée ou bientôt retirée.
+- Question avec réponse potentiellement incorrecte.
+- Information technique contredite par une source officielle.
+- Source documentaire indisponible.
+- Contenu sans référence.
+- Question présentant plusieurs réponses possibles.
+- Explication contradictoire.
+- Information d'examen non vérifiée.
+- Traduction techniquement incorrecte.
+
+Les alertes doivent être triées selon leur criticité.
+
+---
+
+# 5. Écran 2 — Inventaire des contenus
+
+Créer un inventaire complet et filtrable.
+
+### 5.1 Colonnes
+
+- Identifiant.
+- Type de contenu.
+- Certification.
+- Domaine d'examen.
+- Langue.
+- Titre ou question.
+- Statut de validation.
+- Dernière date d'audit.
+- Nombre d'anomalies.
+- Nombre de sources associées.
+- Version du contenu.
+
+### 5.2 Filtres
+
+Permettre le filtrage par :
+- Certification.
+- Fournisseur.
+- Domaine.
+- Type de contenu.
+- Langue.
+- Statut.
+- Niveau de criticité.
+- Présence ou absence de source.
+- Date de dernière vérification.
+- Présence d'anomalies.
+
+Prévoir une recherche textuelle.
+
+### 5.3 Actions
+
+Pour chaque contenu :
+- Consulter.
+- Auditer.
+- Voir les sources.
+- Consulter les anomalies.
+- Modifier.
+- Comparer les versions.
+- Valider.
+- Refuser la validation.
+- Archiver.
+
+Les actions doivent respecter les autorisations de l'administrateur.
+
+---
+
+# 6. Écran 3 — Fiche détaillée d'un contenu
+
+Chaque question, fiche ou entrée du glossaire doit posséder une fiche d'administration.
+
+### 6.1 Informations générales
+
+- Identifiant unique.
+- Type de contenu.
+- Certification associée.
+- Domaine d'examen.
+- Langue.
+- Version.
+- Date de création.
+- Date de modification.
+- Statut éditorial.
+- Historique des validations.
+
+### 6.2 Contenu original
+
+Afficher le contenu réellement utilisé par l'application.
+
+Pour un QCM :
+- Énoncé.
+- Réponses proposées.
+- Réponse(s) attendue(s).
+- Explication.
+- Justification des réponses incorrectes.
+- Niveau de difficulté.
+- Domaine d'examen.
+
+Pour une flashcard :
+- Question.
+- Réponse.
+- Explication éventuelle.
+- Domaine associé.
+
+Pour une entrée du glossaire :
+- Terme.
+- Définition.
+- Explication détaillée.
+- Exemples.
+- Termes associés.
+
+### 6.3 Sources documentaires
+
+Afficher les références associées au contenu :
+- Fournisseur.
+- Titre de la documentation.
+- URL.
+- Type de source.
+- Date de publication ou de mise à jour lorsqu'elle est connue.
+- Date de dernière consultation.
+- Extrait justificatif.
+- Affirmation que la source permet de vérifier.
+
+Permettre d'ouvrir la source dans un nouvel onglet.
+
+Une simple URL ne suffit pas à justifier une information : il faut identifier précisément l'affirmation soutenue et le passage documentaire pertinent.
+
+---
+
+# 7. Écran 4 — Moteur d'audit assisté par IA
+
+C'est le cœur du module.
+
+L'administrateur doit pouvoir lancer :
+- Un audit d'un contenu individuel.
+- Un audit d'une sélection de contenus.
+- Un audit de toutes les questions d'une certification.
+- Un audit d'un domaine.
+- Un audit de tous les contenus d'un fournisseur.
+- Un audit complet de l'application.
+
+## 7.1 Déroulement d'un audit
+
+Étape 1 : récupérer le contenu original.
+
+Étape 2 : identifier la certification, le domaine et l'objectif pédagogique associé.
+
+Étape 3 : récupérer les références documentaires pertinentes.
+
+Étape 4 : analyser les affirmations et les réponses.
+
+Étape 5 : comparer les informations avec les sources.
+
+Étape 6 : détecter les anomalies.
+
+Étape 7 : produire un rapport structuré.
+
+Étape 8 : proposer éventuellement une correction.
+
+Étape 9 : soumettre les résultats à une validation humaine.
+
+## 7.2 Contrôles effectués
+
+### A. Exactitude technique
+
+- La définition est-elle correcte ?
+- La fonctionnalité existe-t-elle réellement ?
+- Le service est-il toujours disponible ?
+- La description technique est-elle précise ?
+- La réponse correspond-elle aux possibilités réelles du service ?
+- Les limites et contraintes sont-elles correctement décrites ?
+
+### B. Conformité au programme
+
+- Le contenu appartient-il au programme de la certification ?
+- Correspond-il à un objectif officiel ?
+- Est-il adapté au niveau attendu ?
+- Le contenu est-il pertinent pour la préparation de l'examen ?
+- Le domaine est-il correctement identifié ?
+
+### C. Vérification des QCM
+
+- L'énoncé est-il compréhensible ?
+- Existe-t-il une réponse incontestablement correcte ?
+- Plusieurs réponses sont-elles possibles ?
+- Les propositions sont-elles techniquement cohérentes ?
+- La difficulté est-elle adaptée ?
+- L'explication correspond-elle à la réponse correcte ?
+- Les réponses incorrectes sont-elles réellement incorrectes ?
+- Le contexte est-il suffisant pour répondre ?
+- Le vocabulaire est-il conforme à celui du fournisseur ?
+
+### D. Détection des formulations problématiques
+
+Repérer les termes et formulations tels que :
+- Toujours.
+- Jamais.
+- Obligatoirement.
+- Uniquement.
+- Nécessairement.
+- Tous les cas.
+- Garantie de performance.
+
+Ces formulations doivent faire l'objet d'une vérification particulière lorsqu'elles expriment une règle technique générale.
+
+### E. Contrôle des explications
+
+- L'explication répond-elle à la question ?
+- Justifie-t-elle le choix de la réponse ?
+- Explique-t-elle les autres options ?
+- Évite-t-elle les simplifications trompeuses ?
+- Ne contient-elle pas de contradiction ?
+- Est-elle suffisamment détaillée pour enseigner la notion ?
+
+### F. Contrôle des traductions
+
+Comparer les versions française et anglaise.
+
+Vérifier :
+- Le sens technique.
+- La réponse correcte.
+- Les termes spécialisés.
+- Les acronymes.
+- Les explications.
+- Les exemples.
+- Les formulations propres aux examens.
+
+Une traduction ne doit jamais modifier implicitement la difficulté ou la réponse correcte.
+
+## 7.3 Résultat de l'analyse
+
+Pour chaque contenu, présenter :
+
+- Résumé du contrôle.
+- Points conformes.
+- Points non vérifiés.
+- Anomalies détectées.
+- Sources utilisées.
+- Extraits justificatifs.
+- Recommandations.
+- Proposition de correction.
+- Niveau de confiance et ses limites.
+
+Le résultat de l'IA doit être présenté comme une analyse, pas comme une certification de vérité.
+
+---
+
+# 8. Écran 5 — Gestion des anomalies
+
+Créer une liste centralisée des anomalies détectées.
+
+### 8.1 Classification
+
+**Criticité critique**
+- Réponse incorrecte à une question.
+- Information officielle manifestement contredite.
+- Certification ou examen présenté à tort comme actif.
+- Donnée d'examen erronée susceptible d'induire l'utilisateur en erreur.
+
+**Criticité élevée**
+- Explication techniquement incorrecte.
+- Question ambiguë.
+- Plusieurs réponses possibles sans justification.
+- Fonctionnalité présentée de façon trompeuse.
+
+**Criticité moyenne**
+- Information partiellement exacte.
+- Explication incomplète.
+- Source insuffisante.
+- Traduction imprécise.
+
+**Criticité faible**
+- Problème de formulation.
+- Terminologie non harmonisée.
+- Exemple perfectible.
+- Amélioration pédagogique.
+
+### 8.2 Gestion
+
+Chaque anomalie doit comporter :
+- Identifiant.
+- Contenu concerné.
+- Description.
+- Criticité.
+- Date de détection.
+- Source justificative.
+- Statut.
+- Responsable de la correction.
+- Correction proposée.
+- Date de résolution.
+
+Statuts possibles :
+- Nouvelle.
+- En cours d'analyse.
+- À corriger.
+- Corrigée.
+- En attente de validation.
+- Résolue.
+- Écartée avec justification.
+
+Une anomalie ne doit pas disparaître simplement parce qu'un audit ultérieur ne la retrouve plus : conserver son historique et sa résolution.
+
+---
+
+# 9. Écran 6 — Référentiel des sources documentaires
+
+Créer un registre central des sources.
+
+### 9.1 Fournisseurs à prendre en charge
+
+Prévoir au minimum :
+
+- Microsoft.
+- AWS.
+- Google Cloud.
+- IBM.
+- NVIDIA.
+
+Prévoir une architecture extensible à d'autres fournisseurs.
+
+### 9.2 Types de sources
+
+- Guides officiels d'examen.
+- Documentation technique officielle.
+- Pages officielles de certification.
+- Notes de version.
+- Documentation API.
+- Guides de bonnes pratiques.
+- Documentation de services.
+- Référentiels de terminologie.
+
+### 9.3 Informations enregistrées
+
+- Identifiant.
+- Fournisseur.
+- Certification ou domaine concerné.
+- Titre.
+- URL canonique.
+- Type de document.
+- Langue.
+- Date de publication si disponible.
+- Date de mise à jour si disponible.
+- Dernière consultation.
+- État de disponibilité.
+- Version ou identifiant de version.
+- Fiabilité de la source.
+
+### 9.4 Hiérarchie des sources
+
+Priorité 1 : documents officiels du fournisseur relatifs à l'examen.
+
+Priorité 2 : documentation technique officielle du service.
+
+Priorité 3 : notes de version et annonces officielles.
+
+Priorité 4 : documentation secondaire fiable, uniquement si nécessaire.
+
+Les forums, blogs personnels et réponses générées par IA ne doivent jamais constituer l'unique justification d'une réponse de certification.
+
+### 9.5 Contrôle des sources
+
+Détecter :
+- Les liens cassés.
+- Les redirections.
+- Les documents déplacés.
+- Les pages modifiées.
+- Les informations anciennes.
+- Les différences entre versions.
+
+Ne pas considérer qu'une URL accessible signifie que le contenu associé est toujours exact.
+
+Respecter les conditions d'accès, les limitations et les règles des sites consultés.
+
+---
+
+# 10. Écran 7 — Référentiel des certifications
+
+Chaque certification doit posséder une fiche de référence.
+
+Données à contrôler :
+- Nom officiel.
+- Code de certification.
+- Fournisseur.
+- Statut : actif, annoncé pour retrait, retiré, suspendu ou historique.
+- Date de lancement.
+- Date de retrait éventuelle.
+- Version du programme.
+- Domaines d'examen.
+- Pondération de chaque domaine.
+- Durée de l'examen.
+- Nombre de questions lorsqu'il est officiellement communiqué.
+- Score de réussite.
+- Langues disponibles.
+- Modalités particulières.
+
+Chaque donnée doit être associée à une source officielle.
+
+Ne pas inventer une date, une durée ou un score lorsque l'information n'est pas publiée.
+
+Prévoir une alerte lorsqu'une certification change de statut.
+
+Les contenus associés à une certification retirée peuvent être conservés à des fins historiques ou pédagogiques, mais doivent être signalés comme tels et ne plus être présentés comme préparation à un examen actif.
+
+---
+
+# 11. Écran 8 — Validation humaine
+
+La validation humaine est une étape obligatoire pour toute approbation finale.
+
+### 11.1 Interface
+
+Afficher côte à côte :
+- Contenu original.
+- Analyse de l'IA.
+- Sources officielles.
+- Extraits justificatifs.
+- Anomalies.
+- Correction proposée.
+
+### 11.2 Actions
+
+L'administrateur peut :
+- Approuver.
+- Refuser.
+- Demander une correction.
+- Modifier manuellement.
+- Demander une nouvelle analyse.
+- Marquer une source comme insuffisante.
+- Reporter la décision.
+
+### 11.3 Conditions d'approbation
+
+Un contenu ne peut pas être approuvé si :
+- Une anomalie critique reste ouverte.
+- La réponse correcte n'est pas justifiée.
+- Une affirmation déterminante n'a aucune source suffisante.
+- La certification est retirée alors que le contenu est présenté comme un examen actif.
+- Une correction proposée n'a pas été examinée.
+
+Il doit être possible d'approuver un contenu avec des réserves mineures, à condition de documenter ces réserves.
+
+### 11.4 Historique
+
+Conserver :
+- Qui a validé.
+- Quand.
+- Quelle version.
+- Sur quelles sources.
+- Avec quelles réserves.
+- Quelle décision a été prise.
+
+---
+
+# 12. Écran 9 — Historique et versions
+
+Chaque contenu doit être versionné.
+
+Lorsqu'une modification est effectuée :
+- Créer une nouvelle version.
+- Conserver l'ancienne.
+- Enregistrer les différences.
+- Associer les audits aux versions exactes.
+- Conserver les validations précédentes.
+- Permettre une comparaison.
+- Prévoir un retour à une version antérieure.
+
+Une modification importante doit invalider la validation précédente ou déclencher une nouvelle vérification selon les règles définies.
+
+Une validation d'une version ne doit jamais être automatiquement transférée à une version modifiée.
+
+---
+
+# 13. Modèle de données recommandé
+
+Adapter les structures au modèle existant, sans créer de doublons inutiles.
+
+Prévoir conceptuellement les entités suivantes.
+
+## ContentItem
+
+- id
+- contentType
+- certificationId
+- domainId
+- language
+- title
+- contentReference
+- contentHash
+- version
+- editorialStatus
+- createdAt
+- updatedAt
+
+## SourceReference
+
+- id
+- provider
+- title
+- canonicalUrl
+- sourceType
+- language
+- publishedAt
+- updatedAt
+- checkedAt
+- sourceVersion
+- availabilityStatus
+
+## ContentEvidence
+
+- id
+- contentItemId
+- sourceReferenceId
+- claimReference
+- supportingExcerpt
+- evidenceType
+- verificationStatus
+
+## AuditRun
+
+- id
+- auditScope
+- startedAt
+- completedAt
+- auditStatus
+- toolVersion
+- modelIdentifier
+- promptVersion
+- sourceSnapshot
+- contentVersion
+- contentHash
+
+## AuditFinding
+
+- id
+- auditRunId
+- contentItemId
+- category
+- severity
+- description
+- evidence
+- recommendation
+- confidence
+- resolutionStatus
+
+## HumanReview
+
+- id
+- contentItemId
+- contentVersion
+- reviewerId
+- decision
+- comment
+- reviewedAt
+
+## ContentRevision
+
+- id
+- contentItemId
+- version
+- previousVersion
+- changes
+- authorId
+- createdAt
+
+## CertificationReference
+
+- id
+- certificationId
+- officialName
+- provider
+- status
+- examVersion
+- effectiveDate
+- retirementDate
+- officialReferenceId
+- lastVerifiedAt
+
+Ces structures sont des propositions conceptuelles : les adapter aux conventions, au stockage et aux types existants.
+
+---
+
+# 14. Sécurité et droits d'administration
+
+L'espace d'audit contient des fonctions qui peuvent modifier le contenu de production.
+
+Il doit donc être protégé.
+
+Exigences :
+- Accès réservé aux administrateurs autorisés.
+- Contrôle des droits côté serveur ou dans une infrastructure réellement sécurisée.
+- Aucune clé secrète ou clé API dans le code frontend.
+- Protection des opérations de modification.
+- Validation des données reçues.
+- Journalisation des actions.
+- Protection contre les modifications non autorisées.
+- Gestion des erreurs.
+- Limitation des appels aux services IA.
+- Protection contre les injections dans les contenus analysés.
+- Séparation entre les données d'audit et les données personnelles des utilisateurs.
+
+Un simple booléen dans localStorage ou une route masquée ne constitue pas un contrôle d'accès.
+
+Si l'application ne possède pas actuellement de mécanisme sécurisé permettant de protéger et de persister les modifications administratives, il faut d'abord proposer et implémenter une solution compatible avec l'architecture réelle.
+
+Ne jamais prétendre qu'une administration est sécurisée si le contrôle d'accès est uniquement effectué côté client.
+
+---
+
+# 15. Architecture technique
+
+L'architecture doit être déterminée après inspection du dépôt.
+
+Elle doit séparer logiquement :
+
+1. Le référentiel pédagogique.
+2. Le moteur d'audit.
+3. Le registre des sources.
+4. Le stockage des résultats.
+5. La validation humaine.
+6. La publication des contenus.
+
+Prévoir des interfaces de services indépendantes du fournisseur d'IA.
+
+Exemple conceptuel :
+
+- `ContentAuditService`
+- `ContentInventoryService`
+- `SourceRegistryService`
+- `OfficialSourceVerificationService`
+- `AIReviewService`
+- `FindingManagementService`
+- `HumanValidationService`
+- `ContentVersioningService`
+- `AuditReportService`
+
+Le moteur d'audit ne doit pas dépendre directement d'un composant React.
+
+Les traitements longs doivent être exécutés de manière adaptée à l'environnement d'hébergement.
+
+Ne pas lancer un audit complet depuis un simple rendu de composant ou une opération bloquante du navigateur.
+
+### Règle importante sur le stockage
+
+Le référentiel actuel peut être constitué de fichiers TypeScript versionnés.
+
+Si c'est le cas :
+- Ne pas prétendre qu'un changement dans un état React modifie le référentiel source.
+- Ne pas stocker des corrections administratives uniquement dans la mémoire du navigateur.
+- Ne pas exposer de mécanisme de publication non sécurisé.
+
+Choisir une stratégie de stockage et de publication réellement compatible avec le projet.
+
+Si une modification persistante et centralisée des contenus nécessite une évolution d'infrastructure, la documenter et la mettre en œuvre uniquement si elle est compatible avec les contraintes existantes.
+
+---
+
+# 16. Gestion de l'intelligence artificielle
+
+Le moteur doit pouvoir utiliser différents fournisseurs de modèles sans être étroitement couplé à un fournisseur particulier.
+
+Prévoir une interface commune permettant :
+- L'envoi du contenu.
+- L'envoi des sources.
+- L'analyse des affirmations.
+- L'analyse des réponses.
+- Le retour de résultats structurés.
+- La gestion des erreurs.
+- Le suivi de consommation.
+- La limitation des coûts.
+
+Les appels IA doivent être réalisés dans un environnement sécurisé.
+
+### 16.1 Résultats structurés
+
+Le moteur doit retourner des résultats exploitables sous forme structurée.
+
+Exemple de résultat :
+
+{
+  "contentId": "question-example",
+  "contentVersion": 3,
+  "overallStatus": "needs_review",
+  "findings": [
+    {
+      "category": "technical_accuracy",
+      "severity": "high",
+      "description": "La réponse proposée ne correspond pas aux capacités documentées.",
+      "evidence": [
+        {
+          "sourceId": "source-example",
+          "url": "https://example.com/documentation",
+          "excerpt": "Extrait documentaire à vérifier"
+        }
+      ],
+      "recommendation": "Revoir la réponse et son explication."
+    }
+  ],
+  "confidence": "medium"
+}
+
+Ce format est illustratif. Adapter le schéma final et le valider strictement.
+
+Une réponse invalide du modèle doit être rejetée ou signalée, jamais interprétée comme un audit réussi.
+
+### 16.2 Limites de l'IA
+
+L'IA peut :
+- Détecter des contradictions.
+- Proposer des corrections.
+- Comparer des affirmations.
+- Identifier des informations suspectes.
+- Aider à retrouver les sources.
+
+Elle ne peut pas :
+- Garantir seule l'exactitude.
+- Transformer une source secondaire en source officielle.
+- Inventer une preuve.
+- Déclarer un contenu validé humainement.
+- Approuver automatiquement une correction importante.
+
+---
+
+# 17. Rapports et exportations
+
+Prévoir des rapports par :
+- Certification.
+- Fournisseur.
+- Domaine.
+- Type de contenu.
+- Période.
+- Statut.
+- Niveau de criticité.
+
+Les rapports doivent notamment présenter :
+- Contenus contrôlés.
+- Contenus approuvés.
+- Anomalies.
+- Sources utilisées.
+- Corrections effectuées.
+- Contenus restant à vérifier.
+
+Prévoir des exports CSV et JSON.
+
+Un export doit conserver les identifiants, versions, statuts et références documentaires nécessaires à sa traçabilité.
+
+---
+
+# 18. Critères d'acceptation fonctionnels
+
+Le module est considéré comme fonctionnel lorsque :
+
+- Tous les contenus pédagogiques existants sont inventoriés.
+- Les contenus sont consultables depuis l'administration.
+- Chaque contenu possède un identifiant stable.
+- Les sources documentaires peuvent être associées à des affirmations.
+- Un audit individuel peut être lancé.
+- Un audit par certification peut être lancé.
+- Les résultats sont enregistrés.
+- Les anomalies sont consultables et suivies.
+- Les propositions de correction sont visibles.
+- L'administrateur peut approuver ou refuser une correction.
+- Les versions sont conservées.
+- L'historique est consultable.
+- Les certifications retirées sont détectées.
+- Les contenus non vérifiés sont clairement identifiés.
+- Les indicateurs du tableau de bord sont calculés dynamiquement.
+- Les accès administratifs sont réellement protégés.
+- Les données d'audit ne sont pas perdues après actualisation.
+- Le fonctionnement existant de CertifIA est préservé.
+
+---
+
+# PARTIE II — PROMPT CODEX DE DÉVELOPPEMENT
+
+Tu es un ingénieur logiciel senior spécialisé dans React, TypeScript, les applications SaaS, les systèmes de gestion de connaissances, l'audit documentaire, les architectures sécurisées et les applications pédagogiques.
+
+Tu interviens directement sur le dépôt :
+
+https://github.com/jeanpierrenouhailler-dot/CertifIA
+
+Ton objectif est de développer un espace complet d'administration intitulé :
+
+**Audit du contenu**
+
+Tu dois implémenter le cahier des charges défini dans la première partie de ce document.
+
+## 1. PHASE 1 — AUDIT DU PROJET EXISTANT
+
+Avant toute modification :
+
+1. Examiner l'intégralité de l'architecture.
+2. Identifier le framework, les bibliothèques et les conventions.
+3. Examiner les mécanismes de navigation.
+4. Identifier le système d'authentification existant.
+5. Identifier le mode de stockage des données.
+6. Identifier les éventuels services backend.
+7. Identifier les services externes et les intégrations IA.
+8. Examiner les structures TypeScript existantes.
+9. Identifier tous les types de contenus.
+10. Identifier les mécanismes de traduction.
+11. Identifier les tests existants.
+12. Identifier les contraintes de déploiement.
+
+Examiner notamment les fichiers :
+
+- `src/data/localizedQuizData.ts`
+- `src/data/glossaryData.ts`
+- `src/data/flashcardsData.ts`
+- `src/data/certificationsData.ts`
+- `src/types.ts`
+- `package.json`
+- Les composants de navigation.
+- Les services.
+- Les stores.
+- Les mécanismes de stockage.
+- Les configurations de déploiement.
+
+La liste n'est pas exhaustive.
+
+### Livrable de cette phase
+
+Produire un diagnostic synthétique présentant :
+- Architecture actuelle.
+- Sources de données.
+- Types de contenus.
+- Possibilités de persistance.
+- Mécanismes de sécurité disponibles.
+- Contraintes d'intégration.
+- Modifications nécessaires.
+
+Ne pas commencer par créer des composants graphiques sans avoir compris les mécanismes existants.
+
+## 2. PHASE 2 — CONCEPTION TECHNIQUE
+
+Définir une architecture compatible avec le projet.
+
+Principes impératifs :
+
+- Réutiliser les composants existants.
+- Réutiliser les services existants.
+- Respecter le fonctionnement actuel de l'application.
+- Éviter les dépendances inutiles.
+- Préserver le fonctionnement hors ligne lorsqu'il est prévu.
+- Éviter les duplications de données.
+- Séparer les interfaces, la logique métier et les accès aux données.
+- Garantir la traçabilité des modifications.
+
+Ne pas imposer une nouvelle infrastructure sans nécessité démontrée.
+
+Si une administration sécurisée et persistante est impossible avec l'architecture actuelle, documenter le problème et proposer une évolution réaliste.
+
+Ne jamais créer une administration fictivement sécurisée.
+
+## 3. PHASE 3 — CRÉATION DE L'INTERFACE
+
+Créer l'espace d'administration « Audit du contenu ».
+
+Respecter le design de CertifIA.
+
+Développer les pages suivantes :
+
+1. Tableau de bord.
+2. Inventaire.
+3. Certifications.
+4. Questions et QCM.
+5. Flashcards.
+6. Glossaire.
+7. Sources.
+8. Audits et anomalies.
+9. Validation humaine.
+10. Historique.
+11. Paramètres.
+
+Toutes les pages doivent être fonctionnelles.
+
+Prévoir :
+- Recherche.
+- Filtres.
+- Tri.
+- Pagination si nécessaire.
+- États de chargement.
+- États vides.
+- Gestion des erreurs.
+- Notifications.
+- Confirmations des actions sensibles.
+
+Respecter le thème sombre et le thème clair.
+
+Implémenter les traductions FR/EN.
+
+Vérifier l'accessibilité.
+
+## 4. PHASE 4 — INVENTAIRE AUTOMATIQUE
+
+Développer un mécanisme capable de parcourir les sources de données réelles.
+
+Il doit identifier automatiquement :
+- Les certifications.
+- Les questions.
+- Les réponses.
+- Les explications.
+- Les flashcards.
+- Les entrées du glossaire.
+- Les scénarios.
+- Les informations d'examen.
+- Les références documentaires existantes.
+
+Chaque élément doit recevoir un identifiant stable.
+
+Éviter les identifiants générés aléatoirement à chaque inventaire.
+
+Calculer une empreinte du contenu afin de détecter les modifications.
+
+Distinguer les données originales des métadonnées d'audit.
+
+L'inventaire ne doit jamais modifier les contenus pédagogiques.
+
+## 5. PHASE 5 — REGISTRE DES SOURCES
+
+Développer le registre des sources documentaires.
+
+Prévoir les fournisseurs :
+- Microsoft.
+- AWS.
+- Google Cloud.
+- IBM.
+- NVIDIA.
+
+Permettre l'ajout d'autres fournisseurs.
+
+Implémenter :
+- Enregistrement des sources.
+- Catégorisation.
+- Association aux certifications.
+- Association aux domaines.
+- Association aux affirmations.
+- Vérification de disponibilité.
+- Date de dernière consultation.
+- Historique des changements lorsque cela est possible.
+
+Privilégier les guides d'examen officiels et la documentation technique des fournisseurs.
+
+Ne pas considérer les moteurs de recherche ou les réponses d'IA comme des sources de vérité.
+
+Ne pas inventer d'extraits documentaires.
+
+Si un document ne peut pas être consulté, indiquer clairement que la vérification n'a pas été effectuée.
+
+## 6. PHASE 6 — MOTEUR D'AUDIT IA
+
+Développer un moteur indépendant de l'interface.
+
+Il doit être capable d'auditer :
+- Un contenu individuel.
+- Une sélection.
+- Une certification complète.
+- Un fournisseur.
+- L'ensemble du catalogue.
+
+Implémenter des contrôles distincts :
+
+1. Exactitude technique.
+2. Conformité au programme officiel.
+3. Exactitude des réponses.
+4. Cohérence des explications.
+5. Pertinence pédagogique.
+6. Actualité des informations.
+7. Qualité des sources.
+8. Ambiguïtés.
+9. Traductions.
+10. Doublons.
+
+Le moteur doit produire des résultats structurés et validables.
+
+Chaque anomalie doit être associée à :
+- Un contenu précis.
+- Une version précise.
+- Une catégorie.
+- Une criticité.
+- Une description.
+- Une preuve documentaire si disponible.
+- Une recommandation.
+- Un niveau de confiance.
+- Un statut.
+
+### Règle essentielle
+
+Ne jamais transformer automatiquement une suggestion de l'IA en correction publiée.
+
+Les propositions de correction doivent être soumises à l'administrateur.
+
+Prévoir une gestion des coûts et des limites d'utilisation.
+
+Ne pas déclencher des audits IA en boucle à chaque affichage d'une page.
+
+## 7. PHASE 7 — AUDIT DES QUESTIONS QCM
+
+C'est une fonctionnalité prioritaire.
+
+Pour chaque question, vérifier :
+
+- Exactitude de l'énoncé.
+- Exactitude de chaque réponse.
+- Réponse attendue.
+- Unicité de la réponse lorsqu'elle est attendue.
+- Pertinence des distracteurs.
+- Cohérence de l'explication.
+- Justification de la réponse.
+- Cohérence avec le domaine officiel.
+- Niveau de difficulté.
+- Actualité des informations.
+- Qualité de la traduction.
+
+Identifier les questions présentant plusieurs réponses techniquement défendables.
+
+Identifier les questions nécessitant davantage de contexte.
+
+Identifier les questions reposant sur une fonctionnalité retirée ou modifiée.
+
+Prévoir un aperçu interactif permettant à l'administrateur de tester la question exactement comme un utilisateur.
+
+Ne pas modifier les scores ou les résultats des utilisateurs à la suite d'une correction éditoriale.
+
+## 8. PHASE 8 — AUDIT DU GLOSSAIRE ET DES FLASHCARDS
+
+Pour le glossaire :
+- Vérifier les définitions.
+- Vérifier les acronymes.
+- Vérifier les distinctions entre technologies.
+- Vérifier les exemples.
+- Détecter les généralisations abusives.
+- Vérifier la terminologie officielle.
+
+Pour les flashcards :
+- Vérifier les réponses.
+- Vérifier la précision.
+- Vérifier la cohérence avec les certifications.
+- Détecter les informations obsolètes.
+- Contrôler la qualité pédagogique.
+
+## 9. PHASE 9 — CERTIFICATIONS ET RÉFÉRENTIELS OFFICIELS
+
+Créer une procédure de vérification des certifications.
+
+Pour chaque certification :
+- Vérifier son existence.
+- Vérifier son statut.
+- Vérifier sa disponibilité.
+- Vérifier son guide d'examen.
+- Vérifier les objectifs.
+- Vérifier les pondérations.
+- Vérifier les modalités.
+- Vérifier les dates de retrait éventuelles.
+
+Ne jamais inventer une information absente des sources officielles.
+
+Prévoir des alertes en cas de changement.
+
+Ne pas supprimer automatiquement le contenu d'une certification retirée : conserver son historique et gérer son statut.
+
+## 10. PHASE 10 — VALIDATION HUMAINE
+
+Développer le workflow de validation.
+
+Les décisions possibles :
+- Approuvé.
+- Refusé.
+- À corriger.
+- En attente.
+- Approuvé avec réserves.
+
+Une validation doit être liée à une version précise.
+
+Toute modification importante doit provoquer une invalidation ou une réévaluation de la validation précédente.
+
+Enregistrer les décisions et commentaires.
+
+## 11. PHASE 11 — HISTORIQUE ET PERSISTANCE
+
+Implémenter :
+- Historique des audits.
+- Historique des corrections.
+- Historique des validations.
+- Versions des contenus.
+- Comparaison des versions.
+- Possibilité de restauration.
+
+Garantir la persistance réelle des données.
+
+Ne pas utiliser uniquement le state React ou localStorage pour les décisions administratives qui doivent être partagées et conservées en production.
+
+Respecter l'architecture de stockage existante ou proposer son évolution si nécessaire.
+
+## 12. PHASE 12 — SÉCURITÉ
+
+Vérifier :
+- Authentification.
+- Autorisations.
+- Protection des routes.
+- Contrôle des opérations d'écriture.
+- Validation des entrées.
+- Protection des secrets.
+- Protection des appels IA.
+- Gestion des erreurs.
+- Journalisation.
+- Protection contre les modifications non autorisées.
+
+Les secrets doivent rester côté serveur ou dans l'environnement sécurisé approprié.
+
+Ne jamais placer une clé API dans le bundle frontend.
+
+Ne jamais considérer une route cachée comme une protection suffisante.
+
+## 13. PHASE 13 — TESTS
+
+Créer une suite de tests complète.
+
+### Tests unitaires
+
+- Inventaire.
+- Calcul des empreintes.
+- Détection des changements.
+- Validation des données.
+- Classification des anomalies.
+- Gestion des statuts.
+- Contrôle des versions.
+- Calcul des indicateurs.
+
+### Tests d'intégration
+
+- Enregistrement d'une source.
+- Association d'une source à un contenu.
+- Lancement d'un audit.
+- Enregistrement des résultats.
+- Création d'une anomalie.
+- Proposition de correction.
+- Approbation humaine.
+- Refus de validation.
+- Restauration d'une version.
+
+### Tests de sécurité
+
+- Accès non autorisé.
+- Tentative de modification sans permission.
+- Accès aux données administratives.
+- Vérification de l'absence de secrets frontend.
+- Validation des entrées.
+- Résistance aux contenus malveillants transmis au moteur IA.
+
+### Tests d'interface
+
+- Navigation.
+- Recherche.
+- Filtres.
+- Pagination.
+- Thème clair.
+- Thème sombre.
+- Français.
+- Anglais.
+- Mobile.
+- Desktop.
+- Gestion des erreurs.
+- États vides.
+
+### Tests de non-régression
+
+Vérifier que l'ajout du module ne casse aucune fonctionnalité existante :
+- QCM.
+- Flashcards.
+- Glossaire.
+- Progression.
+- Certifications.
+- Historique utilisateur.
+- Préférences.
+- Navigation.
+
+## 14. PHASE 14 — DOCUMENTATION
+
+Créer ou mettre à jour la documentation technique :
+
+- Architecture du module.
+- Modèle de données.
+- Fonctionnement des audits.
+- Configuration des sources.
+- Configuration des fournisseurs IA.
+- Sécurité.
+- Gestion des rôles.
+- Workflow de validation.
+- Installation.
+- Tests.
+- Déploiement.
+- Procédures de sauvegarde et de restauration.
+
+Documenter également les limites du moteur IA.
+
+## 15. ORDRE DE DÉVELOPPEMENT
+
+Procéder par étapes :
+
+**P0 — Fondations**
+- Audit de l'architecture.
+- Inventaire des contenus.
+- Modèle de données.
+- Sécurité.
+- Persistance.
+- Navigation d'administration.
+
+**P1 — Audit documentaire**
+- Registre des sources.
+- Fiches de contenu.
+- Audit manuel.
+- Gestion des anomalies.
+- Traçabilité.
+
+**P2 — Intelligence artificielle**
+- Moteur d'audit.
+- Analyse des QCM.
+- Analyse du glossaire.
+- Analyse des flashcards.
+- Détection des contradictions.
+- Propositions de corrections.
+
+**P3 — Validation et publication**
+- Workflow humain.
+- Historique.
+- Versionnement.
+- Restauration.
+- Publication sécurisée.
+
+**P4 — Automatisation**
+- Détection des changements de sources.
+- Alertes d'obsolescence.
+- Audits périodiques.
+- Rapports de qualité.
+
+Ne pas développer une automatisation avancée avant que les fondations de traçabilité et de validation soient opérationnelles.
+
+## 16. CRITÈRES FINAUX D'ACCEPTATION
+
+Le développement est considéré comme terminé lorsque :
+
+1. L'espace Audit du contenu est accessible aux seuls administrateurs autorisés.
+2. Tous les contenus pédagogiques sont inventoriés.
+3. Chaque contenu dispose d'un identifiant stable.
+4. Les sources officielles sont gérées dans un registre.
+5. Les audits peuvent être exécutés et enregistrés.
+6. Les anomalies sont correctement classées.
+7. Les preuves documentaires sont consultables.
+8. Les corrections sont proposées sans publication automatique.
+9. La validation humaine est opérationnelle.
+10. Les versions et historiques sont conservés.
+11. Les certifications obsolètes sont détectées.
+12. Les données d'administration sont persistantes.
+13. Les interfaces FR/EN fonctionnent.
+14. Le thème clair et sombre fonctionnent.
+15. Le module est responsive.
+16. Les tests sont automatisés.
+17. Les fonctionnalités existantes ne sont pas dégradées.
+18. La documentation est complète.
+
+## 17. RAPPORT FINAL OBLIGATOIRE
+
+À la fin du développement, produire un rapport indiquant :
+
+- Architecture initiale.
+- Architecture finale.
+- Fichiers créés.
+- Fichiers modifiés.
+- Modèle de données.
+- Fonctionnalités développées.
+- Fonctionnalités non terminées.
+- Dépendances ajoutées.
+- Configuration nécessaire.
+- Résultats des tests.
+- Résultats des contrôles de sécurité.
+- Limites connues.
+- Actions restant à effectuer avant production.
+
+Fournir un verdict :
+
+- PRÊT POUR LA PRODUCTION.
+- PRÊT SOUS RÉSERVE.
+- NON PRÊT.
+
+Ne jamais déclarer le module prêt si la sécurité, la persistance ou les validations critiques ne sont pas réellement opérationnelles.
+
+**PRINCIPE DIRECTEUR : CertifIA doit pouvoir expliquer pourquoi un contenu est considéré comme fiable, montrer les sources qui le justifient, conserver la trace de sa vérification et permettre à un administrateur de prendre la décision finale.**

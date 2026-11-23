@@ -475,11 +475,51 @@ async function run() {
     assert.match(resetText, /Aucune activité enregistrée/i, 'Recent activity did not reset');
     assert.equal(await page.locator('aside').innerText().then((t) => t.includes('SRS 0')), true, 'Sidebar did not reset to SRS 0');
 
+    // 5. Verify Backend Audit API Security Guards & Unauthenticated Admin Gate
+    console.log('5. Testing /api/audit/* security guards and unauthenticated /?view=audit gate...');
+    const healthRes = await fetch(`${ORIGIN}/api/audit/health`);
+    assert.equal(healthRes.status, 200, 'Expected /api/audit/health to return 200 JSON');
+    const healthJson = await healthRes.json();
+    assert.equal(healthJson.ok, true);
+    assert.equal(healthJson.model, 'gemini-4-hydrogen');
+
+    const unauthAnalyzeRes = await fetch(`${ORIGIN}/api/audit/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentId: 'test', contentType: 'quiz_question', contentVersion: 1 }),
+    });
+    assert.equal(unauthAnalyzeRes.status, 401, 'Unauthenticated /api/audit/analyze must return 401');
+
+    const unauthCheckSrcRes = await fetch(`${ORIGIN}/api/audit/check-source`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'https://learn.microsoft.com/' }),
+    });
+    assert.equal(unauthCheckSrcRes.status, 401, 'Unauthenticated /api/audit/check-source must return 401');
+
+    const badTokenRes = await fetch(`${ORIGIN}/api/audit/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer invalid.jwt.token',
+      },
+      body: JSON.stringify({ contentId: 'test' }),
+    });
+    assert.equal(badTokenRes.status, 401, 'Forged Bearer token on /api/audit/analyze must return 401');
+
+    // Verify unauthenticated browser access to /?view=audit displays strict sign-in gate with ZERO admin data leaked
+    await page.goto(`${ORIGIN}/?view=audit`, { waitUntil: 'load' });
+    await page.waitForSelector('#audit-admin-gate-signin', { state: 'visible', timeout: 10000 });
+    const adminWorkspaceLeaked = await page.locator('#audit-workspace-root').count();
+    assert.equal(adminWorkspaceLeaked, 0, 'Admin workspace must NEVER render for unauthenticated visitors');
+    const adminSidebarLeak = await page.locator('#sidebar-audit-admin-btn').count();
+    assert.equal(adminSidebarLeak, 0, 'Sidebar must hide admin Audit entry from unauthenticated visitors');
+
     assert.equal(consoleErrors.length, 0, `Console errors detected: ${JSON.stringify(consoleErrors)}`);
     assert.equal(pageErrors.length, 0, `Uncaught page errors detected: ${JSON.stringify(pageErrors)}`);
     assert.equal(failedRequests.length, 0, `Failed HTTP requests detected: ${JSON.stringify(failedRequests)}`);
 
-    console.log('✅ All landing, app persistence, zero-state, reset, and modal accessibility checks passed!');
+    console.log('✅ All landing, app persistence, zero-state, reset, security gate, and modal checks passed!');
   } catch (err) {
     try {
       const diag = await page.evaluate(() => {

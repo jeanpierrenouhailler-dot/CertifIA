@@ -1,4 +1,4 @@
-export type AppScreen = 'landing' | 'today' | 'recommendation' | 'catalogue' | 'quiz' | 'flashcards' | 'exam' | 'analytics' | 'profile' | 'glossary' | 'assistant';
+export type AppScreen = 'landing' | 'today' | 'recommendation' | 'catalogue' | 'quiz' | 'flashcards' | 'exam' | 'analytics' | 'profile' | 'glossary' | 'assistant' | 'audit';
 
 export type UserLevel = 'debutant' | 'intermediaire' | 'avance';
 

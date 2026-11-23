@@ -18,6 +18,7 @@ import {
   LayoutGrid,
   Download,
   RotateCcw,
+  ShieldCheck,
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -56,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenResetData,
 }) => {
   const { t } = useTranslation(['common', 'navigation', 'dashboard']);
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, isAdmin } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { isInstalled, promptInstall } = usePwa();
@@ -386,6 +387,27 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                   <span className="text-[10px] font-mono text-slate-400">{versionInfo.version}</span>
                 </button>
+
+                {isAdmin && (
+                  <button
+                    id="header-menu-audit-admin-btn"
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setIsWorkspaceMenuOpen(false);
+                      onNavigate('audit');
+                    }}
+                    className="w-full px-2.5 py-2 rounded-xl flex items-center justify-between text-xs font-semibold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-colors"
+                  >
+                    <span className="flex items-center gap-2.5 truncate">
+                      <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      <span className="truncate">{t('navigation:items.audit.label', 'Audit du contenu')}</span>
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-violet-500/10 border border-violet-500/20">
+                      Admin
+                    </span>
+                  </button>
+                )}
 
                 {onOpenResetData && (
                   <button

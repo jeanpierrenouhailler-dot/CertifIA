@@ -4,6 +4,22 @@ Toutes les modifications notables apportées au projet **CertifIA** sont consign
 
 ---
 
+## [2.10.0] - 2026-11-22 • Espace d'Administration « Audit du contenu » & Gouvernance Éditoriale
+
+### 🛡️ Architecture Back/Front, Sécurité RBAC & Proxy IA (`server.ts`, `firestore.rules`)
+* **Serveur Express Full-Stack (`server.ts`) :**
+  * Vérification cryptographique RS256 des jetons Firebase ID (`requireAdminAuth`), contrôle strict des emails administrateurs autorisés (`ADMIN_EMAILS`) et limitation de débit / budget journalier par administrateur.
+  * `POST /api/audit/check-source` : vérification réelle de disponibilité HTTP, redirections finales et en-tête `Last-Modified` avec protection SSRF multi-sauts (blocage IP privées/loopback/métadonnées cloud via `node:dns/promises`).
+  * `POST /api/audit/analyze` : analyse éditoriale assistée côté serveur uniquement via `@google/genai` (`gemini-4-hydrogen`), validation stricte de schéma JSON, délimiteurs XML anti-injection de prompt et zéro auto-validation.
+* **Règles Firestore Durcies (`firestore.rules`, `firebase-blueprint.json`, `eslint.config.mjs`) :**
+  * Déploiement de 10 collections d'administration strictement réservées aux comptes `isAdmin()` (avec immuabilité de `auditReviews` et `auditRevisions`) et de `publishedContent` lisible publiquement pour refléter les validations et alertes de certification approuvées.
+
+### 📊 11 Sous-Vues d'Administration (`src/components/audit/*`, `AuditContext.tsx`, `PublishedContentContext.tsx`)
+* **Inventaire complet unifié (`2 862` éléments réels)** : Tableau de bord dynamique sans statistique fictive, inventaire filtrable/triable/paginé, fiche détaillée avec éditeur de révisions JSON et rattachement d'extraits de preuve, gestion du cycle de vie des certifications avec bandeau public côté apprenant (`CatalogueView`), laboratoire QCM avec **simulateur apprenant isolé**, explorateur des 2 800 flashcards, glossaire, registre des sources Priorités 1–4, moteur d'audit 6 périmètres, file centrale des anomalies avec conservation d'historique, atelier de validation humaine bloquant les contenus incomplets/critiques, timeline avec rollback et exports CSV/JSON.
+* **Tests & Documentation :** Ajout de `tests/auditModule.test.ts` (tests domaine, hashing/diff, règles bloquantes, exports), extension de `tests/landing-responsive.mjs` (vérification `401` sur `/api/audit/*` et blocage UI sur `/?view=audit`), et rédaction de `AUDIT_CONTENT_ARCHITECTURE.md`.
+
+---
+
 ## [2.9.1] - 2026-11-20 • Audit Pré-Production, Suppression des Données Fictives & Fiabilisation
 
 ### 🛡️ Source Unique de Vérité & Zéro Donnée Fictive

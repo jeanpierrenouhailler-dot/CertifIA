@@ -30,6 +30,7 @@ const DEFAULT_TOUR_STEP_BY_SCREEN: Record<Exclude<AppScreen, 'landing'>, number>
   analytics: 9,
   glossary: 0,
   profile: 0,
+  audit: 0,
 };
 
 export const ScreenGuideBanner: React.FC<ScreenGuideBannerProps> = ({

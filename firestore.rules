@@ -9,7 +9,7 @@ service cloud.firestore {
 
     // Validation primitives
     function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_:\\-]+$');
     }
 
     function incoming() {
@@ -28,7 +28,19 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Entity validation functions
+    function isAdmin() {
+      return isSignedIn() &&
+             request.auth.token.email_verified == true &&
+             (
+               request.auth.token.email == 'jeanpierre.nouhailler@gmail.com' ||
+               (
+                 exists(/databases/$(database)/documents/admins/$(request.auth.uid)) &&
+                 get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true
+               )
+             );
+    }
+
+    // Existing learner entity validation functions
     function isValidUserProfile(data, userId) {
       return data.userId == request.auth.uid &&
              data.userId == userId &&
@@ -43,6 +55,7 @@ service cloud.firestore {
              (!('questionsSolved' in data) || (data.questionsSolved is number && data.questionsSolved >= 0)) &&
              (!('averageScore' in data) || (data.averageScore is number && data.averageScore >= 0 && data.averageScore <= 100)) &&
              (!('readinessIndex' in data) || (data.readinessIndex is number && data.readinessIndex >= 0 && data.readinessIndex <= 100)) &&
+             (!('preferredLanguage' in data) || (data.preferredLanguage in ['fr', 'en'])) &&
              (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
              (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
@@ -94,6 +107,106 @@ service cloud.firestore {
              (!('reviewedAt' in data) || (data.reviewedAt is string && data.reviewedAt.size() <= 64));
     }
 
+    // Content Audit admin entity validation functions
+    function isValidAdminAccount(data, docUid) {
+      return data.uid == docUid &&
+             data.uid is string && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.role == 'admin' &&
+             data.active is bool &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 120));
+    }
+
+    function isValidAuditContentState(data, contentId) {
+      return data.id == contentId &&
+             data.id is string && data.id.size() <= 128 &&
+             data.contentType in ['certification', 'domain', 'quiz_question', 'exam_question', 'flashcard', 'glossary'] &&
+             data.editorialStatus is string && data.editorialStatus.size() <= 48 &&
+             data.validationStatus is string && data.validationStatus.size() <= 48 &&
+             data.activeVersion is number && data.activeVersion >= 1 &&
+             data.contentHash is string && data.contentHash.size() <= 128 &&
+             (!('archived' in data) || data.archived is bool);
+    }
+
+    function isValidCertificationReference(data, certId) {
+      return data.id == certId &&
+             data.id is string && data.id.size() <= 64 &&
+             data.code is string && data.code.size() <= 32 &&
+             data.title is string && data.title.size() <= 160 &&
+             data.provider is string && data.provider.size() <= 32 &&
+             data.officialStatus in ['active', 'announced_retirement', 'retired', 'suspended', 'historical'];
+    }
+
+    function isValidSourceReference(data, sourceId) {
+      return data.id == sourceId &&
+             data.id is string && data.id.size() <= 128 &&
+             data.title is string && data.title.size() <= 240 &&
+             data.vendor is string && data.vendor.size() <= 64 &&
+             data.url is string && data.url.size() <= 2048 &&
+             data.sourceType is string && data.sourceType.size() <= 48 &&
+             data.priorityLevel is number && data.priorityLevel >= 1 && data.priorityLevel <= 4;
+    }
+
+    function isValidContentEvidence(data, evidenceId) {
+      return data.id == evidenceId &&
+             data.contentId is string && data.contentId.size() <= 128 &&
+             data.sourceId is string && data.sourceId.size() <= 128 &&
+             data.claimSummary is string && data.claimSummary.size() <= 512 &&
+             (!('excerpt' in data) || (data.excerpt is string && data.excerpt.size() <= 4096));
+    }
+
+    function isValidAuditRun(data, runId) {
+      return data.id == runId &&
+             data.scopeType is string && data.scopeType.size() <= 48 &&
+             data.status in ['running', 'completed', 'failed', 'cancelled'] &&
+             data.startedAt is string && data.startedAt.size() <= 64 &&
+             data.initiatedBy is string && data.initiatedBy.size() <= 256;
+    }
+
+    function isValidAuditFinding(data, findingId) {
+      return data.id == findingId &&
+             data.runId is string && data.runId.size() <= 128 &&
+             data.contentId is string && data.contentId.size() <= 128 &&
+             data.category is string && data.category.size() <= 64 &&
+             data.severity in ['critical', 'high', 'medium', 'low'] &&
+             data.status in ['new', 'analyzing', 'to_fix', 'corrected', 'pending_validation', 'resolved', 'dismissed'] &&
+             data.title is string && data.title.size() <= 240;
+    }
+
+    function isValidHumanReview(data, reviewId) {
+      return data.id == reviewId &&
+             data.contentId is string && data.contentId.size() <= 128 &&
+             data.contentVersion is number && data.contentVersion >= 1 &&
+             data.reviewerUid == request.auth.uid &&
+             data.decision in ['approved', 'approved_with_reserves', 'rejected', 'needs_source'] &&
+             data.reviewedAt is string && data.reviewedAt.size() <= 64;
+    }
+
+    function isValidContentRevision(data, revisionId) {
+      return data.id == revisionId &&
+             data.contentId is string && data.contentId.size() <= 128 &&
+             data.versionNumber is number && data.versionNumber >= 1 &&
+             data.contentHash is string && data.contentHash.size() <= 128 &&
+             data.authorUid == request.auth.uid &&
+             data.snapshotJson is string && data.snapshotJson.size() <= 32768 &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidAuditSettings(data, settingId) {
+      return data.id == settingId &&
+             data.activeAiModel is string && data.activeAiModel.size() <= 128 &&
+             data.freshnessMaxDays is number && data.freshnessMaxDays >= 1 && data.freshnessMaxDays <= 730 &&
+             data.dailyAiCallCap is number && data.dailyAiCallCap >= 1 && data.dailyAiCallCap <= 1000;
+    }
+
+    function isValidPublishedContentOverride(data, contentId) {
+      return data.id == contentId &&
+             data.contentType is string && data.contentType.size() <= 32 &&
+             data.approvedVersion is number && data.approvedVersion >= 1 &&
+             data.approvedAt is string && data.approvedAt.size() <= 64 &&
+             (!('patchJson' in data) || (data.patchJson is string && data.patchJson.size() <= 32768));
+    }
+
     // Connection testing doc
     match /test/connection {
       allow get: if true;
@@ -106,14 +219,12 @@ service cloud.firestore {
       allow update: if isOwner(userId) && isValidUserProfile(incoming(), userId) && incoming().userId == existing().userId;
       allow delete: if false;
 
-      // Subcollection: Certification progressions
       match /certifications/{certId} {
         allow get, list: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidId(certId) && isValidCertificationProgress(incoming(), userId);
         allow delete: if isOwner(userId) && isValidId(certId);
       }
 
-      // Subcollection: Exam attempts
       match /attempts/{attemptId} {
         allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && isValidId(attemptId) && isValidExamAttempt(incoming(), userId);
@@ -121,12 +232,79 @@ service cloud.firestore {
         allow delete: if isOwner(userId) && isValidId(attemptId);
       }
 
-      // Subcollection: Flashcard spaced repetition reviews
       match /reviews/{reviewId} {
         allow get, list: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidId(reviewId) && isValidFlashcardReview(incoming(), userId);
         allow delete: if isOwner(userId) && isValidId(reviewId);
       }
+    }
+
+    // --- Content Audit Governance Collections (Strict Admin Only) ---
+    match /admins/{uid} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(uid) && isValidAdminAccount(incoming(), uid);
+      allow delete: if isAdmin() && uid != request.auth.uid;
+    }
+
+    match /auditContentState/{contentId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(contentId) && isValidAuditContentState(incoming(), contentId);
+      allow delete: if false;
+    }
+
+    match /auditCertifications/{certId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(certId) && isValidCertificationReference(incoming(), certId);
+      allow delete: if false;
+    }
+
+    match /auditSources/{sourceId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(sourceId) && isValidSourceReference(incoming(), sourceId);
+      allow delete: if isAdmin() && isValidId(sourceId);
+    }
+
+    match /auditEvidence/{evidenceId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(evidenceId) && isValidContentEvidence(incoming(), evidenceId);
+      allow delete: if isAdmin() && isValidId(evidenceId);
+    }
+
+    match /auditRuns/{runId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(runId) && isValidAuditRun(incoming(), runId);
+      allow delete: if false;
+    }
+
+    match /auditFindings/{findingId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(findingId) && isValidAuditFinding(incoming(), findingId);
+      allow delete: if false;
+    }
+
+    match /auditReviews/{reviewId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin() && isValidId(reviewId) && isValidHumanReview(incoming(), reviewId);
+      allow update, delete: if false;
+    }
+
+    match /auditRevisions/{revisionId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin() && isValidId(revisionId) && isValidContentRevision(incoming(), revisionId);
+      allow update, delete: if false;
+    }
+
+    match /auditSettings/{settingId} {
+      allow get, list: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(settingId) && isValidAuditSettings(incoming(), settingId);
+      allow delete: if false;
+    }
+
+    // Human-approved live content patches (no PII, read by app runtime, written only by admins)
+    match /publishedContent/{contentId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() && isValidId(contentId) && isValidPublishedContentOverride(incoming(), contentId);
+      allow delete: if isAdmin() && isValidId(contentId);
     }
   }
 }

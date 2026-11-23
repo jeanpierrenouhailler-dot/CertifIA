@@ -15,7 +15,8 @@ import {
   Scale, 
   Sparkles,
   Target,
-  RotateCcw
+  RotateCcw,
+  ShieldCheck
 } from 'lucide-react';
 import { AppScreen } from '../types';
 import { getLocalizedCertifications } from '../data/localizedCertifications';
@@ -25,6 +26,7 @@ import { TOTAL_FLASHCARDS_COUNT } from '../data/flashcardsData';
 import { useOnboardingTour } from '../context/OnboardingTourContext';
 import { useTranslation } from '../i18n';
 import { useAccessibleModal } from '../hooks/useAccessibleModal';
+import { useAuth } from '../context/AuthContext';
 
 interface CommandPaletteModalProps {
   isOpen: boolean;
@@ -54,6 +56,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useAccessibleModal({ isOpen, onClose, initialFocusRef: inputRef });
   const { t, i18n } = useTranslation(['navigation', 'common']);
+  const { isAdmin } = useAuth();
   const { startTour } = useOnboardingTour();
   const lang = (i18n.language === 'en' ? 'en' : 'fr');
 
@@ -215,6 +218,21 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
         onClose();
       },
     },
+    ...(isAdmin
+      ? [
+          {
+            id: 'act-audit',
+            type: 'action',
+            title: t('navigation:items.audit.label', 'Audit du contenu (Administration)'),
+            category: t('navigation:categories.plus', 'Système'),
+            icon: ShieldCheck,
+            onSelect: () => {
+              onNavigate('audit');
+              onClose();
+            },
+          },
+        ]
+      : []),
     ...(onOpenResetData
       ? [
           {

@@ -169,3 +169,11 @@ Les traductions sont découpées en **13 namespaces sémantiques** (totalisant *
 5. Ajouter l'option dans `src/components/LanguageSelector.tsx` (`{ code: 'es', label: 'Español', flag: '🇪🇸' }`).
 6. Exécuter le script de parité `npx tsx src/i18n/verifyI18nParity.ts` pour valider l'intégrité 1:1.
 
+---
+
+## 10. Espace d'Administration « Audit du contenu » (`v2.10.0`)
+Décrit en détail dans `AUDIT_CONTENT_ARCHITECTURE.md`, cet espace dédié aux administrateurs authentifiés assure la gouvernance complète des **2 862 éléments pédagogiques** indexés (`6` certifications, `28` domaines, `4` QCM scénarisés, `4` questions d'examen blanc, `2 800` flashcards, `20` entrées de glossaire) :
+* **Proxy Backend Express (`/server.ts`)** : vérification RS256 des jetons Firebase ID, liste blanche d'administrateurs, contrôle SSRF des sources officielles (`/api/audit/check-source`) et audit IA via `@google/genai` (`gemini-4-hydrogen`) sur `/api/audit/analyze` sans aucune exposition de clé API côté client.
+* **11 sous-vues d'administration (`src/components/audit/`)** : Tableau de bord dynamique (12 compteurs et 5 indicateurs mesurés), Inventaire complet, Fiche détaillée éditable avec preuves documentaires, Certifications & alertes de retrait répercutées côté apprenant (`PublishedContentContext`), Questions/QCM avec simulateur bac à sable apprenant isolé, Flashcards, Glossaire, Sources documentaires (Priorités 1 à 4), Moteur d'audit 6 périmètres & File d'anomalies, Atelier de validation humaine avec règles bloquantes, Historique/Rollback & Exports CSV/JSON.
+* **Règle d'or** : aucune suggestion générée par IA n'est publiée ou validée automatiquement ; toute révision invalide la validation antérieure et requiert une décision humaine traçable avant publication dans `publishedContent`.
+

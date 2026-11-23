@@ -39,6 +39,9 @@ import { GuideProvider, useGuide } from './context/GuideContext';
 import { PwaProvider, usePwa } from './context/PwaContext';
 import { OnboardingTourProvider } from './context/OnboardingTourContext';
 import { OnboardingTourModal } from './components/OnboardingTourModal';
+import { PublishedContentProvider } from './context/PublishedContentContext';
+import { AuditProvider } from './context/AuditContext';
+import { ContentAuditWorkspace } from './components/audit/ContentAuditWorkspace';
 
 export default function App() {
   return (
@@ -47,9 +50,13 @@ export default function App() {
         <GuideProvider>
           <PwaProvider>
             <AuthProvider>
-              <ProgressProvider>
-                <AppContent />
-              </ProgressProvider>
+              <PublishedContentProvider>
+                <AuditProvider>
+                  <ProgressProvider>
+                    <AppContent />
+                  </ProgressProvider>
+                </AuditProvider>
+              </PublishedContentProvider>
             </AuthProvider>
           </PwaProvider>
         </GuideProvider>
@@ -64,7 +71,7 @@ function AppContent() {
       const params = new URLSearchParams(window.location.search);
       const viewParam = params.get('view') || params.get('screen');
       if (viewParam === 'landing' || window.location.hash === '#landing') return 'landing';
-      if (viewParam && ['today', 'recommendation', 'catalogue', 'quiz', 'flashcards', 'exam', 'analytics', 'profile', 'glossary', 'assistant'].includes(viewParam)) {
+      if (viewParam && ['today', 'recommendation', 'catalogue', 'quiz', 'flashcards', 'exam', 'analytics', 'profile', 'glossary', 'assistant', 'audit'].includes(viewParam)) {
         return viewParam as AppScreen;
       }
     }
@@ -288,6 +295,12 @@ function AppContent() {
             <GlossaryView
               onNavigate={(screen) => setCurrentScreen(screen)}
               onOpenBlueprint={handleOpenBlueprint}
+            />
+          )}
+
+          {currentScreen === 'audit' && (
+            <ContentAuditWorkspace
+              onNavigate={(screen) => setCurrentScreen(screen)}
             />
           )}
         </main>

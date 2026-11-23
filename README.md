@@ -52,6 +52,7 @@
 | ⚙️ **Paramètres Système & Auto-Update** | `SystemSettingsModal.tsx` | Affiche la **Date de sortie** (`16 Novembre 2026`), la **Dernière vérification**, le bouton **« Vérifier les mises à jour »**, le bouton **« Forcer la mise à jour »** et le commutateur de mises à jour automatiques. |
 | 💡 **Onboarding Contextuel & Infobulles** | `ScreenGuideBanner.tsx`, `InfoTooltip.tsx` | Bandeau explicatif rétractable en 3 étapes + infobulles d’aide (?) intégrées sur **chacun des 10 écrans** de l’application, synchronisés avec le mode Guide Novice. |
 | ⚖️ **Onboarding & Mentions Légales** | `LegalOnboardingModal.tsx` | Acceptation obligatoire à la première ouverture précisant explicitement que **l’éditeur et le concepteur ne sont pas responsables des données, questions ou réponses fournies**. |
+| 🛡️ **Audit du contenu (Admin)** | `ContentAuditWorkspace.tsx`, `server.ts` | Espace réservé aux administrateurs vérifiés pour auditer les **2 862 contenus**, vérifier les sources officielles, lancer des contrôles déterministes / IA (`gemini-4-hydrogen`) et valider humainement avant publication ([architecture](AUDIT_CONTENT_ARCHITECTURE.md)). |
 
 ---
 

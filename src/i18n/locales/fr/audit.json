@@ -1,0 +1,25 @@
+{
+  "title": "Audit du contenu",
+  "subtitle": "Gouvernance éditoriale, traçabilité documentaire, vérification IA et validation humaine",
+  "advisoryBanner": "Gouvernance stricte : l’IA assiste l’audit mais ne publie et ne valide jamais de contenu automatiquement.",
+  "gate": {
+    "title": "Espace réservé aux administrateurs",
+    "signInPrompt": "Connectez-vous avec un compte Google administrateur vérifié pour accéder à l’Audit du contenu.",
+    "deniedPrompt": "Votre compte ({{email}}) ne dispose pas des droits d’administration requis pour accéder à cet espace.",
+    "backToApp": "Retour à l’application",
+    "signInButton": "Connexion administrateur Google"
+  },
+  "tabs": {
+    "dashboard": "Tableau de bord",
+    "inventory": "Inventaire",
+    "certifications": "Certifications",
+    "quizzes": "Questions & QCM",
+    "flashcards": "Flashcards",
+    "glossary": "Glossaire",
+    "sources": "Sources doc",
+    "findings": "Audits & Anomalies",
+    "validations": "Validations",
+    "history": "Historique",
+    "settings": "Paramètres"
+  }
+}

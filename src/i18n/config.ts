@@ -15,6 +15,7 @@ import frAssistant from './locales/fr/assistant.json';
 import frSettings from './locales/fr/settings.json';
 import frErrors from './locales/fr/errors.json';
 import frNotifications from './locales/fr/notifications.json';
+import frAudit from './locales/fr/audit.json';
 
 // English namespaces
 import enCommon from './locales/en/common.json';
@@ -30,6 +31,7 @@ import enAssistant from './locales/en/assistant.json';
 import enSettings from './locales/en/settings.json';
 import enErrors from './locales/en/errors.json';
 import enNotifications from './locales/en/notifications.json';
+import enAudit from './locales/en/audit.json';
 
 export type SupportedLanguage = 'fr' | 'en';
 
@@ -50,6 +52,7 @@ export const resources = {
     settings: frSettings,
     errors: frErrors,
     notifications: frNotifications,
+    audit: frAudit,
   },
   en: {
     common: enCommon,
@@ -65,6 +68,7 @@ export const resources = {
     settings: enSettings,
     errors: enErrors,
     notifications: enNotifications,
+    audit: enAudit,
   },
 } as const;
 

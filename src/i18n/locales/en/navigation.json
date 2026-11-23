@@ -154,6 +154,11 @@
       "shortLabel": "Guided Tour",
       "description": "Progressive automated discovery tour of the CertifIA platform"
     },
+    "audit": {
+      "label": "Content Audit",
+      "shortLabel": "Content Audit",
+      "description": "Editorial governance, official sources, AI-assisted audit, and human validation"
+    },
     "resetData": {
       "label": "Reset All Data",
       "shortLabel": "Reset Data",
@@ -263,6 +268,13 @@
       "step1": "1. Edit your display name or sign in with Google to sync study progress across devices.",
       "step2": "2. Choose your priority certification goal from the active tracks list.",
       "step3": "3. Open “Help & GDPR” to inspect stored data and export your learning history as JSON."
+    },
+    "audit": {
+      "title": "Content Audit & Editorial Governance",
+      "summary": "Administrator workspace to inventory, source-ground, AI-audit, and human-validate all pedagogical content.",
+      "step1": "1. Review real inventory counters and priority alerts on the Dashboard.",
+      "step2": "2. Run deterministic or AI-assisted audits and verify official documentation links.",
+      "step3": "3. Human-review, edit, or roll back items in Validations before live publishing."
     }
   }
 }

@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { 
   type User, 
   onAuthStateChanged 
 } from 'firebase/auth';
 import { 
   doc, 
+  getDoc,
   onSnapshot, 
-  setDoc,
   updateDoc 
 } from 'firebase/firestore';
 import { 
@@ -21,11 +21,16 @@ import {
 } from '../lib/firebase';
 import type { UserProfile } from '../types';
 
+const PRIMARY_ADMIN_EMAIL = 'jeanpierre.nouhailler@gmail.com';
+
 interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
   isFirebaseConnected: boolean;
+  isAdmin: boolean;
+  adminChecking: boolean;
+  getIdToken: () => Promise<string | null>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateUserGoal: (targetExam: string, targetExamTitle: string) => Promise<void>;
@@ -40,6 +45,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isFirebaseConnected, setIsFirebaseConnected] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [adminChecking, setAdminChecking] = useState<boolean>(false);
 
   // Check connection on mount
   useEffect(() => {
@@ -56,23 +63,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(currentUser);
 
       if (currentUser) {
+        // Evaluate admin privileges securely without failing for normal learners
+        setAdminChecking(true);
+        const verifiedEmail = Boolean(currentUser.emailVerified);
+        const normalizedEmail = (currentUser.email || '').trim().toLowerCase();
+        if (verifiedEmail && normalizedEmail === PRIMARY_ADMIN_EMAIL) {
+          setIsAdmin(true);
+          setAdminChecking(false);
+        } else if (verifiedEmail) {
+          getDoc(doc(db, 'admins', currentUser.uid))
+            .then((snap) => {
+              setIsAdmin(snap.exists() && snap.data()?.active === true);
+            })
+            .catch(() => {
+              setIsAdmin(false);
+            })
+            .finally(() => {
+              setAdminChecking(false);
+            });
+        } else {
+          setIsAdmin(false);
+          setAdminChecking(false);
+        }
+
         const userDocRef = doc(db, 'users', currentUser.uid);
 
-        // Ensure user profile document exists or is initialized in Firestore
         try {
           await syncUserProfile(currentUser);
         } catch (err) {
           console.warn('[AuthContext] syncUserProfile fallback notice:', err);
         }
 
-        // Real-time snapshot listener on the user's document
         unsubscribeFirestore = onSnapshot(
           userDocRef,
           (snapshot) => {
             if (snapshot.exists()) {
               setUserProfile(snapshot.data() as UserProfile);
             } else {
-              // Create default doc if missing
               syncUserProfile(currentUser).catch(console.error);
             }
             setLoading(false);
@@ -89,6 +116,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
       } else {
         setUserProfile(null);
+        setIsAdmin(false);
+        setAdminChecking(false);
         if (unsubscribeFirestore) {
           unsubscribeFirestore();
           unsubscribeFirestore = null;
@@ -103,6 +132,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         unsubscribeFirestore();
       }
     };
+  }, []);
+
+  const getIdToken = useCallback(async (): Promise<string | null> => {
+    if (!auth.currentUser) return null;
+    try {
+      return await auth.currentUser.getIdToken();
+    } catch {
+      return null;
+    }
   }, []);
 
   const loginWithGoogle = async () => {
@@ -124,6 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await logOut();
       setUser(null);
       setUserProfile(null);
+      setIsAdmin(false);
     } catch (error) {
       console.error('[AuthContext] Logout error:', error);
       throw error;
@@ -190,6 +229,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         userProfile,
         loading,
         isFirebaseConnected,
+        isAdmin,
+        adminChecking,
+        getIdToken,
         loginWithGoogle,
         logout,
         updateUserGoal,

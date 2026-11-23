@@ -154,6 +154,11 @@
       "shortLabel": "Visite guidée",
       "description": "Parcours de découverte progressive et automatique de l’interface"
     },
+    "audit": {
+      "label": "Audit du contenu",
+      "shortLabel": "Audit contenu",
+      "description": "Gouvernance éditoriale, sources officielles, audit IA et validation humaine"
+    },
     "resetData": {
       "label": "Remettre à zéro les données",
       "shortLabel": "Remise à zéro",
@@ -263,6 +268,13 @@
       "step1": "1. Modifiez votre nom d’affichage ou connectez votre compte Google pour sauvegarder dans le Cloud.",
       "step2": "2. Définissez votre certification objectif prioritaire parmi les pistes proposées.",
       "step3": "3. Ouvrez « Aide & RGPD » pour consulter les données stockées et exporter votre historique au format JSON."
+    },
+    "audit": {
+      "title": "Audit du contenu & Gouvernance éditoriale",
+      "summary": "Espace administrateur pour inventorier, vérifier contre les sources officielles, auditer et valider humainement tous les contenus pédagogiques.",
+      "step1": "1. Consultez les compteurs d’inventaire et alertes prioritaires sur le Tableau de bord.",
+      "step2": "2. Lancez un audit déterministe ou assisté par IA puis vérifiez les sources officielles.",
+      "step3": "3. Validez ou corrigez humainement chaque fiche dans l’onglet Validations avant publication."
     }
   }
 }

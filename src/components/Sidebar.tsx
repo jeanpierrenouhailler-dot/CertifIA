@@ -24,7 +24,8 @@ import {
   HelpCircle,
   FileText,
   Download,
-  RotateCcw
+  RotateCcw,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usePwa } from '../context/PwaContext';
@@ -70,7 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed: controlledCollapsed,
   onToggleCollapse: controlledToggleCollapse,
 }) => {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, isAdmin } = useAuth();
   const { isInstalled, promptInstall } = usePwa();
   const { isGuideModeActive, toggleGuideMode } = useGuide();
   const { versionInfo } = useSystemUpdate();
@@ -530,6 +531,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span className="truncate">{t('navigation:items.pwa.label', 'Installer l’application')}</span>
+                  </button>
+                )}
+
+                {isAdmin && (
+                  <button
+                    id="sidebar-audit-admin-btn"
+                    onClick={() => handleNav('audit')}
+                    className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold ${
+                      currentScreen === 'audit'
+                        ? 'bg-violet-600 text-white'
+                        : 'text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/20'
+                    }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{t('navigation:items.audit.shortLabel', 'Audit contenu')}</span>
+                    <span className="ml-auto text-[9px] font-mono px-1.5 py-0.2 rounded bg-violet-500/15 text-violet-600 dark:text-violet-300">
+                      Admin
+                    </span>
                   </button>
                 )}
 

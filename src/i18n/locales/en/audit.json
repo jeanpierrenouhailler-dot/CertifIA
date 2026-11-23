@@ -1,0 +1,25 @@
+{
+  "title": "Content Audit",
+  "subtitle": "Editorial governance, official source grounding, AI-assisted auditing, and human validation",
+  "advisoryBanner": "Strict Governance: AI assists the audit workflow but never auto-approves or auto-publishes content.",
+  "gate": {
+    "title": "Administrator-Only Workspace",
+    "signInPrompt": "Sign in with a verified Google administrator account to access Content Audit.",
+    "deniedPrompt": "Your account ({{email}}) does not hold administrator privileges for this governance workspace.",
+    "backToApp": "Back to Application",
+    "signInButton": "Administrator Google Sign-In"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "inventory": "Inventory",
+    "certifications": "Certifications",
+    "quizzes": "Questions & MCQs",
+    "flashcards": "Flashcards",
+    "glossary": "Glossary",
+    "sources": "Doc Sources",
+    "findings": "Audits & Findings",
+    "validations": "Validations",
+    "history": "History",
+    "settings": "Settings"
+  }
+}

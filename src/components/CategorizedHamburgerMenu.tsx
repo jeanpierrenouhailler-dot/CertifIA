@@ -38,6 +38,7 @@ import { NAV_CATEGORIES, NAV_ITEMS, NavCategoryId, NavItemConfig } from '../navi
 import { LanguageSelector } from './LanguageSelector';
 import { useTranslation } from '../i18n';
 import { useAccessibleModal } from '../hooks/useAccessibleModal';
+import { useAuth } from '../context/AuthContext';
 
 interface CategorizedHamburgerMenuProps {
   isOpen: boolean;
@@ -73,6 +74,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
   const { isInstalled, promptInstall } = usePwa();
   const { versionInfo } = useSystemUpdate();
   const { startTour } = useOnboardingTour();
+  const { user, isAdmin } = useAuth();
   const drawerRef = useAccessibleModal({ isOpen, onClose });
 
   if (!isOpen) return null;
@@ -178,6 +180,7 @@ export const CategorizedHamburgerMenu: React.FC<CategorizedHamburgerMenuProps> =
             const localizedCatName = t(`navigation:categories.${catId}`, cat.label);
             const items = NAV_ITEMS.filter((item) => {
               if (item.category !== catId) return false;
+              if (item.adminOnly && (!user || !isAdmin)) return false;
               if (!q) return true;
               const itemKey = item.id.replace('nav-', '');
               const itemLabel = t(`navigation:items.${itemKey}.label`, item.label).toLowerCase();
